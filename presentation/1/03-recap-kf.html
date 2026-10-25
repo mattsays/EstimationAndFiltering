@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>KF Recap</title>
+  <link rel="stylesheet" href="slideui.css">
+  <script src="slideui.js" defer></script>
+</head>
+<body>
+
+<div class="slide-layout" style="display: flex; flex-direction: column; padding: 40px 48px;">
+  
+  <!-- HEADER -->
+  <div style="flex-shrink: 0;">
+    <h1 class="title" style="margin-bottom: 0.25rem;">Kalman Filter Recap</h1>
+  </div>
+
+  <!-- MAIN MIDDLE CONTENT -->
+  <!-- margin-top: 60px crea lo spazio esatto per far sedere il blocco giallo "Measurement Model" -->
+  <div style="flex: 1; display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 60px; position: relative;">
+    
+    <!-- STEP 1: PREDICTION -->
+    <div class="panel panel-primary" style="flex: 1; padding: 20px; margin: 0; position: relative; z-index: 10;">
+      <p class="text-xl text-primary font-semibold" style="margin-bottom: 8px;">1. Prediction \(k \to k+1\)</p>
+      <p class="text-lg text-muted" style="margin-bottom: 12px; font-size: 1.1rem;">Predicts a-priori moments (mean & covariance) for step \(k+1\).</p>
+      <div class="math-block" style="padding: 12px; margin: 0; background: white; border-radius: 12px; font-size: 1.25rem;">
+        \[ \hat{x}_{k+1|k} = F_k\hat{x}_{k|k} + G_ku_k \]
+        \[ P_{k+1|k} = F_kP_{k|k}F_k' + Q_k \]
+      </div>
+    </div>
+
+    <!-- FORWARD ARROW -->
+    <div data-step="1" style="display: flex; flex-direction: column; align-items: center; width: 140px; flex-shrink: 0; z-index: 5;">
+      <span style="background: #eff6ff; color: #2563eb; padding: 4px 10px; border-radius: 8px; border: 1px solid #bfdbfe; font-family: monospace; font-size: 1rem; font-weight: bold; margin-bottom: 4px;">\(\hat{x}_{k+1|k}, P_{k+1|k}\)</span>
+      <svg style="width: 40px; height: 40px; color: #3b82f6;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+      <span class="text-muted" style="margin-top: 4px; font-size: 0.75rem; text-transform: uppercase; font-weight: bold; letter-spacing: 0.05em;">2 A-Priori Moments</span>
+    </div>
+
+    <!-- STEP 2 WRAPPER -->
+    <div style="flex: 1; position: relative; display: flex; flex-direction: column; z-index: 10;">
+      
+      <!-- MEASUREMENT MODEL (Absolute) -->
+      <div data-step="1" style="position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; width: 100%; margin-bottom: 8px;">
+        <div class="panel" style="background: #fef9c3; border: 2px solid #fde047; padding: 8px 16px; text-align: center; margin: 0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border-radius: 12px;">
+          <span style="color: #854d0e; font-weight: bold; font-size: 0.95rem;">Measurement Model</span><br>
+          <span style="color: #713f12; font-weight: bold; font-family: monospace; font-size: 1.1rem; display: inline-block; margin-top: 2px;">\( z_{k+1} = H_{k+1} x_{k+1} + v_{k+1} \)</span>
+        </div>
+        <svg style="width: 28px; height: 28px; color: #eab308; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+      </div>
+
+      <!-- STEP 2: CORRECTION -->
+      <div class="panel panel-accent" data-step="1" style="padding: 20px; margin: 0;">
+        <p class="text-xl text-accent font-semibold" style="margin-bottom: 8px;">2. Correction of \(k+1\) Prediction</p>
+        <p class="text-lg text-muted" style="margin-bottom: 12px; font-size: 1.1rem;">Updates a-posteriori moments via LMMSE.</p>
+        <div class="math-block" style="padding: 12px; margin: 0; background: white; border-radius: 12px; font-size: 1.25rem;">
+          \[ K_{k+1} = P_{k+1|k}H_{k+1}'S_{k+1}^{-1} \]
+          \[ \hat{x}_{k+1|k+1} = \hat{x}_{k+1|k} + K_{k+1}(z_{k+1} - \hat{z}_{k+1|k}) \]
+          \[ P_{k+1|k+1} = P_{k+1|k} - K_{k+1} S_{k+1} K_{k+1}' \]
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM U-TURN ARROW -->
+  <div data-step="2" style="position: relative; width: 60%; height: 40px; margin: 0 auto 24px auto; border: 3px dashed #6366f1; border-top: none; border-radius: 0 0 40px 40px; display: flex; justify-content: center; align-items: flex-end; z-index: 1; flex-shrink: 0;">
+    <svg style="position: absolute; top: -12px; left: -13.5px; width: 24px; height: 24px; color: #6366f1;" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2l8 12H4z"/>
+    </svg>
+    <!-- translateY(50%) sposta il blocco verso il basso, quindi margin-bottom: 24px sul parent compensa -->
+    <div style="background: white; padding: 6px 20px; border-radius: 99px; border: 2px solid #e2e8f0; transform: translateY(50%); display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+      <span class="font-semibold" style="color: #334155; font-size: 1rem;">Next Step \(k+1 \to k+2\)</span>
+      <span style="color: #4f46e5; background: #e0e7ff; padding: 2px 8px; border-radius: 6px; border: 1px solid #c7d2fe; font-family: monospace; font-weight: bold; font-size: 1rem;">\(\hat{x}_{k+1|k+1}, P_{k+1|k+1}\)</span>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

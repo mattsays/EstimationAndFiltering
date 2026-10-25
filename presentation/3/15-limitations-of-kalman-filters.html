@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Limitations of Kalman filters</title>
+<link rel="stylesheet" href="slideui.css">
+<script src="slideui.js" defer></script>
+</head>
+<body>
+
+<div class="slide-layout">
+
+<section class="slide build" data-steps="5">
+  <h1>Limitations of Kalman filters</h1>
+  <div class="body">
+    <div class="strip">
+      <div class="math" style="font-size:50px;text-align:center">p(x<sub>k</sub> | z<sup>k</sup>) ≈ N(x̂<sub>k|k</sub>, P<sub>k|k</sub>)</div>
+      <p class="lead" style="margin:10px 0 0">Every Kalman-type filter carries the belief in two
+        numbers. That choice has consequences, whatever the model.</p>
+    </div>
+    <div class="limit-grid">
+      <div class="panel" data-step="2">
+        <h3>A Gaussian is imposed</h3>
+        <p>The posterior is replaced by its first two moments at every step. A nonlinear map of a
+          Gaussian is <b>not</b> Gaussian: skew and multiple modes are discarded.</p>
+      </div>
+      <div class="panel" data-step="3">
+        <h3>Optimal only among linear estimators</h3>
+        <p>The correction is linear in the innovation, so the filter is <b>LMMSE</b>, not MMSE.
+          Even exact moments do not yield the true conditional mean.</p>
+      </div>
+      <div class="panel" data-step="4">
+        <h3>No hard constraints</h3>
+        <p>A Gaussian puts probability on <b>every</b> value, including impossible ones: a negative
+          distance, a pose inside a wall. Clamping the estimate fixes the number, not the
+          covariance.</p>
+      </div>
+    </div>
+    <div class="takeaway" data-step="5" style="font-size:25px">When one mean and one covariance are
+      not enough, change the representation: <b>mixtures of Gaussians</b>, <b>particle filters</b>,
+      or <b>different coordinates</b>.</div>
+  </div>
+</section>
+
+</div>
+
+</body>
+</html>

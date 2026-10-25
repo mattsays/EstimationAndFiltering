@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The four filters side by side</title>
+<link rel="stylesheet" href="slideui.css">
+<script src="slideui.js" defer></script>
+</head>
+<body>
+
+<div class="slide-layout">
+
+<section class="slide build comparison-slide" data-steps="4">
+  <h1>The four filters side by side</h1>
+  <div class="body">
+    <div class="cmp">
+      <!-- the row labels -->
+      <div class="card">
+        <div class="cmp-head"></div>
+        <div class="cmp-colhead"></div>
+        <div class="cmp-row" data-step="2"><span class="lab">Accuracy</span></div>
+        <div class="cmp-row" data-step="3"><span class="lab">HyperParameters</span></div>
+        <div class="cmp-row" data-step="4"><span class="lab">P stays positive definite</span></div>
+      </div>
+
+      <!-- the linear filter -->
+      <div class="card group">
+        <div class="cmp-head">Linear</div>
+        <div class="cmp-colhead"><span>KF</span></div>
+        <div class="cmp-row" data-step="2"><span class="v">exact</span></div>
+        <div class="cmp-row" data-step="3"><span class="v">Q, R</span></div>
+        <div class="cmp-row" data-step="4"><span class="v">yes</span></div>
+      </div>
+
+      <!-- the nonlinear filters -->
+      <div class="card group">
+        <div class="cmp-head" style="color:var(--accent2)">Non-Linear</div>
+        <div class="cmp-colhead three"><span>EKF</span><span>UKF</span><span>CKF</span></div>
+        <div class="cmp-row three" data-step="2">
+          <span class="v">1st order</span><span class="v">3rd order</span><span class="v">3rd order</span></div>
+        <div class="cmp-row three" data-step="3">
+          <span class="v">Q, R</span><span class="v">Q, R, κ</span><span class="v">Q, R</span></div>
+        <div class="cmp-row three" data-step="4">
+          <span class="v">yes</span><span class="v">not if κ &lt; 0</span><span class="v">yes</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div>
+
+</body>
+</html>

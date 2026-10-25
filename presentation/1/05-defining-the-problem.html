@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>The Unscented Transform Intuition</title>
+  <link rel="stylesheet" href="slideui.css">
+  <script src="slideui.js" defer></script>
+  <style>
+    .arrow { font-size: 2rem; font-weight: bold; line-height: 1; color: #94a3b8; display: inline-block; }
+    .arrow-right { animation: nudge-x 1.2s ease-in-out infinite; }
+    .arrow-down { animation: nudge-y 1.2s ease-in-out infinite; }
+    @keyframes nudge-x { 0%, 100% { transform: translateX(-4px); } 50% { transform: translateX(4px); } }
+    @keyframes nudge-y { 0%, 100% { transform: translateY(-4px); } 50% { transform: translateY(4px); } }
+  </style>
+</head>
+<body>
+
+<div class="slide-layout" style="padding: 36px 48px; justify-content: flex-start; position: relative;">
+
+  <!-- HEADER -->
+  <div style="margin-bottom: 20px;">
+    <h1 class="title" style="font-size: 2.75rem; margin-bottom: 0.25rem;">The Problem</h1>
+    <p class="subtitle" style="font-size: 1.5rem; margin-bottom: 0;">Pushing a Gaussian through a non-linear function</p>
+  </div>
+
+  <!-- ROW 1: previous state -> f(.) -> next state -->
+  <div style="display: flex; align-items: stretch; gap: 16px;">
+
+    <!-- Previous state -->
+    <div class="panel panel-primary" style="flex: 1.3; padding: 20px; margin: 0;">
+      <p class="text-xl text-primary" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">Previous state</p>
+      <p class="text-lg text-muted" style="font-size: 1.05rem; margin-bottom: 10px;">A Gaussian: its two moments (mean and covariance) describe it completely.</p>
+      <div class="math-block" style="padding: 12px; margin: 0; font-size: 1.1rem;">
+        \(\displaystyle x_k \sim \mathcal{N}(\hat{x}_{k|k},\, P_{k|k}) \)
+      </div>
+    </div>
+
+    <!-- Arrow 1 (Step 1) -->
+    <div data-step="1" style="width: 40px; align-self: center; display: flex; justify-content: center;">
+      <span class="arrow arrow-right">→</span>
+    </div>
+
+    <!-- Non-linear function (Step 1) -->
+    <div class="panel" data-step="1" style="flex: 0.8; padding: 20px; margin: 0; text-align: center;">
+      <p class="text-xl" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">Non-linear function</p>
+      <p class="text-lg text-muted" style="font-size: 1.05rem; margin-bottom: 10px;">The NON-LINEAR state dynamics represented by:</p>
+      <div class="math-block" style="padding: 12px; margin: 0; font-size: 1.6rem;">
+        \(\displaystyle f_k(\cdot) \)
+      </div>
+    </div>
+
+    <!-- Arrow 2 (Step 2) -->
+    <div data-step="2" style="width: 40px; align-self: center; display: flex; justify-content: center;">
+      <span class="arrow arrow-right">→</span>
+    </div>
+
+    <!-- Next state (Step 2) -->
+    <div class="panel panel-accent" data-step="2" style="flex: 1.1; padding: 20px; margin: 0;">
+      <p class="text-xl text-accent" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">Next state</p>
+      <p class="text-lg text-muted" style="font-size: 1.05rem; margin-bottom: 10px;">No longer Gaussian! BUT we approximate it with a Gaussian Distribution</p>
+      <div class="math-block" style="padding: 12px; margin: 0; font-size: 1.1rem;">
+        \(\displaystyle \hat{x}_{k+1|k},\, P_{k+1|k} = \; ? \)
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ONE WAY WE ALREADY KNOW (Step 3) -->
+  <div class="panel" data-step="3" style="padding: 16px 20px; margin: 16px 0 0 0;">
+    <p class="text-lg" style="font-size: 1.2rem; margin: 0;">
+      <span style="font-weight: 700; color: #475569;">One way we already know: the EKF</span>
+      <span class="text-muted"> — linearize \(f_k\) with a first-order Taylor expansion (indirect solution to this problem!)</span>
+    </p>
+  </div>
+
+  <!-- ARROW DOWN (Step 4) -->
+  <div data-step="4" style="display: flex; justify-content: center; margin: 8px 0;">
+    <span class="arrow arrow-down">↓</span>
+  </div>
+
+  <!-- THE QUESTION (Step 4) -->
+  <div class="quote-block" data-step="4" style="padding: 20px 28px; margin: 0; border-left: 6px solid #3b82f6; background: #eff6ff;">
+    <p style="font-size: 1.6rem; font-style: normal; font-weight: 600; margin: 0; color: #1e293b; line-height: 1.35;">
+      Is there a more direct way to push the two moments (which fully describe the distribution \(\displaystyle x_k \sim \mathcal{N}(\hat{x}_{k|k},\, P_{k|k}) \)) through the non-linear function?
+    </p>
+  </div>
+
+  <!-- FINAL STEP: BLUR AND ANSWER (Step 5) -->
+  <div data-step="5" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255, 255, 255, 0.6); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 100;">
+    <div style="background: white; padding: 40px 60px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); border: 6px solid #3b82f6; transform: rotate(-3deg);">
+      <h2 style="font-size: 4rem; font-weight: 900; color: #1e3a8a; margin: 0; text-transform: uppercase;">Yes! It's UKF</h2>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>EKF Derivation</title>
+  <link rel="stylesheet" href="slideui.css">
+  <script src="slideui.js" defer></script>
+  <style>
+    /* frecce animate */
+    .arrow { font-size: 2rem; font-weight: bold; line-height: 1; color: #94a3b8; display: inline-block; }
+    .arrow-right { animation: nudge-x 1.2s ease-in-out infinite; }
+    .arrow-down { animation: nudge-y 1.2s ease-in-out infinite; }
+    @keyframes nudge-x { 0%, 100% { transform: translateX(-4px); } 50% { transform: translateX(4px); } }
+    @keyframes nudge-y { 0%, 100% { transform: translateY(-4px); } 50% { transform: translateY(4px); } }
+  </style>
+</head>
+<body>
+
+<div class="slide-layout" style="padding: 36px 48px; justify-content: flex-start;">
+
+  <!-- HEADER -->
+  <div style="margin-bottom: 16px;">
+    <h1 class="title" style="font-size: 2.75rem; margin-bottom: 0.25rem;">Extended Kalman Filter (EKF)</h1>
+    <p class="subtitle" style="font-size: 1.5rem; margin-bottom: 0;">Deriving the prediction step via Taylor expansion</p>
+  </div>
+
+  <!-- ROW 1: non-linear model -> linearization -->
+  <div style="display: flex; align-items: center; gap: 16px;">
+
+    <!-- 1. Dynamics -->
+    <div class="panel" style="flex: 1; padding: 20px; margin: 0;">
+      <p class="text-xl" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">1. Non-linear dynamics</p>
+      <p class="text-lg text-muted" style="font-size: 1.05rem; margin-bottom: 10px;">The true state evolves through a non-linear \(f_k(\cdot)\).</p>
+      <div class="math-block" style="padding: 12px; margin: 0; font-size: 1.2rem;">
+        \(\displaystyle x_{k+1} = f_k(x_k) + w_k \)
+      </div>
+    </div>
+
+    <div data-step="1" style="width: 40px; display: flex; justify-content: center;">
+      <span class="arrow arrow-right">→</span>
+    </div>
+
+    <!-- 2. Taylor expansion -->
+    <div class="panel panel-accent" data-step="1" style="flex: 1.5; padding: 20px; margin: 0;">
+      <p class="text-xl text-accent" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">2. First-order Taylor expansion</p>
+      <p class="text-lg text-muted" style="font-size: 1.05rem; margin-bottom: 10px;">
+        Linearize around the last estimate \(\hat{x}_{k|k}\), with Jacobian
+        \(F_k = \left.\frac{\partial f_k}{\partial x_k}\right|_{x_k = \hat{x}_{k|k}}\):
+      </p>
+      <div class="math-block" style="padding: 12px; margin: 0; font-size: 1.15rem;">
+        \(\displaystyle f_k(x_k) \approx f_k(\hat{x}_{k|k}) + F_k(x_k - \hat{x}_{k|k}) \)
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ARROW DOWN -->
+  <div data-step="2" style="display: flex; justify-content: center; margin: 8px 0;">
+    <span class="arrow arrow-down">↓</span>
+  </div>
+
+  <!-- ROW 2: result -->
+  <div class="panel panel-primary" data-step="2" style="padding: 20px; margin: 0;">
+    <p class="text-xl text-primary" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">3. EKF prediction step</p>
+    <p class="text-lg text-muted" style="font-size: 1.05rem; margin-bottom: 10px;">Taking the expectation \(\mathbb{E}[\cdot]\) of the linearized model gives the a priori moments:</p>
+    <div class="grid-2" style="gap: 16px; margin: 0;">
+      <div class="math-block" style="padding: 12px; margin: 0; font-size: 1.2rem;">
+        <div class="text-muted" style="font-size: 0.9rem; margin-bottom: 4px;">State prediction</div>
+        \(\displaystyle \hat{x}_{k+1|k} = f_k(\hat{x}_{k|k}) \)
+      </div>
+      <div class="math-block" style="padding: 12px; margin: 0; font-size: 1.2rem;">
+        <div class="text-muted" style="font-size: 0.9rem; margin-bottom: 4px;">Covariance prediction</div>
+        \(\displaystyle P_{k+1|k} = F_kP_{k|k}F_k' + Q_k \)
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>UKF: Mathematical Breakdown</title>
+  <link rel="stylesheet" href="slideui.css">
+  <script src="slideui.js" defer></script>
+  <style>
+    /* Animated arrows as per Rule 8 */
+    .arrow { font-size: 2.5rem; font-weight: bold; line-height: 1; color: #94a3b8; display: inline-block; }
+    .arrow-right { animation: nudge-x 1.2s ease-in-out infinite; }
+    @keyframes nudge-x { 0%, 100% { transform: translateX(-4px); } 50% { transform: translateX(4px); } }
+  </style>
+</head>
+<body>
+
+<div class="slide-layout" style="padding: 36px 48px; justify-content: flex-start; display: flex; flex-direction: column;">
+
+  <!-- HEADER -->
+  <div style="margin-bottom: 16px;">
+    <h1 class="title" style="color: #b91c1c; font-size: 2.4rem; margin-bottom: 0.25rem;">UKF Math Breakdown: When Roots Go Negative</h1>
+    <p class="subtitle text-muted" style="font-size: 1.25rem; margin-bottom: 0;">How bad hyperparameters (\(\alpha, \beta, \kappa\)) break the 2D Cholesky decomposition \(\mathbf{L}\)</p>
+  </div>
+
+  <!-- MAIN ROW: 3 PANELS + ARROWS -->
+  <div style="display: flex; gap: 12px; align-items: stretch; flex: 1;">
+
+    <!-- PANEL 1: The Trap -->
+    <div class="panel" data-step="1" style="flex: 1.3; padding: 16px; margin: 0; display: flex; flex-direction: column;">
+      <h3 style="font-size: 1.15rem; font-weight: 700; color: #1e3a8a; margin-top: 0; margin-bottom: 8px; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px;">1. The Sigma Spread & The Trap</h3>
+      
+      <p style="font-size: 0.95rem; margin-bottom: 6px;">Let \(\gamma = \sqrt{n+\lambda}\). Points extract columns of <span style="background-color: #fef08a; padding: 0 4px; border-radius: 4px; font-weight: bold; color: #b45309;">\(\mathbf{L}\)</span>:</p>
+      <div class="math-block" style="padding: 6px; margin: 0 0 10px 0; font-size: 1.05rem;">
+        \(\displaystyle \mathbf{x}_i = \mathbf{\hat{x}} \pm \left ( \sqrt{(n+\lambda) \mathbf{P}}\right)_i = \mathbf{\hat{x}} \pm \gamma \cdot (\mathbf{L})_i \)
+      </div>
+
+      <div class="math-block" style="padding: 8px; margin: 0 0 12px 0; font-size: 0.95rem; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px;">
+        \(\displaystyle \lambda = \alpha^2(n+\kappa) - n \) <br>
+        \(\displaystyle w_0^c = \frac{\lambda}{n+\lambda} + (1 - \alpha^2 + \beta) \)
+      </div>
+      
+      <div style="background: #fffbeb; border: 2px solid #f59e0b; border-radius: 8px; padding: 12px; margin-top: auto;">
+        <strong style="font-size: 1.1rem; color: #b45309; display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+          ⚠️ The Chain Reaction
+        </strong>
+        <ol style="margin: 0; padding-left: 20px; line-height: 1.4; font-size: 0.9rem; color: #92400e;">
+          <li style="margin-bottom: 6px;">
+            <strong>Small \(\alpha\)</strong> (e.g., \(10^{-3}\)) \(\implies \lambda \approx -n\)
+          </li>
+          <li style="margin-bottom: 6px;">
+            <strong>Massive Negative Weight</strong>:
+            <div class="math-block" style="padding: 4px; font-size: 0.9rem; background: transparent; margin: 2px 0;">
+              \(\displaystyle w_0^c \approx \frac{(-n)}{\varepsilon} + (1-\varepsilon^2 + \beta) = -M \ll 0 \)
+            </div>
+            where \( 0<\varepsilon\ll 1 \) and \( 1 \ll M < +\infty \)
+          </li>
+          <li style="margin-bottom: 6px;">
+            <strong>Corrupted Covariance:</strong>
+            <div class="math-block" style="padding: 4px; font-size: 0.9rem; background: transparent; margin: 2px 0;">
+              \(\displaystyle \mathbf{P} = \color{red}{w_0^c} (\mathbf{y}_0 - \mathbf{\hat{x}})(\dots)^T + \sum_{i=1}^{2n} w_i (\dots) \)
+            </div>
+          </li>
+          <li>
+            <strong>Result:</strong> \(\mathbf{P}\) loses <em>Positive Definiteness</em>.
+          </li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- ARROW 1 -->
+    <div data-step="2" style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+      <span class="arrow arrow-right">→</span>
+    </div>
+
+    <!-- PANEL 2: Matrix Root -->
+    <div class="panel panel-primary" data-step="2" style="flex: 1; padding: 16px; margin: 0; display: flex; flex-direction: column;">
+      <h3 style="font-size: 1.15rem; font-weight: 700; color: #4338ca; margin-top: 0; margin-bottom: 8px; border-bottom: 2px solid #c7d2fe; padding-bottom: 6px;">2. Explicit 2D Matrix Root (\(\mathbf{L}\))</h3>
+      
+      <p style="font-size: 0.95rem; margin-bottom: 8px;">Next iteration needs <span style="background-color: #fef08a; padding: 0 4px; border-radius: 4px; font-weight: bold; color: #b45309;">\(\mathbf{L}\)</span> where \(\mathbf{P} = \mathbf{L}\mathbf{L}^T\):</p>
+      
+      <div class="math-block" style="padding: 10px; margin: 0 0 16px 0; font-size: 1.05rem; background: white; border-radius: 6px;">
+        \(\displaystyle \mathbf{P} = \begin{bmatrix} p_{11} & p_{12} \\ p_{12} & p_{22} \end{bmatrix} \)
+      </div>
+      
+      <p style="font-size: 0.95rem; margin-bottom: 8px;">The standard 2D decomposition yields:</p>
+      
+      <div class="math-block" style="padding: 12px; margin: 0 0 auto 0; font-size: 1.15rem; background: white; border: 1px solid #c7d2fe; border-radius: 6px;">
+        \(\displaystyle \mathbf{L} = \begin{bmatrix} \sqrt{p_{11}} & 0 \\ \frac{p_{12}}{\sqrt{p_{11}}} & \sqrt{p_{22} - \frac{p_{12}^2}{p_{11}}} \end{bmatrix} \)
+      </div>
+    </div>
+
+    <!-- ARROW 2 -->
+    <div data-step="3" style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+      <span class="arrow arrow-right">→</span>
+    </div>
+
+    <!-- PANEL 3: Crash -->
+    <div class="panel" data-step="3" style="flex: 1; padding: 16px; margin: 0; background-color: #fef2f2; border: 2px solid #fca5a5; display: flex; flex-direction: column;">
+      <h3 style="font-size: 1.15rem; font-weight: 700; color: #991b1b; margin-top: 0; margin-bottom: 8px; border-bottom: 2px solid #fecaca; padding-bottom: 6px;">3. The Breaking Points</h3>
+      
+      <p style="font-size: 0.95rem; color: #7f1d1d; margin-bottom: 16px;">The corrupted \(\mathbf{P}\) makes \(\mathbf{L}\) impossible to compute:</p>
+      
+      <div style="background: white; border-radius: 6px; padding: 12px; margin-bottom: 16px; border: 1px solid #fca5a5;">
+        <p style="margin: 0 0 8px 0; font-weight: bold; font-size: 0.95rem; color: #b91c1c;">Crash 1: Negative Variance</p>
+        <div class="math-block" style="padding: 6px; font-size: 1rem; margin: 0; color: #dc2626;">
+          \(\displaystyle L_{11} = \sqrt{\mathbf{p}_{11}} \)
+        </div>
+        <p style="margin: 6px 0 0 0; font-size: 0.85rem; color: #7f1d1d;">Fails if \(p_{11} < 0\).</p>
+      </div>
+
+      <div style="background: white; border-radius: 6px; padding: 12px; border: 1px solid #fca5a5; margin-bottom: auto;">
+        <p style="margin: 0 0 8px 0; font-weight: bold; font-size: 0.95rem; color: #b91c1c;">Crash 2: Invalid Determinant</p>
+        <div class="math-block" style="padding: 6px; font-size: 1rem; margin: 0; color: #dc2626;">
+          \(\displaystyle L_{22} = \sqrt{\mathbf{p}_{22} - \frac{p_{12}^2}{p_{11}}} = \sqrt{\frac{\det(\mathbf{P})}{p_{11}}} \)
+        </div>
+        <p style="margin: 6px 0 0 0; font-size: 0.85rem; color: #7f1d1d;">Fails if \(\det(\mathbf{P}) < 0\).</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

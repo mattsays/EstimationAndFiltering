@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Example application: KF</title>
+<link rel="stylesheet" href="slideui.css">
+<script src="slideui.js" defer></script>
+</head>
+<body>
+
+<div class="slide-layout">
+
+<section class="slide build split-slide motor-scene" data-steps="4">
+  <h1>Example Application for KF</h1>
+  <div class="body">
+    <div class="split">
+      <div class="split-figure">
+        <svg viewBox="0 0 780 430" role="img" aria-label="Schematic signal flow: applied voltage drives the DC motor, the motor drives a wheel whose shaft angle theta is read by the encoder, and the Kalman filter combines the model prediction with the encoder measurement to update angle, speed and current.">
+          <g font-family="var(--font)">
+            <g class="motor-input" stroke="var(--muted)" stroke-width="2.5" fill="none">
+              <path d="M20 140 h16 v-20 h26 v40 h26 v-20 h26"/>
+            </g>
+            <text x="20" y="52" fill="var(--muted)" font-size="22" font-weight="650">Applied voltage</text>
+            <path d="M114 140 H128" stroke="var(--muted)" stroke-width="2.5" fill="none"/>
+            <path d="M120 133 L132 140 L120 147" stroke="var(--muted)" stroke-width="2.5" fill="none"/>
+            <rect x="140" y="100" width="160" height="86" rx="14" fill="var(--card)" stroke="var(--muted)" stroke-width="2.5"/>
+            <text x="220" y="140" text-anchor="middle" fill="var(--fg)" font-size="25" font-weight="650">DC motor</text>
+            <text x="220" y="170" text-anchor="middle" fill="var(--muted)" font-size="22">state: θ, ω, i</text>
+            <path d="M300 143 H314" stroke="var(--muted)" stroke-width="2.5" fill="none"/>
+            <path d="M306 136 L318 143 L306 150" stroke="var(--muted)" stroke-width="2.5" fill="none"/>
+            <g transform="translate(395 143)">
+              <circle r="60" fill="none" stroke="var(--fg)" stroke-opacity=".16" stroke-width="12"/>
+              <circle r="51" fill="var(--bg)" stroke="var(--line)" stroke-width="2"/>
+              <g class="wheel-spin" fill="none" stroke="var(--fg)" stroke-opacity=".7" stroke-width="5" stroke-linecap="round">
+                <path d="M0 -45 L0 -13 M39 -22.5 L11.3 -6.5 M39 22.5 L11.3 6.5 M0 45 L0 13 M-39 22.5 L-11.3 6.5 M-39 -22.5 L-11.3 -6.5"/>
+              </g>
+              <circle r="13" fill="var(--fg)"/>
+              <circle r="5" fill="var(--bg)"/>
+            </g>
+            <path d="M395 63 A 72 72 0 0 1 458 94" fill="none" stroke="var(--muted)" stroke-width="2" stroke-dasharray="5 5"/>
+            <path d="M449 83 L460 96 L445 99" fill="none" stroke="var(--muted)" stroke-width="2"/>
+            <text x="462" y="62" fill="var(--fg)" font-size="25" font-weight="650">θ</text>
+            <g data-step="2">
+              <path d="M464 143 H474" stroke="var(--muted)" stroke-width="2.5" fill="none"/>
+              <path d="M468 136 L480 143 L468 150" stroke="var(--muted)" stroke-width="2.5" fill="none"/>
+              <rect x="486" y="100" width="134" height="86" rx="14" fill="var(--bg)" stroke="var(--accent2)" stroke-width="2.5"/>
+              <text x="553" y="140" text-anchor="middle" fill="var(--accent2)" font-size="24" font-weight="650">Encoder</text>
+              <text x="553" y="170" text-anchor="middle" fill="var(--muted)" font-size="22">measures θ</text>
+            </g>
+            <g data-step="3">
+              <path d="M220 188 V292 H300 V312" fill="none" stroke="var(--muted)" stroke-width="2" stroke-dasharray="7 6"/>
+              <path d="M293 304 L300 314 L307 304" fill="none" stroke="var(--muted)" stroke-width="2"/>
+              <path class="encoder-signal" d="M553 188 V292 H500 V312" fill="none" stroke="var(--accent2)" stroke-width="2.5" stroke-dasharray="9 7"/>
+              <path d="M493 304 L500 314 L507 304" fill="none" stroke="var(--accent2)" stroke-width="2.5"/>
+              <rect x="250" y="320" width="290" height="88" rx="14" fill="var(--bg)" stroke="var(--accent)" stroke-width="2.5"/>
+              <text x="395" y="357" text-anchor="middle" fill="var(--accent)" font-size="25" font-weight="650">KF update</text>
+              <text x="395" y="392" text-anchor="middle" fill="var(--fg)" font-size="22">θ̂, ω̂, î</text>
+              <path d="M540 364 H596" stroke="var(--accent)" stroke-width="2.5" fill="none"/>
+              <path d="M588 357 L600 364 L588 371" stroke="var(--accent)" stroke-width="2.5" fill="none"/>
+              <text x="610" y="372" fill="var(--accent)" font-size="22">estimated state</text>
+            </g>
+          </g>
+        </svg>
+      </div>
+      <div class="split-text">
+        <div class="rail" aria-hidden="true"></div>
+        <div class="rail-active" aria-hidden="true"></div>
+        <div class="step" data-n="1">
+          <span class="step-num">1</span>
+          <div>
+            <p class="step-title">Predict with the motor model</p>
+            <p class="step-note">Applied voltage and the previous state estimate predict the next angle, angular speed and armature current.</p>
+          </div>
+        </div>
+        <div class="step" data-n="2">
+          <span class="step-num">2</span>
+          <div>
+            <p class="step-title">Observe with the encoder</p>
+            <p class="step-note">The encoder reads the shaft angle. Measured minus predicted angle is the innovation.</p>
+          </div>
+        </div>
+        <div class="step" data-n="3">
+          <span class="step-num">3</span>
+          <div>
+            <p class="step-title">Correct the estimated state</p>
+            <p class="step-note">The KF weighs model and encoder by their uncertainty and updates angle, speed and current.</p>
+          </div>
+        </div>
+        <div class="step" data-n="4">
+          <span class="step-num">4</span>
+          <div>
+            <p class="step-title">Why KF?</p>
+            <p class="step-note">With constant parameters, linear friction and no saturation, the motor dynamics and the angle measurement are linear. No linearization needed.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div>
+
+</body>
+</html>

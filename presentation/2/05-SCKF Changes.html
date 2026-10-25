@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>CKF vs SCKF</title>
+  <link rel="stylesheet" href="slideui.css">
+  <script src="slideui.js" defer></script>
+</head>
+<body>
+
+<div class="slide-layout" style="padding: 36px 48px; justify-content: flex-start;">
+
+  <!-- Header -->
+  <div class="title" style="font-size: 2.75rem; margin-bottom: 0.25rem;">CKF → SCKF: What Changes</div>
+  <div class="subtitle" style="font-size: 1.5rem; margin-bottom: 0;">No factorization step: square roots S are propagated instead of P</div>
+
+  <!-- Row 1: time update covariance and innovation covariance -->
+  <div style="display: flex; align-items: stretch; gap: 16px; margin-top: 16px;">
+
+    <!-- Time update: predicted error covariance -->
+    <div class="panel panel-primary" data-step="1" style="flex: 1 1 0; min-width: 0; box-sizing: border-box; padding: 20px; margin: 0;">
+      <div class="text-primary" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">Time update · covariance</div>
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+        <div class="text-muted" style="width: 52px; font-size: 1.05rem; font-weight: 700;">CKF</div>
+        <div class="math-block" style="flex: 1; min-width: 0; padding: 12px; margin: 0; font-size: 1.1rem;">
+          \(\displaystyle P_{k+1|k} = \mathbf{X}^{*}_{k+1|k}\mathbf{X}^{*T}_{k+1|k} + Q_k\)
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div class="text-accent" style="width: 52px; font-size: 1.05rem; font-weight: 700;">SCKF</div>
+        <div class="math-block" style="flex: 1; min-width: 0; padding: 12px; margin: 0; font-size: 1.1rem;">
+          \(\displaystyle S_{k+1|k} = \mathrm{Tria}\big([\,\mathbf{X}^{*}_{k+1|k}\;\; S_{Q,k}\,]\big)\)
+        </div>
+      </div>
+    </div>
+
+    <!-- Measurement update: innovation covariance -->
+    <div class="panel panel-primary" data-step="2" style="flex: 1 1 0; min-width: 0; box-sizing: border-box; padding: 20px; margin: 0;">
+      <div class="text-primary" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">Measurement · innovation cov.</div>
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+        <div class="text-muted" style="width: 52px; font-size: 1.05rem; font-weight: 700;">CKF</div>
+        <div class="math-block" style="flex: 1; min-width: 0; padding: 12px; margin: 0; font-size: 1.1rem;">
+          \(\displaystyle P_{zz,k+1|k} = \mathbf{Z}_{k+1|k}\mathbf{Z}_{k+1|k}^{T} + R_{k+1}\)
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div class="text-accent" style="width: 52px; font-size: 1.05rem; font-weight: 700;">SCKF</div>
+        <div class="math-block" style="flex: 1; min-width: 0; padding: 12px; margin: 0; font-size: 1.1rem;">
+          \(\displaystyle S_{zz,k+1|k} = \mathrm{Tria}\big([\,\mathbf{Z}_{k+1|k}\;\; S_{R,k+1}\,]\big)\)
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Row 2: Kalman gain and updated covariance -->
+  <div style="display: flex; align-items: stretch; gap: 16px; margin-top: 12px;">
+
+    <!-- Measurement update: Kalman gain -->
+    <div class="panel panel-accent" data-step="3" style="flex: 1 1 0; min-width: 0; box-sizing: border-box; padding: 20px; margin: 0;">
+      <div class="text-accent" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">Measurement · Kalman gain</div>
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+        <div class="text-muted" style="width: 52px; font-size: 1.05rem; font-weight: 700;">CKF</div>
+        <div class="math-block" style="flex: 1; min-width: 0; padding: 12px; margin: 0; font-size: 1.1rem;">
+          \(\displaystyle K_{k+1} = P_{xz,k+1|k}\,P_{zz,k+1|k}^{-1}\)
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div class="text-accent" style="width: 52px; font-size: 1.05rem; font-weight: 700;">SCKF</div>
+        <div class="math-block" style="flex: 1; min-width: 0; padding: 12px; margin: 0; font-size: 1.1rem;">
+          \(\displaystyle K_{k+1} = \big(P_{xz,k+1|k}\,/\,S_{zz,k+1|k}^{T}\big)\,/\,S_{zz,k+1|k}\)
+        </div>
+      </div>
+    </div>
+
+    <!-- Measurement update: updated error covariance -->
+    <div class="panel panel-accent" data-step="4" style="flex: 1.3 1 0; min-width: 0; box-sizing: border-box; padding: 20px; margin: 0;">
+      <div class="text-accent" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">Measurement · updated covariance</div>
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+        <div class="text-muted" style="width: 52px; font-size: 1.05rem; font-weight: 700;">CKF</div>
+        <div class="math-block" style="flex: 1; min-width: 0; padding: 12px; margin: 0; font-size: 1.1rem;">
+          \(\displaystyle P_{k+1|k+1} = P_{k+1|k} - K_{k+1}P_{zz,k+1|k}K_{k+1}^{T}\)
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div class="text-accent" style="width: 52px; font-size: 1.05rem; font-weight: 700;">SCKF</div>
+        <div class="math-block" style="flex: 1; min-width: 0; padding: 12px; margin: 0; font-size: 1.1rem;">
+          \(\displaystyle S_{k+1|k+1} = \mathrm{Tria}\big([\,\mathbf{X}_{k+1|k} - K_{k+1}\mathbf{Z}_{k+1|k}\;\; K_{k+1}S_{R,k+1}\,]\big)\)
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Legend: weighted-centered matrices X and Z -->
+  <div class="text-muted" style="display: flex; justify-content: center; align-items: center; gap: 24px; font-size: 1.05rem; margin-top: 12px; white-space: nowrap;">
+    <div>\(\mathbf{X}_{k+1|k} = \tfrac{1}{\sqrt{m}}\,[\,\mathbf{x}^{1}_{k+1|k}-\hat{x}_{k+1|k}\;\cdots\;\mathbf{x}^{m}_{k+1|k}-\hat{x}_{k+1|k}\,]\)</div>
+    <div>\(\mathbf{Z}_{k+1|k} = \tfrac{1}{\sqrt{m}}\,[\,\mathcal{Z}^{1}_{k+1|k}-\hat{z}_{k+1|k}\;\cdots\;\mathcal{Z}^{m}_{k+1|k}-\hat{z}_{k+1|k}\,]\)</div>
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>UKF: Animated Recap</title>
+  <link rel="stylesheet" href="slideui.css">
+  <script src="slideui.js" defer></script>
+  <style>
+    /* ONLY arrow animations allowed in head */
+    .arrow { font-size: 2rem; font-weight: bold; line-height: 1; color: #94a3b8; display: inline-block; }
+    .arrow-right { animation: nudge-x 1.2s ease-in-out infinite; }
+    .arrow-down { animation: nudge-y 1.2s ease-in-out infinite; }
+    @keyframes nudge-x { 0%, 100% { transform: translateX(-4px); } 50% { transform: translateX(4px); } }
+    @keyframes nudge-y { 0%, 100% { transform: translateY(-4px); } 50% { transform: translateY(4px); } }
+  </style>
+</head>
+<body>
+
+<div class="slide-layout" style="padding: 36px 48px; justify-content: flex-start; display: flex; flex-direction: column;">
+
+  <!-- HEADER -->
+  <div style="margin-bottom: 24px;">
+    <h1 class="title" style="font-size: 2.5rem; margin-bottom: 0.25rem;">Unscented Kalman Filter Recap in Action</h1>
+    <p class="subtitle text-muted" style="font-size: 1.35rem; margin-bottom: 0;">Full cycle: Sigma Points Extraction \(\to\) Non-Linear Propagation \(\to\) Gaussian Reconstruction</p>
+  </div>
+
+  <!-- ROW 1: 3 COLUMNS -->
+  <div style="display: flex; align-items: stretch; gap: 12px; margin-bottom: 4px;">
+
+    <!-- COL 1: Extraction -->
+    <div class="panel" data-step="1" style="flex: 1; padding: 16px; margin: 0; display: flex; flex-direction: column; justify-content: space-between;">
+      <div>
+        <p class="text-xl" style="font-size: 1.25rem; font-weight: 700; margin-bottom: 4px; color: #1e3a8a;">1. Extract Sigma Points</p>
+        <p class="text-muted" style="font-size: 0.95rem; margin-bottom: 8px;">Deterministic sampling from the prior:</p>
+      </div>
+
+      <div class="math-block" style="padding: 8px; margin: 0 0 6px 0; font-size: 1rem;">
+        \(\displaystyle \mathbf{x}_0 = \mathbf{\hat{x}}_{k|k} \)
+      </div>
+      <div class="math-block" style="padding: 8px; margin: 0 0 12px 0; font-size: 1rem;">
+        \(\displaystyle \mathbf{x}_i = \mathbf{\hat{x}}_{k|k} \pm \left ( \sqrt{(n+\lambda) \mathbf{P}} \right )_i \)
+      </div>
+
+      <!-- SVG 1: Pulsing Points on Ellipse -->
+      <div style="background: white; border-radius: 8px; padding: 6px; border: 1px solid #e2e8f0; display: flex; justify-content: center; height: 160px;">
+        <svg width="100%" height="100%" viewBox="0 0 200 140">
+          <ellipse cx="100" cy="70" rx="70" ry="45" fill="rgba(59,130,246,0.1)" stroke="#3b82f6" stroke-width="2" stroke-dasharray="4 4"/>
+          <path d="M 96 70 L 104 70 M 100 66 L 100 74" stroke="#1d4ed8" stroke-width="1.5"/>
+          
+          <!-- Animated Sigma Points -->
+          <circle cx="100" cy="70" r="5" fill="#1e40af">
+            <animate attributeName="r" values="3; 6; 3" dur="2s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="170" cy="70" r="4" fill="#3b82f6">
+            <animate attributeName="r" values="2; 5; 2" dur="2s" begin="0.2s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="100" cy="25" r="4" fill="#3b82f6">
+            <animate attributeName="r" values="2; 5; 2" dur="2s" begin="0.4s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="30" cy="70" r="4" fill="#3b82f6">
+            <animate attributeName="r" values="2; 5; 2" dur="2s" begin="0.6s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="100" cy="115" r="4" fill="#3b82f6">
+            <animate attributeName="r" values="2; 5; 2" dur="2s" begin="0.8s" repeatCount="indefinite"/>
+          </circle>
+        </svg>
+      </div>
+    </div>
+
+    <!-- ARROW 1 -->
+    <div data-step="2" style="width: 24px; align-self: center; display: flex; justify-content: center;">
+      <span class="arrow arrow-right">→</span>
+    </div>
+
+    <!-- COL 2: Transformation -->
+    <div class="panel panel-primary" data-step="2" style="flex: 1; padding: 16px; margin: 0; display: flex; flex-direction: column; justify-content: space-between;">
+      <div>
+        <p class="text-xl text-primary" style="font-size: 1.25rem; font-weight: 700; margin-bottom: 4px;">2. Non-Linear Function</p>
+        <p class="text-muted" style="font-size: 0.95rem; margin-bottom: 8px;">Each point flows through \(f(\cdot)\):</p>
+      </div>
+
+      <div class="math-block" style="padding: 12px; margin: 0 0 12px 0; font-size: 1.15rem; background: white;">
+        \(\displaystyle \mathbf{y}_i = f(\mathbf{x}_i) \)
+      </div>
+      
+      <!-- Placeholder to align with Col 1 and 3 -->
+      <div style="height: 38px;"></div>
+
+      <!-- SVG 2: Flow Animation -->
+      <div style="background: white; border-radius: 8px; padding: 6px; border: 1px solid #c4b5fd; display: flex; justify-content: center; height: 160px; overflow: hidden;">
+        <svg width="100%" height="100%" viewBox="0 0 200 140">
+          <style>
+            .flow { stroke-dasharray: 6 6; animation: dash 1.5s linear infinite; }
+            @keyframes dash { to { stroke-dashoffset: -12; } }
+          </style>
+          
+          <path d="M 0 40 C 60 40, 60 70, 80 70" fill="none" stroke="#e9d5ff" stroke-width="3" class="flow"/>
+          <path d="M 0 70 L 80 70" fill="none" stroke="#e9d5ff" stroke-width="3" class="flow"/>
+          <path d="M 0 100 C 60 100, 60 70, 80 70" fill="none" stroke="#e9d5ff" stroke-width="3" class="flow"/>
+          
+          <path d="M 120 70 C 140 70, 140 30, 200 30" fill="none" stroke="#e9d5ff" stroke-width="3" class="flow"/>
+          <path d="M 120 70 C 140 70, 140 90, 200 90" fill="none" stroke="#e9d5ff" stroke-width="3" class="flow"/>
+          
+          <rect x="75" y="45" width="50" height="50" rx="8" fill="#ede9fe" stroke="#8b5cf6" stroke-width="2"/>
+          <text x="100" y="75" font-size="16" font-weight="bold" font-family="serif" font-style="italic" fill="#5b21b6" text-anchor="middle">f(x)</text>
+
+          <!-- Moving points -->
+          <circle cx="0" cy="70" r="4" fill="#8b5cf6">
+            <animate attributeName="cx" values="0; 70; 70; 200" keyTimes="0; 0.4; 0.6; 1" dur="2s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="0" cy="40" r="4" fill="#a78bfa">
+            <animate attributeName="cx" values="-20; 70; 70; 200" keyTimes="0; 0.4; 0.6; 1" dur="2s" repeatCount="indefinite"/>
+            <animate attributeName="cy" values="40; 70; 70; 30" keyTimes="0; 0.4; 0.6; 1" dur="2s" repeatCount="indefinite"/>
+          </circle>
+        </svg>
+      </div>
+    </div>
+
+    <!-- ARROW 2 -->
+    <div data-step="3" style="width: 24px; align-self: center; display: flex; justify-content: center;">
+      <span class="arrow arrow-right">→</span>
+    </div>
+
+    <!-- COL 3: Reconstruction -->
+    <div class="panel panel-accent" data-step="3" style="flex: 1.3; padding: 16px; margin: 0; display: flex; flex-direction: column; justify-content: space-between;">
+      <div>
+        <p class="text-xl text-accent" style="font-size: 1.25rem; font-weight: 700; margin-bottom: 4px;">3. Reconstruct Gaussian</p>
+        <p class="text-muted" style="font-size: 0.95rem; margin-bottom: 8px;">Compute predicted mean and covariance:</p>
+      </div>
+
+      <div class="math-block" style="padding: 6px; margin: 0 0 6px 0; font-size: 0.9rem; background: white;">
+        \(\displaystyle \mathbf{\hat{x}}_{k+1|k} = \sum_{i=0}^{2n} w_i \mathbf{y}_i \)
+      </div>
+      <div class="math-block" style="padding: 6px; margin: 0 0 12px 0; font-size: 0.85rem; background: white;">
+        \(\displaystyle \mathbf{P}_{k+1|k} = \sum_{i=1}^{2n} w_i (\dots)(\dots)^T + w_0^c (\dots)(\dots)^T \)
+      </div>
+      
+      <!-- SVG 3: New Gaussian with Distorted Points -->
+      <div style="background: white; border-radius: 8px; padding: 6px; border: 1px solid #6ee7b7; display: flex; justify-content: center; height: 160px;">
+        <svg width="100%" height="100%" viewBox="0 0 240 140">
+          <g transform="rotate(-15 120 70)">
+            <ellipse cx="120" cy="70" rx="90" ry="40" fill="rgba(16,185,129,0.1)" stroke="#10b981" stroke-width="2"/>
+          </g>
+          
+          <path d="M 115 70 L 125 70 M 120 65 L 120 75" stroke="#047857" stroke-width="2"/>
+          
+          <!-- Distorted Points -->
+          <circle cx="126" cy="74" r="5" fill="#047857"/>
+          <circle cx="205" cy="45" r="4" fill="#34d399"/>
+          <circle cx="140" cy="25" r="4" fill="#34d399"/>
+          <circle cx="40" cy="90" r="4" fill="#34d399"/>
+          <circle cx="100" cy="115" r="4" fill="#34d399"/>
+        </svg>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MEGA BRACKET & LMMSE BIG PICTURE -->
+  <div data-step="4" style="display: flex; flex-direction: column; align-items: center; margin-top: 8px;">
+    <!-- Graphical bracket -->
+    <div style="width: 96%; height: 24px; border: 3px solid #94a3b8; border-top: none; border-radius: 0 0 16px 16px;"></div>
+    <div style="width: 3px; height: 16px; background-color: #94a3b8;"></div>
+    
+    <!-- Big Picture Label -->
+    <div style="background: #f8fafc; padding: 12px 32px; border-radius: 12px; border: 1px solid #cbd5e1; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+      <p style="margin: 0; font-weight: bold; color: #334155; font-size: 1.15rem;">
+        Output: A-Priori Moments \(\left( \mathbf{\hat{x}}_{k+1|k}, \mathbf{P}_{k+1|k} \right)\)
+      </p>
+      <p style="margin: 4px 0 0 0; color: #64748b; font-size: 0.95rem;">
+        These serve as the prediction step, ready for the <span style="color: #4f46e5; font-weight: bold;">LMMSE Correction Update</span> with measurements \(z_{k+1}\)
+      </p>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

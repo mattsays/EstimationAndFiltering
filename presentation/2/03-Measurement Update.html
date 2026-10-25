@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>CKF: Measurement Update</title>
+  <link rel="stylesheet" href="slideui.css">
+  <script src="slideui.js" defer></script>
+  <style>
+    .arrow { font-size: 2rem; font-weight: bold; line-height: 1; color: #94a3b8; display: inline-block; }
+    .arrow-right { animation: nudge-x 1.2s ease-in-out infinite; }
+    .arrow-down { animation: nudge-y 1.2s ease-in-out infinite; }
+    @keyframes nudge-x { 0%, 100% { transform: translateX(-4px); } 50% { transform: translateX(4px); } }
+    @keyframes nudge-y { 0%, 100% { transform: translateY(-4px); } 50% { transform: translateY(4px); } }
+  </style>
+</head>
+<body>
+
+<div class="slide-layout" style="padding: 36px 48px; justify-content: flex-start;">
+
+  <!-- Header -->
+  <div class="title" style="font-size: 2.75rem; margin-bottom: 0.25rem;">CKF: Measurement Update</div>
+  <div class="subtitle" style="font-size: 1.5rem; margin-bottom: 0;">From the predicted state at k+1|k to the updated state at k+1|k+1</div>
+
+  <!-- Row 1: cubature points, propagation + predicted measurement, covariances -->
+  <div style="display: flex; align-items: stretch; gap: 8px; margin-top: 12px;">
+
+    <!-- Steps 1-2: factorize and evaluate cubature points -->
+    <div class="panel panel-primary" data-step="1" style="flex: 285 1 0; min-width: 0; box-sizing: border-box; padding: 20px; margin: 0;">
+      <div class="text-primary" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">1–2 · Cubature points</div>
+      <div class="math-block" style="padding: 12px; margin: 0 0 8px 0; font-size: 1.1rem;">
+        \(\displaystyle P_{k+1|k} = S_{k+1|k}S_{k+1|k}^{T}\)
+      </div>
+      <div class="math-block" style="padding: 12px; margin: 0; font-size: 1.1rem;">
+        \(\displaystyle \mathbf{x}^{i}_{k+1|k} = S_{k+1|k}\xi^{i} + \hat{x}_{k+1|k}\)
+      </div>
+    </div>
+
+    <!-- Transition 1 -> 2 -->
+    <div data-step="2" style="display: flex; justify-content: center; align-items: center;"><span class="arrow arrow-right">→</span></div>
+
+    <!-- Steps 3-4: propagated points and predicted measurement -->
+    <div class="panel panel-primary" data-step="3" style="flex: 260 1 0; min-width: 0; box-sizing: border-box; padding: 20px; margin: 0;">
+      <div class="text-primary" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">3–4 · Measurement</div>
+      <div class="math-block" style="padding: 12px; margin: 0 0 8px 0; font-size: 1.1rem;">
+        \(\displaystyle \mathcal{Z}^{i}_{k+1|k} = h(\mathbf{x}^{i}_{k+1|k}, u_{k+1})\)
+      </div>
+      <div class="math-block" style="padding: 12px; margin: 0; font-size: 1.1rem;">
+        \(\displaystyle \hat{z}_{k+1|k} = \frac{1}{m}\sum_{i=1}^{m}\mathcal{Z}^{i}_{k+1|k}\)
+      </div>
+    </div>
+
+    <!-- Transition 2 -> 3 -->
+    <div data-step="4" style="display: flex; justify-content: center; align-items: center;"><span class="arrow arrow-right">→</span></div>
+
+    <!-- Steps 5-6: innovations and cross covariances -->
+    <div class="panel panel-primary" data-step="5" style="flex: 500 1 0; min-width: 0; box-sizing: border-box; padding: 20px; margin: 0;">
+      <div class="text-primary" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">5–6 · Covariances</div>
+      <div class="math-block" style="padding: 12px; margin: 0 0 8px 0; font-size: 1.0rem;">
+        \(\displaystyle P_{zz,k+1|k} = \frac{1}{m}\sum_{i=1}^{m}\mathcal{Z}^{i}_{k+1|k}\mathcal{Z}^{i\,T}_{k+1|k} - \hat{z}_{k+1|k}\hat{z}_{k+1|k}^{T} + R_{k+1}\)
+      </div>
+      <div class="math-block" style="padding: 12px; margin: 0; font-size: 1.0rem;">
+        \(\displaystyle P_{xz,k+1|k} = \frac{1}{m}\sum_{i=1}^{m}\mathbf{x}^{i}_{k+1|k}\mathcal{Z}^{i\,T}_{k+1|k} - \hat{x}_{k+1|k}\hat{z}_{k+1|k}^{T}\)
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Transition from row 1 to row 2 -->
+  <div data-step="6" style="display: flex; justify-content: center; margin: 8px 0;"><span class="arrow arrow-down">↓</span></div>
+
+  <!-- Row 2: Kalman gain and state/covariance update -->
+  <div style="display: flex; align-items: stretch; gap: 8px;">
+
+    <!-- Step 7: cubature Kalman gain -->
+    <div class="panel panel-accent" data-step="7" style="flex: 1 1 0; min-width: 0; box-sizing: border-box; padding: 20px; margin: 0;">
+      <div class="text-accent" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">7 · Kalman gain</div>
+      <div class="text-muted" style="font-size: 1.05rem; margin-bottom: 10px;">Weights the innovation in the update</div>
+      <div class="math-block" style="padding: 12px; margin: 0; font-size: 1.1rem;">
+        \(\displaystyle K_{k+1} = P_{xz,k+1|k}\,P_{zz,k+1|k}^{-1}\)
+      </div>
+    </div>
+
+    <!-- Transition 7 -> 8-9 -->
+    <div data-step="8" style="display: flex; justify-content: center; align-items: center;"><span class="arrow arrow-right">→</span></div>
+
+    <!-- Steps 8-9: updated state and error covariance -->
+    <div class="panel panel-accent" data-step="9" style="flex: 1.4 1 0; min-width: 0; box-sizing: border-box; padding: 20px; margin: 0;">
+      <div class="text-accent" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">8–9 · State update</div>
+      <div class="math-block" style="padding: 12px; margin: 0 0 8px 0; font-size: 1.1rem;">
+        \(\displaystyle \hat{x}_{k+1|k+1} = \hat{x}_{k+1|k} + K_{k+1}\,(z_{k+1} - \hat{z}_{k+1|k})\)
+      </div>
+      <div class="math-block" style="padding: 12px; margin: 0; font-size: 1.1rem;">
+        \(\displaystyle P_{k+1|k+1} = P_{k+1|k} - K_{k+1}\,P_{zz,k+1|k}\,K_{k+1}^{T}\)
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+</html>

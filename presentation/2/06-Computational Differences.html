@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Computational Cost: CKF vs SCKF</title>
+  <link rel="stylesheet" href="slideui.css">
+  <script src="slideui.js" defer></script>
+  <style>
+    .arrow { font-size: 2rem; font-weight: bold; line-height: 1; color: #94a3b8; display: inline-block; }
+    .arrow-right { animation: nudge-x 1.2s ease-in-out infinite; }
+    .arrow-down { animation: nudge-y 1.2s ease-in-out infinite; }
+    @keyframes nudge-x { 0%, 100% { transform: translateX(-4px); } 50% { transform: translateX(4px); } }
+    @keyframes nudge-y { 0%, 100% { transform: translateY(-4px); } 50% { transform: translateY(4px); } }
+  </style>
+</head>
+<body>
+
+<div class="slide-layout" style="padding: 36px 48px; justify-content: flex-start;">
+
+  <!-- Header -->
+  <div class="title" style="font-size: 2.75rem; margin-bottom: 0.25rem;">Computational Cost: CKF vs SCKF</div>
+  <div class="subtitle" style="font-size: 1.5rem; margin-bottom: 0;">Flops per recursion cycle, with \(n_x\), \(n_z\) and \(m\) the state, measurement and cubature-point counts</div>
+
+  <!-- Row 1: exact flop counts -->
+  <div style="display: flex; align-items: stretch; gap: 16px; margin-top: 12px;">
+
+    <!-- CKF: total cost (Eq. 4.37) -->
+    <div class="panel panel-primary" data-step="1" style="flex: 1 1 0; min-width: 0; box-sizing: border-box; padding: 20px; margin: 0;">
+      <div class="text-primary" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">CKF</div>
+      <div class="math-block" style="padding: 12px; margin: 0 0 8px 0; font-size: 1.2rem;">
+        \(\displaystyle C = 4mn_x^2 + \tfrac{2}{3}n_x^3 + mn_x(2n_z+3) + 6n_x^2\)
+      </div>
+      <div class="math-block" style="padding: 12px; margin: 0 0 8px 0; font-size: 1.2rem;">
+        \(\displaystyle {}+ mn_z(2n_z+1) + n_xn_z(6n_z+1) + \tfrac{14}{3}n_x\)
+      </div>
+      <div class="math-block" style="padding: 12px; margin: 0; font-size: 1.2rem;">
+        \(\displaystyle {}+ n_z^3 + 5n_z^2 + \tfrac{1}{2}n_z - 3\ \ \text{flops}\)
+      </div>
+    </div>
+
+    <!-- SCKF: total cost (Section 5.3) -->
+    <div class="panel panel-accent" data-step="2" style="flex: 1 1 0; min-width: 0; box-sizing: border-box; padding: 20px; margin: 0;">
+      <div class="text-accent" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">SCKF</div>
+      <div class="math-block" style="padding: 12px; margin: 0 0 8px 0; font-size: 1.2rem;">
+        \(\displaystyle C = 6mn_x^2 + 2n_x^3 + mn_x(4n_z+9) + 2n_x^2n_z\)
+      </div>
+      <div class="math-block" style="padding: 12px; margin: 0 0 8px 0; font-size: 1.2rem;">
+        \(\displaystyle {}+ \tfrac{1}{2}mn_z(5n_z+11) + n_xn_z(4n_z+1) + n_x\)
+      </div>
+      <div class="math-block" style="padding: 12px; margin: 0; font-size: 1.2rem;">
+        \(\displaystyle {}+ \tfrac{7}{3}n_z^3 + \tfrac{1}{2}n_z^2 + \tfrac{19}{6}n_z\ \ \text{flops}\)
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Transition: simplifying assumptions -->
+  <div data-step="3" style="display: flex; justify-content: center; align-items: center; gap: 12px; margin: 6px 0;">
+    <span class="arrow arrow-down">↓</span>
+    <span class="text-muted" style="font-size: 1.05rem;">\(n_x \gg n_z\) and \(m = 2n_x\)</span>
+  </div>
+
+  <!-- Row 2: leading-order cost and ratio -->
+  <div style="display: flex; align-items: stretch; gap: 16px;">
+
+    <!-- CKF: approximate cost -->
+    <div class="panel panel-primary" data-step="4" style="flex: 1 1 0; min-width: 0; box-sizing: border-box; padding: 20px; margin: 0;">
+      <div class="text-primary" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">CKF</div>
+      <div class="math-block" style="padding: 12px; margin: 0; font-size: 1.2rem;">
+        \(\displaystyle C_{\mathrm{CKF}} \approx \tfrac{26}{3}\,n_x^{3}\)
+      </div>
+    </div>
+
+    <!-- SCKF: approximate cost -->
+    <div class="panel panel-accent" data-step="5" style="flex: 1 1 0; min-width: 0; box-sizing: border-box; padding: 20px; margin: 0;">
+      <div class="text-accent" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">SCKF</div>
+      <div class="math-block" style="padding: 12px; margin: 0; font-size: 1.2rem;">
+        \(\displaystyle C_{\mathrm{SCKF}} \approx 14\,n_x^{3}\)
+      </div>
+    </div>
+
+    <!-- Relative cost -->
+    <div class="panel" data-step="6" style="flex: 1 1 0; min-width: 0; box-sizing: border-box; padding: 20px; margin: 0;">
+      <div style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">SCKF / CKF</div>
+      <div class="math-block" style="padding: 12px; margin: 0; font-size: 1.2rem;">
+        \(\displaystyle C_{\mathrm{SCKF}}\,/\,C_{\mathrm{CKF}} \approx 1.6\)
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+</html>

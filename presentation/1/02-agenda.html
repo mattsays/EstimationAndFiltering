@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Agenda</title>
+  <link rel="stylesheet" href="slideui.css">
+  <script src="slideui.js" defer></script>
+</head>
+<body>
+
+<div class="slide-layout">
+  <h1 class="title">Agenda</h1>
+  
+  <div class="flex-col" style="gap: 1rem; justify-content: center; height: 100%; padding-bottom: 1rem;">
+    
+    <!-- PART 1: ALBERTO PINI -->
+    <div style="display: flex; gap: 2rem; border-left: 6px solid #3b82f6; padding-left: 1.5rem; align-items: center;">
+      <div style="flex: 0 0 180px;">
+        <p class="font-bold uppercase" style="color: #3b82f6; letter-spacing: 0.1em; font-size: 0.9rem; margin-bottom: 0.25rem;">Part 1</p>
+        <p class="text-xl font-bold">Alberto Pini</p>
+      </div>
+      
+      <div class="flex-col" style="flex: 1; gap: 0.5rem;">
+        <div class="panel" style="margin: 0; padding: 12px 20px; background: #eff6ff; border: 1px solid #bfdbfe;">
+          <p class="text-lg font-semibold" style="color: #1e40af; margin-bottom: 4px;">1. EKF Reminder</p>
+          <p class="text-muted" style="margin: 0;">Taylor linearization and the limits of the Extended Kalman Filter.</p>
+        </div>
+        <div class="panel" data-step="1" style="margin: 0; padding: 12px 20px; background: #eff6ff; border: 1px solid #bfdbfe;">
+          <p class="text-lg font-semibold" style="color: #1e40af; margin-bottom: 4px;">2. Unscented Kalman Filter (UKF)</p>
+          <p class="text-muted" style="margin: 0;">Solving non-linearity via Unscented Transform & parameter constraints.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- PART 2: MATTEO SCURATTI -->
+    <div data-step="2" style="display: flex; gap: 2rem; border-left: 6px solid #10b981; padding-left: 1.5rem; align-items: center;">
+      <div style="flex: 0 0 180px;">
+        <p class="font-bold uppercase" style="color: #10b981; letter-spacing: 0.1em; font-size: 0.9rem; margin-bottom: 0.25rem;">Part 2</p>
+        <p class="text-xl font-bold">Matteo Scuratti</p>
+      </div>
+      
+      <div class="flex-col" style="flex: 1;">
+        <div class="panel" style="margin: 0; padding: 12px 20px; background: #ecfdf5; border: 1px solid #a7f3d0;">
+          <p class="text-lg font-semibold" style="color: #065f46; margin-bottom: 4px;">3. Cubature Kalman Filter (CKF) Spherical ...</p>
+          <p class="text-muted" style="margin: 0;">Spherical-radial integration rule: parameter-free state estimation.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- PART 3: MATTIA SICOLI -->
+    <div data-step="3" style="display: flex; gap: 2rem; border-left: 6px solid #8b5cf6; padding-left: 1.5rem; align-items: center;">
+      <div style="flex: 0 0 180px;">
+        <p class="font-bold uppercase" style="color: #8b5cf6; letter-spacing: 0.1em; font-size: 0.9rem; margin-bottom: 0.25rem;">Part 3</p>
+        <p class="text-xl font-bold">Mattia Sicoli</p>
+      </div>
+      
+      <div class="flex-col" style="flex: 1;">
+        <div class="panel" style="margin: 0; padding: 12px 20px; background: #f5f3ff; border: 1px solid #ddd6fe;">
+          <p class="text-lg font-semibold" style="color: #5b21b6; margin-bottom: 4px;">4. Comprehensive Comparison</p>
+          <p class="text-muted" style="margin: 0;">KF vs. EKF vs. UKF vs. CKF in real-world application scenarios.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

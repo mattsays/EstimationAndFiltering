@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>The Flywheel Analogy</title>
+  <link rel="stylesheet" href="slideui.css">
+  <script src="slideui.js" defer></script>
+  <style>
+    .arrow { font-size: 2rem; font-weight: bold; line-height: 1; color: #94a3b8; display: inline-block; }
+    .arrow-right { animation: nudge-x 1.2s ease-in-out infinite; }
+    .arrow-down { animation: nudge-y 1.2s ease-in-out infinite; }
+    @keyframes nudge-x { 0%, 100% { transform: translateX(-4px); } 50% { transform: translateX(4px); } }
+    @keyframes nudge-y { 0%, 100% { transform: translateY(-4px); } 50% { transform: translateY(4px); } }
+    
+    /* Flywheel rotation animation */
+    .spin {
+      transform-origin: 130px 90px;
+      animation: spin-anim 8s linear infinite;
+    }
+    @keyframes spin-anim { 100% { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<div class="slide-layout" style="padding: 36px 48px; justify-content: flex-start;">
+
+  <!-- HEADER -->
+  <div style="margin-bottom: 16px;">
+    <h1 class="title" style="font-size: 2.75rem; margin-bottom: 0.25rem;">The Flywheel Analogy</h1>
+    <p class="subtitle" style="font-size: 1.5rem; margin-bottom: 0;">Gaussian \(\to\) 2 moments \(\sim \) mass & inertia \(\to\) Flywheel</p>
+  </div>
+
+  <!-- ROW 1: Gaussian <-> flywheel -->
+  <div style="display: flex; align-items: center; gap: 16px;">
+
+    <!-- 2D Gaussian -->
+    <div class="panel panel-primary" style="flex: 1; padding: 20px; margin: 0;">
+      <p class="text-xl text-primary" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">2D Gaussian distribution</p>
+      <svg viewBox="0 0 260 190" style="width: 100%; height: 170px; display: block; margin-bottom: 8px;">
+        <!-- axes -->
+        <line x1="20" y1="165" x2="245" y2="165" stroke="#94a3b8" stroke-width="2"/>
+        <line x1="20" y1="165" x2="20" y2="10" stroke="#94a3b8" stroke-width="2"/>
+        <text x="236" y="182" font-size="13" fill="#64748b">x1</text>
+        <text x="4" y="20" font-size="13" fill="#64748b">x2</text>
+        <!-- probability contours -->
+        <g transform="rotate(-30 135 88)">
+          <ellipse cx="135" cy="88" rx="100" ry="46" fill="#3b82f6" fill-opacity="0.10" stroke="#3b82f6" stroke-width="1.5"/>
+          <ellipse cx="135" cy="88" rx="66" ry="30" fill="#3b82f6" fill-opacity="0.20" stroke="#3b82f6" stroke-width="1.5"/>
+          <ellipse cx="135" cy="88" rx="33" ry="15" fill="#3b82f6" fill-opacity="0.35" stroke="#3b82f6" stroke-width="1.5"/>
+        </g>
+        <circle cx="135" cy="88" r="5" fill="#dc2626"/>
+        <text x="146" y="102" font-size="13" font-weight="bold" fill="#dc2626">mean \(\mathbf{\hat{x}}\)</text>
+      </svg>
+      <div class="math-block" style="padding: 12px; margin: 0; font-size: 1.1rem;">
+        \(\displaystyle \mathbf{\hat{x}} = \mathbb{E}[\mathbf{x}], \quad \mathbf{P} = \mathbb{E}[(\mathbf{x}-\mathbf{\hat{x}})(\mathbf{x}-\mathbf{\hat{x}})^T] \)
+      </div>
+    </div>
+
+    <!-- Arrow -->
+    <div data-step="1" style="width: 40px; display: flex; justify-content: center;">
+      <span class="arrow arrow-right">↔</span>
+    </div>
+
+    <!-- Flywheel -->
+    <div class="panel panel-accent" data-step="1" style="flex: 1; padding: 20px; margin: 0;">
+      <p class="text-xl text-accent" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">Flywheel of mass \(M=1\text{kg}\)</p>
+      <svg viewBox="0 0 260 190" style="width: 100%; height: 170px; display: block; margin-bottom: 8px;">
+        <defs>
+          <radialGradient id="mass" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#475569" stop-opacity="0.85"/>
+            <stop offset="100%" stop-color="#475569" stop-opacity="0.08"/>
+          </radialGradient>
+        </defs>
+        
+        <!-- Rotating Group -->
+        <g class="spin">
+          <!-- body and rim -->
+          <circle cx="130" cy="90" r="76" fill="url(#mass)" stroke="#334155" stroke-width="6"/>
+          <!-- spokes -->
+          <g stroke="#334155" stroke-width="3" opacity="0.45">
+            <line x1="54" y1="90" x2="206" y2="90"/>
+            <line x1="130" y1="14" x2="130" y2="166"/>
+            <line x1="76" y1="36" x2="184" y2="144"/>
+            <line x1="184" y1="36" x2="76" y2="144"/>
+          </g>
+        </g>
+        
+        <!-- Center overlay (static) -->
+        <circle cx="130" cy="90" r="10" fill="#1e293b"/>
+        <circle cx="130" cy="90" r="5" fill="#dc2626"/>
+        
+        <!-- Inertia rotation arrow -->
+        <path d="M 218 56 A 92 92 0 0 1 218 124" fill="none" stroke="#6366f1" stroke-width="3"/>
+        <polygon points="212,120 224,122 216,133" fill="#6366f1"/>
+        
+        <!-- Labels -->
+        <text x="230" y="95" font-size="16" font-weight="bold" fill="#6366f1">I</text>
+        <text x="142" y="100" font-size="13" font-weight="bold" fill="#dc2626" stroke="white" stroke-width="3" paint-order="stroke">\(\mathbf{c_m}\)</text>
+      </svg>
+      <div class="math-block" style="padding: 12px; margin: 0; font-size: 1.1rem;">
+        \(\displaystyle \mathbf{c_m} = \sum_{i} m_i \mathbf{r}_i, \quad \mathbf{I} = \sum_{i} m_i \|\mathbf{r}_i - \mathbf{c_m}\|^2 \)
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ROW 2: the mapping -->
+  <div class="panel" data-step="2" style="padding: 16px 20px; margin: 16px 0 0 0;">
+    <div style="display: flex; gap: 16px; align-items: center; justify-content: space-between;">
+      
+      <div style="flex: 1; background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; text-align: center; font-size: 1.15rem;">
+        <span class="text-primary" style="font-weight: 700;">\(\int p(\mathbf{x})d\mathbf{x} = 1\)</span> ↔ <span class="text-accent" style="font-weight: 700;">Mass \(M = 1\text{kg}\)</span>
+      </div>
+
+      <div style="flex: 1; background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; text-align: center; font-size: 1.15rem;">
+        <span class="text-primary" style="font-weight: 700;">Mean \(\mathbf{\hat{x}}\)</span> ↔ <span class="text-accent" style="font-weight: 700;">Center of Mass \(\mathbf{c_m}\)</span>
+      </div>
+
+      <div style="flex: 1; background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; text-align: center; font-size: 1.15rem;">
+        <span class="text-primary" style="font-weight: 700;">Covariance \(\mathbf{P}\)</span> ↔ <span class="text-accent" style="font-weight: 700;">Inertia \(\mathbf{I}\)</span>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

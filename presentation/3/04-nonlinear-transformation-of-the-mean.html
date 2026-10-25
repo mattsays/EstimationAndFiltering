@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nonlinear transformation of the mean</title>
+<link rel="stylesheet" href="slideui.css">
+<script src="slideui.js" defer></script>
+</head>
+<body>
+
+<div class="slide-layout">
+
+<section class="slide build curvature-slide" data-steps="4">
+  <h1>Nonlinear transformation of the mean</h1>
+  <div class="body">
+    <div class="strip" style="text-align:center;margin-bottom:12px;padding:16px">
+      <p style="margin:0;font-size:28px">\(x\sim\mathcal{N}(0,1),\qquad y=f(x)=x^2+\tfrac12\)</p>
+      <p style="margin:18px 0 0;font-size:34px;font-weight:700;line-height:1.25;color:var(--accent)">What is the output mean \(\mathbb{E}[y]\)?</p>
+    </div>
+<div class="method-columns">
+<article class="method-column" data-step="2"><svg viewBox="0 0 552 365" role="img" aria-label="EKF flat tangent"><defs>
+        <g id="mean-axes" fill="none" stroke="var(--muted)" stroke-width="1.5">
+          <path d="M64 318 H480 M272 326 V98"/>
+          <path d="M162 312 V324 M382 312 V324 M266 268 H278 M266 168 H278"/>
+        </g>
+        <path id="mean-parabola" d="M134 110 Q272 426 410 110"/>
+      </defs><g font-family="var(--font)">
+          <rect x="4" y="4" width="544" height="360" rx="22" fill="var(--card)"/>
+          <text x="32" y="47" font-size="28" font-weight="650" fill="var(--fg)">EKF: linearize at the mean</text>
+          <text x="32" y="79" font-size="22" fill="var(--muted)">Replace the nonlinear curve with its tangent.</text>
+          <use href="#mean-axes"/>
+          <use href="#mean-parabola" fill="none" stroke="var(--muted)" stroke-width="3" opacity=".55"/>
+          
+          <path d="M90 268 H454" fill="none" stroke="var(--accent2)" stroke-width="4"/>
+          <circle cx="272" cy="268" r="7" fill="var(--accent2)"/>
+          
+          <text x="328" y="254" font-size="22" fill="var(--accent2)">y = 0.5</text>
+          <g font-size="22" fill="var(--muted)" text-anchor="middle">
+            <text x="162" y="351">−1</text><text x="272" y="351">0</text><text x="382" y="351">1</text>
+          </g>
+          <text x="485" y="325" font-size="23" fill="var(--muted)">x</text>
+          <text x="287" y="107" font-size="23" fill="var(--muted)">y</text>
+        </g></svg><div class="derivation">
+        <p>First-order Taylor approximation at zero.</p>
+        \[f(x)\approx f(0)+f'(0)(x-0)=\tfrac12\]
+        \[\widehat{\mu}_y^{\mathrm{EKF}}=\mathbb{E}[\tfrac12]=\boxed{\tfrac12}\]
+        
+      </div></article>
+<article class="method-column" data-step="3"><svg viewBox="0 0 552 365" role="img" aria-label="CKF transformed points"><g font-family="var(--font)">
+          <rect x="4" y="4" width="544" height="360" rx="22" fill="var(--card)"/>
+          <text x="32" y="47" font-size="28" font-weight="650" fill="var(--fg)">CKF: transform two points</text>
+          <text x="32" y="79" font-size="22" fill="var(--muted)">Evaluate the original curve at two representative points.</text>
+          <use href="#mean-axes"/>
+          <use href="#mean-parabola" fill="none" stroke="var(--muted)" stroke-width="3"/>
+          <path d="M66 168 H480" fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="7 7"/>
+          <path d="M162 318 V168 M382 318 V168" fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="4 6"/>
+          <g fill="var(--accent)" stroke="var(--card)" stroke-width="2">
+            <circle cx="162" cy="168" r="9"/><circle cx="382" cy="168" r="9"/>
+            <circle cx="162" cy="318" r="6"/><circle cx="382" cy="318" r="6"/>
+          </g>
+          <text x="75" y="151" font-size="22" fill="var(--accent)">f(−1) = f(+1) = 1.5</text>
+          <g font-size="22" fill="var(--muted)" text-anchor="middle">
+            <text x="162" y="351">−1</text><text x="272" y="351">0</text><text x="382" y="351">1</text>
+          </g>
+          <text x="485" y="325" font-size="23" fill="var(--muted)">x</text>
+          <text x="287" y="107" font-size="23" fill="var(--muted)">y</text>
+        </g></svg><div class="derivation">
+        <p>Weighted average of the nonlinear outputs.</p>
+        \[\chi_1=-1,\quad\chi_2=1,\quad w_1=w_2=\tfrac12\]
+        \[\widehat{\mu}_y^{\mathrm{CKF}}=\sum_{i=1}^{2}w_i f(\chi_i)=\boxed{\tfrac32}\]
+        
+      </div></article>
+</div>
+    <div class="exact-result" data-step="4">
+      \(\text{Exact mean:}\quad\mathbb{E}[y]=\mathbb{E}[x^2]+\tfrac12=1+\tfrac12=\boxed{\tfrac32}\)
+      <p style="font-size:22px;margin:10px 0 0;color:var(--muted)">CKF recovers the exact mean in this example. This does not imply an exact output variance.</p>
+    </div>
+  </div>
+</section>
+
+</div>
+
+</body>
+</html>

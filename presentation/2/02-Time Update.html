@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>CKF: Time Update</title>
+  <link rel="stylesheet" href="slideui.css">
+  <script src="slideui.js" defer></script>
+  <style>
+    .arrow { font-size: 2rem; font-weight: bold; line-height: 1; color: #94a3b8; display: inline-block; }
+    .arrow-right { animation: nudge-x 1.2s ease-in-out infinite; }
+    .arrow-down { animation: nudge-y 1.2s ease-in-out infinite; }
+    @keyframes nudge-x { 0%, 100% { transform: translateX(-4px); } 50% { transform: translateX(4px); } }
+    @keyframes nudge-y { 0%, 100% { transform: translateY(-4px); } 50% { transform: translateY(4px); } }
+  </style>
+</head>
+<body>
+
+<div class="slide-layout" style="padding: 36px 48px; justify-content: flex-start;">
+
+  <!-- Header -->
+  <div class="title" style="font-size: 2.75rem; margin-bottom: 0.25rem;">CKF: Time Update</div>
+  <div class="subtitle" style="font-size: 1.5rem; margin-bottom: 0;">From the posterior at k|k to the predicted state at k+1|k</div>
+
+  <!-- Row 1: factorization, cubature points, propagation -->
+  <div style="display: flex; align-items: stretch; gap: 8px; margin-top: 16px;">
+
+    <!-- Step 1: factorize the posterior covariance -->
+    <div class="panel panel-primary" data-step="1" style="flex: 1 1 0; min-width: 0; box-sizing: border-box; padding: 20px; margin: 0;">
+      <div class="text-primary" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">1 · Factorize</div>
+      <div class="text-muted" style="font-size: 1.05rem; margin-bottom: 10px;">Posterior at time k is known</div>
+      <div class="math-block" style="padding: 12px; margin: 0; font-size: 1.2rem;">
+        \(\displaystyle P_{k|k} = S_{k|k}S_{k|k}^{T}\)
+      </div>
+    </div>
+
+    <!-- Transition 1 -> 2 -->
+    <div data-step="2" style="display: flex; justify-content: center; align-items: center;"><span class="arrow arrow-right">→</span></div>
+
+    <!-- Step 2: evaluate the cubature points -->
+    <div class="panel panel-primary" data-step="3" style="flex: 1 1 0; min-width: 0; box-sizing: border-box; padding: 20px; margin: 0;">
+      <div class="text-primary" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">2 · Cubature points</div>
+      <div class="text-muted" style="font-size: 1.05rem; margin-bottom: 10px;">\(i = 1, 2, \ldots, m\), with \(m = 2n_x\)</div>
+      <div class="math-block" style="padding: 12px; margin: 0; font-size: 1.2rem;">
+        \(\displaystyle \mathbf{x}^{i}_{k|k} = S_{k|k}\xi^{i} + \hat{x}_{k|k}\)
+      </div>
+    </div>
+
+    <!-- Transition 2 -> 3 -->
+    <div data-step="4" style="display: flex; justify-content: center; align-items: center;"><span class="arrow arrow-right">→</span></div>
+
+    <!-- Step 3: propagate the cubature points -->
+    <div class="panel panel-primary" data-step="5" style="flex: 1 1 0; min-width: 0; box-sizing: border-box; padding: 20px; margin: 0;">
+      <div class="text-primary" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">3 · Propagation</div>
+      <div class="text-muted" style="font-size: 1.05rem; margin-bottom: 10px;">Through the state transition \(f\)</div>
+      <div class="math-block" style="padding: 12px; margin: 0; font-size: 1.2rem;">
+        \(\displaystyle \mathbf{x}^{*i}_{k+1|k} = f(\mathbf{x}^{i}_{k|k}, u_k)\)
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Transition from row 1 to row 2 -->
+  <div data-step="6" style="display: flex; justify-content: center; margin: 12px 0;"><span class="arrow arrow-down">↓</span></div>
+
+  <!-- Row 2: predicted state and predicted error covariance -->
+  <div style="display: flex; align-items: stretch; gap: 8px;">
+
+    <!-- Step 4: predicted state -->
+    <div class="panel panel-accent" data-step="7" style="flex: 1 1 0; min-width: 0; box-sizing: border-box; padding: 20px; margin: 0;">
+      <div class="text-accent" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">4 · Predicted state</div>
+      <div class="text-muted" style="font-size: 1.05rem; margin-bottom: 10px;">Mean of the propagated points</div>
+      <div class="math-block" style="padding: 12px; margin: 0; font-size: 1.2rem;">
+        \(\displaystyle \hat{x}_{k+1|k} = \frac{1}{m}\sum_{i=1}^{m}\mathbf{x}^{*i}_{k+1|k}\)
+      </div>
+    </div>
+
+    <!-- Transition 4 -> 5 -->
+    <div data-step="8" style="display: flex; justify-content: center; align-items: center;"><span class="arrow arrow-right">→</span></div>
+
+    <!-- Step 5: predicted error covariance -->
+    <div class="panel panel-accent" data-step="9" style="flex: 1.8 1 0; min-width: 0; box-sizing: border-box; padding: 20px; margin: 0;">
+      <div class="text-accent" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">5 · Predicted error covariance</div>
+      <div class="text-muted" style="font-size: 1.05rem; margin-bottom: 10px;">Includes the process noise covariance \(Q_k\)</div>
+      <div class="math-block" style="padding: 12px; margin: 0; font-size: 1.2rem;">
+        \(\displaystyle P_{k+1|k} = \frac{1}{m}\sum_{i=1}^{m}\mathbf{x}^{*i}_{k+1|k}\mathbf{x}^{*i\,T}_{k+1|k} - \hat{x}_{k+1|k}\hat{x}_{k+1|k}^{T} + Q_k\)
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+</html>

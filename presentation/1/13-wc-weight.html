@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>UKF: The Role of the Central Weight</title>
+  <link rel="stylesheet" href="slideui.css">
+  <script src="slideui.js" defer></script>
+  <style>
+    /* ONLY arrow animations allowed in head */
+    .arrow { font-size: 2rem; font-weight: bold; line-height: 1; color: #94a3b8; display: inline-block; }
+    .arrow-right { animation: nudge-x 1.2s ease-in-out infinite; }
+    .arrow-down { animation: nudge-y 1.2s ease-in-out infinite; }
+    @keyframes nudge-x { 0%, 100% { transform: translateX(-4px); } 50% { transform: translateX(4px); } }
+    @keyframes nudge-y { 0%, 100% { transform: translateY(-4px); } 50% { transform: translateY(4px); } }
+    
+    /* Animation for the covariance tuning effect */
+    @keyframes tune-covariance {
+      0%, 100% { transform: scale(1); stroke: #22c55e; fill: rgba(34, 197, 94, 0.1); }
+      50% { transform: scale(1.15); stroke: #f59e0b; fill: rgba(245, 158, 11, 0.15); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- 
+  ===================================================================
+  GUIDA PER L'ORATORE:
+  ===================================================================
+  1. (Apertura) "Perché abbiamo introdotto w_0^c? Quando i Sigma Points passano attraverso una funzione non lineare, non viene distorta solo la covarianza, ma anche i momenti di ordine superiore (come la curtosi, ovvero la 'forma' delle code della distribuzione)."
+  2. (Step 1) "Se usassimo lo stesso peso w_0 per la covarianza, perderemmo precisione. Aggiungendo un termine correttivo solo al peso centrale della covarianza, compensiamo questo errore di troncamento SENZA alterare il calcolo della media (che deve rimanere centrata)."
+  3. (Step 2) "Matematicamente, la formula di w_0^c include il peso base w_0 più un termine aggiuntivo (1 - alpha^2 + beta). Il parametro chiave qui è beta."
+  4. (Step 3) "Beta codifica la conoscenza a priori sulla forma della distribuzione originale. Per una distribuzione Gaussiana, il valore ottimo è rigorosamente beta = 2. Questo cattura le informazioni del quarto momento."
+  5. (Step 4) "Geometricamente (come vedete dall'animazione in basso), w_0^c agisce come un 'sintonizzatore': permette di espandere o contrarre l'ellisse di incertezza (la covarianza) per farla aderire meglio alla vera distribuzione non lineare, lasciando la media inalterata."
+  ===================================================================
+-->
+
+<div class="slide-layout" style="padding: 36px 48px; justify-content: flex-start; display: flex; flex-direction: column;">
+
+  <!-- HEADER -->
+  <div style="margin-bottom: 24px;">
+    <h1 class="title" style="font-size: 2.75rem; margin-bottom: 0.25rem;">What is \(w_0^c\)?</h1>
+    <p class="subtitle text-muted" style="font-size: 1.5rem; margin-bottom: 0;">Encoding higher-order moment information into the covariance \(\mathbf{P}_{k+1|k}\)</p>
+  </div>
+
+  <!-- ROW 1: 2 COLUMNS (Concept & Math) -->
+  <div style="display: flex; align-items: stretch; gap: 20px; margin-bottom: 24px;">
+
+    <!-- COL 1: The "Why" -->
+    <div class="panel" style="flex: 1; padding: 24px; margin: 0; display: flex; flex-direction: column; justify-content: space-between;">
+      <div>
+        <p class="text-xl" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 8px; color: #1e293b;">1. The Truncation Problem</p>
+        <p class="text-muted" style="font-size: 1.05rem; margin-bottom: 12px; line-height: 1.5;">
+          Non-linear functions \(f_k(\mathbf{x})\) distort the <strong>higher-order moments</strong> (e.g., skewness, kurtosis) of the prior distribution. 
+        </p>
+      </div>
+      
+      <div data-step="1">
+        <p class="text-xl" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 8px; color: #b45309; margin-top: 16px;">2. The Solution</p>
+        <p class="text-muted" style="font-size: 1.05rem; margin-bottom: 0; line-height: 1.5;">
+          To correct the covariance approximation error without shifting the already-computed mean \(\mathbf{\hat{x}}\), we inject extra shape information <strong>only into the central weight</strong> of the covariance formula.
+        </p>
+      </div>
+    </div>
+
+    <!-- ARROW -->
+    <div data-step="2" style="width: 32px; align-self: center; display: flex; justify-content: center;">
+      <span class="arrow arrow-right">→</span>
+    </div>
+
+    <!-- COL 2: The Math -->
+    <div class="panel panel-accent" data-step="2" style="flex: 1.2; padding: 24px; margin: 0; display: flex; flex-direction: column; justify-content: flex-start;">
+      <p class="text-xl text-accent" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 8px;">3. The Mathematical Formula</p>
+      <p class="text-muted" style="font-size: 1.05rem; margin-bottom: 16px;">
+        The central covariance weight adds a specific compensation term:
+      </p>
+
+      <div class="math-block" style="padding: 16px; margin: 0 0 16px 0; font-size: 1.15rem; background: white; border-radius: 8px;">
+        \(\displaystyle w_0^c = w_0 + (1 - \alpha^2 + \beta) \)
+      </div>
+      
+      <div data-step="3" style="background: white; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px; margin-top: auto;">
+        <p style="font-size: 1.05rem; font-weight: 700; color: #1d4ed8; margin: 0 0 4px 0;">What is \(\beta\)?</p>
+        <p class="text-muted" style="font-size: 0.95rem; margin: 0; line-height: 1.4;">
+          \(\beta\) encodes prior knowledge about the distribution's shape (4th moment / kurtosis).<br>
+          <strong>For Gaussian distributions, the optimal value is \(\beta = 2\).</strong>
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ROW 2: GEOMETRIC INTUITION (Animation) -->
+  <div class="panel panel-primary" data-step="4" style="padding: 16px 24px; margin: 0; display: flex; align-items: center; justify-content: space-between; gap: 24px;">
+    
+    <div style="flex: 1.5;">
+      <span style="font-size: 1.25rem; font-weight: 700; color: #1e40af; display: block; margin-bottom: 6px;">
+        Geometric Intuition: Tuning the Covariance
+      </span>
+      <span class="text-muted" style="font-size: 1.05rem; line-height: 1.5;">
+        The extra term acts as a "dial" that safely inflates or deflates the covariance spread \(\mathbf{P}_{k+1|k}\) to capture non-linear distortion, <strong>while keeping the mean \(\mathbf{\hat{x}}\) exactly anchored</strong> to the mapped cloud.
+      </span>
+    </div>
+
+    <div style="width: 2px; height: 64px; background: #cbd5e1;"></div>
+
+    <!-- SVG Animation showing Covariance tuning -->
+    <div style="flex: 1; display: flex; justify-content: center; align-items: center;">
+      <svg width="100%" height="80" viewBox="0 0 160 80" style="overflow: visible;">
+        <!-- The pulsing ellipse representing the tuning of P -->
+        <g style="transform-origin: 80px 40px; animation: tune-covariance 3s ease-in-out infinite;">
+          <ellipse cx="80" cy="40" rx="55" ry="28" stroke-width="2" stroke-dasharray="4,4"/>
+        </g>
+        
+        <!-- Mean anchored in place -->
+        <path d="M 76 40 L 84 40 M 80 36 L 80 44" stroke="#166534" stroke-width="2"/>
+        <text x="73" y="44" font-size="12" font-weight="bold" fill="#166534" text-anchor="end">\(\mathbf{\hat{x}}\)</text>
+        
+        <!-- Central mapped point y0 -->
+        <circle cx="86" cy="44" r="4" fill="#1e40af"/>
+        <text x="92" y="48" font-size="9" font-weight="bold" fill="#1e40af" text-anchor="start">\(\mathbf{y}_0\)</text>
+      </svg>
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+</html>

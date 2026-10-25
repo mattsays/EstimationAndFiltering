@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The nonlinear model</title>
+<link rel="stylesheet" href="slideui.css">
+<script src="slideui.js" defer></script>
+</head>
+<body>
+
+<div class="slide-layout">
+
+<section class="slide build" data-steps="5">
+  <div class="body">
+    <svg viewBox="0 0 1000 590" width="100%" role="img"
+         aria-label="Nonlinear model: Function Approximation and Point Sampling, followed by a common LMMSE correction engine">
+      <defs>
+        <marker id="ar1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="context-stroke"/></marker>
+      </defs>
+
+      <!-- step 1: the model, in the centre -->
+      <g class="model-group">
+        <rect x="300" y="40" width="400" height="170" rx="22" fill="var(--card)" stroke="var(--line)" stroke-width="1.6"/>
+        <text x="500" y="84" text-anchor="middle" font-family="var(--font)" font-size="22"
+              font-weight="650" fill="var(--fg)">Nonlinear model</text>
+        <g font-family="var(--serif)" font-style="italic" font-size="30" fill="var(--fg)">
+          <text x="500" y="132" text-anchor="middle">x<tspan dy="9" font-size="20">k+1</tspan><tspan dy="-9"> = f</tspan><tspan dy="9" font-size="20">k</tspan><tspan dy="-9">(x</tspan><tspan dy="9" font-size="20">k</tspan><tspan dy="-9">) + w</tspan><tspan dy="9" font-size="20">k</tspan></text>
+          <text x="500" y="180" text-anchor="middle">z<tspan dy="9" font-size="20">k</tspan><tspan dy="-9"> = h</tspan><tspan dy="9" font-size="20">k</tspan><tspan dy="-9">(x</tspan><tspan dy="9" font-size="20">k</tspan><tspan dy="-9">) + v</tspan><tspan dy="9" font-size="20">k</tspan></text>
+        </g>
+      </g>
+
+      <!-- step 3: function approximation -->
+      <g data-step="3">
+        <path d="M410 210 C410 232 265 226 265 248" stroke="var(--accent2)" stroke-width="2.2" fill="none"/>
+        <rect x="65" y="250" width="400" height="100" rx="20" fill="var(--card)" stroke="var(--line)" stroke-width="1.6"/>
+        <rect x="65" y="273" width="4" height="54" rx="2" fill="var(--accent2)"/>
+        <g transform="translate(91 267)" fill="none" stroke-linecap="round">
+          <path d="M0 58 H83 M8 62 V3" stroke="var(--line)" stroke-width="2"/>
+          <path d="M12 49 Q39 51 76 8" stroke="var(--muted)" stroke-width="2.5"/>
+          <path d="M17 61 L70 15" stroke="var(--accent2)" stroke-width="3"/>
+          <circle cx="44" cy="37" r="4" fill="var(--accent2)"/>
+        </g>
+        <text x="201" y="293" font-family="var(--font)" fill="var(--fg)" font-weight="650" font-size="27">Function</text>
+        <text x="201" y="325" font-family="var(--font)" fill="var(--fg)" font-weight="650" font-size="27">Approximation</text>
+      </g>
+
+      <!-- step 4: point sampling -->
+      <g data-step="4">
+        <path d="M590 210 C590 232 735 226 735 248" stroke="var(--accent)" stroke-width="2.2" fill="none"/>
+        <rect x="535" y="250" width="400" height="100" rx="20" fill="var(--card)" stroke="var(--line)" stroke-width="1.6"/>
+        <rect x="535" y="273" width="4" height="54" rx="2" fill="var(--accent)"/>
+        <g transform="translate(561 267)" stroke-linecap="round">
+          <path d="M0 58 H83 M8 62 V3" fill="none" stroke="var(--line)" stroke-width="2"/>
+          <path d="M12 49 Q39 51 76 8" fill="none" stroke="var(--muted)" stroke-width="2.5"/>
+          <g fill="var(--accent)" stroke="var(--card)" stroke-width="2">
+            <circle cx="18" cy="49" r="5"/><circle cx="43" cy="37" r="5"/><circle cx="68" cy="17" r="5"/>
+          </g>
+        </g>
+        <text x="671" y="293" font-family="var(--font)" fill="var(--fg)" font-weight="650" font-size="27">Point</text>
+        <text x="671" y="325" font-family="var(--font)" fill="var(--fg)" font-weight="650" font-size="27">Sampling</text>
+      </g>
+
+      <!-- step 5: the common engine -->
+      <g data-step="5">
+        <g stroke-width="2" fill="none" stroke="var(--muted)">
+          <path d="M265 350 L265 378 L440 378 L440 396" marker-end="url(#ar1)"/>
+          <path d="M735 350 L735 378 L560 378 L560 396" marker-end="url(#ar1)"/>
+        </g>
+
+        <rect x="320" y="400" width="360" height="62" rx="31" fill="var(--card)" stroke="var(--line)" stroke-width="1.6"/>
+        <text x="500" y="440" text-anchor="middle" font-family="var(--font)" fill="var(--fg)"
+              font-weight="650" font-size="23">(mean, covariance)</text>
+
+        <path d="M500 462 L500 490" stroke="var(--muted)" stroke-width="2" fill="none" marker-end="url(#ar1)"/>
+
+        <rect x="210" y="492" width="580" height="96" rx="20" fill="var(--card)" stroke="var(--line)" stroke-width="1.6"/>
+        <text x="500" y="525" text-anchor="middle" font-family="var(--font)" fill="var(--fg)"
+              font-weight="650" font-size="27">LMMSE Correction</text>
+        <g font-family="var(--serif)" font-style="italic" font-size="24" fill="var(--fg)">
+          <text x="500" y="568" text-anchor="middle">x̂<tspan dy="7" font-size="16">k+1|k+1</tspan><tspan dy="-7">, P</tspan><tspan dy="7" font-size="16">k+1|k+1</tspan></text>
+        </g>
+      </g>
+    </svg>
+  </div>
+</section>
+
+</div>
+
+</body>
+</html>

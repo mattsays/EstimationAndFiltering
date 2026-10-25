@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A target observed by radar</title>
+<link rel="stylesheet" href="slideui.css">
+<script src="slideui.js" defer></script>
+</head>
+<body>
+
+<div class="slide-layout">
+
+<section class="slide build radar-setup" data-steps="3">
+<h1>A target observed by radar</h1>
+<div class="body">
+<svg viewBox="0 0 1120 460" style="width:100%;max-height:51vh" role="img" aria-label="Radar at the origin observes range r and bearing theta to a moving target at Cartesian position px, py. Velocity is estimated from successive observations.">
+<defs><marker id="radar-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="context-stroke"/></marker></defs>
+<g font-family="var(--font)" font-size="25">
+<path d="M130 350 H900 M130 350 V55" fill="none" stroke="var(--muted)" stroke-width="2"/>
+<text x="918" y="358" fill="var(--muted)">x</text><text x="120" y="40" fill="var(--muted)">y</text>
+<circle cx="130" cy="350" r="10" fill="var(--fg)"/><text x="88" y="395" fill="var(--fg)" font-weight="650">Radar</text>
+<defs><clipPath id="radar-quadrant"><rect x="130" y="55" width="770" height="295"/></clipPath></defs>
+<g aria-hidden="true" pointer-events="none" clip-path="url(#radar-quadrant)">
+  <!-- Quarter-circle waves reach the target at 68%, then cross the rest of the plot. -->
+  <path class="radar-wave" d="M130 -227.603 A577.603 577.603 0 0 1 707.603 350" fill="none" stroke="var(--accent)" stroke-width="2.5" style="transform-box:view-box;transform-origin:130px 350px"/>
+  <path class="radar-wave delayed" d="M130 -227.603 A577.603 577.603 0 0 1 707.603 350" fill="none" stroke="var(--accent)" stroke-width="2.5" style="transform-box:view-box;transform-origin:130px 350px"/>
+  <circle class="radar-echo" cx="670" cy="145" r="18" fill="none" stroke="var(--accent)" stroke-width="2"/>
+  <circle class="radar-echo delayed" cx="670" cy="145" r="18" fill="none" stroke="var(--accent)" stroke-width="2"/>
+</g>
+<path d="M670 145 L670 350 M130 145 H670" fill="none" stroke="var(--line)" stroke-width="2" stroke-dasharray="7 7"/>
+<text x="565" y="108" fill="var(--fg)" font-size="29" font-weight="650">Target</text>
+<text x="650" y="385" fill="var(--muted)">pₓ</text><text x="77" y="154" fill="var(--muted)">pᵧ</text>
+<path d="M707 131 L833 83" fill="none" stroke="var(--fg)" stroke-width="3" marker-end="url(#radar-arrow)"/>
+<text x="835" y="65" fill="var(--fg)">velocity v</text>
+<g data-step="2">
+<path d="M130 350 L670 145" stroke="var(--accent)" stroke-width="4"/>
+<foreignObject x="365" y="181" width="240" height="62">
+  <div xmlns="http://www.w3.org/1999/xhtml" style="font-family:var(--font);font-size:29px;font-weight:650;line-height:1.4;color:var(--accent);white-space:nowrap">range \(r\)</div>
+</foreignObject>
+<path d="M260 350 A130 130 0 0 0 251.5 303.9" fill="none" stroke="var(--accent2)" stroke-width="4"/>
+<foreignObject x="280" y="296" width="250" height="62">
+  <div xmlns="http://www.w3.org/1999/xhtml" style="font-family:var(--font);font-size:29px;font-weight:650;line-height:1.4;color:var(--accent2);white-space:nowrap">bearing \(\theta\)</div>
+</foreignObject>
+</g>
+<g transform="translate(670 145) rotate(30)" role="img" aria-label="Target ship, viewed from above, pointing 30 degrees clockwise from the horizontal">
+  <path d="M-28 -12 H10 Q27 -10 34 0 Q27 10 10 12 H-28 Z" fill="var(--card)" stroke="var(--fg)" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M-20 -8 H-8 V8 H-20 Z" fill="var(--muted)"/>
+  <rect x="-4" y="-7" width="16" height="14" rx="2" fill="var(--accent)"/>
+  <path d="M17 0 H26 M-14 -5 V5" fill="none" stroke="var(--fg)" stroke-width="2" stroke-linecap="round"/>
+</g>
+</g></svg>
+<div data-step="2" style="text-align:center;margin:0 auto 20px;max-width:960px">
+  <div style="font-size:19px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:8px">State to estimate</div>
+  <div style="display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:12px 30px;font-size:27px">
+    <span>\(\mathbf{x}_k=\begin{bmatrix}p_x &amp; p_y &amp; v_x &amp; v_y\end{bmatrix}^{T}\)</span>
+    <span style="font-size:21px;color:var(--muted)">\(p_x,p_y\): position<br>\(v_x,v_y\): velocity</span>
+  </div>
+</div>
+<div data-step="2" style="text-align:center;font-size:25px">
+<div style="font-size:19px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:8px">Nonlinear function</div>
+\(r=\sqrt{p_x^2+p_y^2}+\nu_r,\qquad\theta=\operatorname{atan2}(p_y,p_x)+\nu_\theta\)
+</div>
+<div class="radar-closing">
+  <div data-step="2" class="radar-premise" style="font-size:27px;font-weight:650;color:var(--muted)">
+    <span>Linear motion. <span style="color:var(--accent)">Nonlinear measurements.</span></span>
+  </div>
+  <div data-step="3" class="radar-question">
+    <p style="font-size:32px;font-weight:750;line-height:1.25;margin:0;color:var(--fg)">But how does increasing <span style="color:var(--accent)">initial uncertainty</span><br>affect the filters?</p>
+  </div>
+</div>
+</div>
+</section>
+
+</div>
+
+</body>
+</html>

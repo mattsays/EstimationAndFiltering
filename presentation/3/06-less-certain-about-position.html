@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Less certain about position</title>
+<link rel="stylesheet" href="slideui.css">
+<script src="slideui.js" defer></script>
+</head>
+<body>
+
+<div class="slide-layout">
+
+<section class="slide build experiment-slide" data-steps="4">
+  <h1>Less certain about position. Same radar.</h1>
+  <div class="body">
+    <p class="lead">Before the first measurement, we are uncertain about both position and velocity.</p>
+    <div class="cols uncertainty-section" data-step="2">
+      <div class="panel">
+        <h3>What we vary: initial position uncertainty</h3>
+        <p>How well do we know <b>where the ship is?</b></p>
+        <p class="experiment-value">25 → 1,200 m per axis</p>
+        <p>We make the starting position progressively less certain.</p>
+      </div>
+      <div class="panel">
+        <h3>What stays fixed</h3>
+        <p><b>Initial velocity uncertainty: 3 m/s per axis.</b><br>Our knowledge of velocity is equally uncertain in every experiment.</p>
+        <p style="margin-top:14px"><b>Radar noise: 20 m in range, 3° in bearing.</b><br>The sensor keeps the same precision.</p>
+      </div>
+    </div>
+    <div data-step="3" class="cols methodology-section">
+      <div class="panel"><h3>Same trials for all three filters</h3><p>300 trajectories per uncertainty level.<br>Same measurements and initial estimates.</p></div>
+      <div class="panel"><h3>Compare position RMSE</h3><p>Pool errors over the first 30 updates.<br>Lower RMSE means better tracking.</p></div>
+    </div>
+    <div data-step="4" class="experiment-parameters">
+      <div class="panel"><h3>Time step</h3><p>1 s</p></div>
+      <div class="panel"><h3>UKF</h3><p>α = 1 · β = 2 · κ = 1</p></div>
+      <div class="panel"><h3>CKF</h3><p>8 points · equal weights</p></div>
+    </div>
+  </div>
+</section>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Architectural Numerical Representation</title>
+  <link rel="stylesheet" href="slideui.css">
+  <script src="slideui.js" defer></script>
+  <style>
+    .arrow { font-size: 2rem; font-weight: bold; line-height: 1; color: #94a3b8; display: inline-block; }
+    .arrow-right { animation: nudge-x 1.2s ease-in-out infinite; }
+    .arrow-down { animation: nudge-y 1.2s ease-in-out infinite; }
+    @keyframes nudge-x { 0%, 100% { transform: translateX(-4px); } 50% { transform: translateX(4px); } }
+    @keyframes nudge-y { 0%, 100% { transform: translateY(-4px); } 50% { transform: translateY(4px); } }
+  </style>
+</head>
+<body>
+
+<div class="slide-layout" style="padding: 36px 48px; justify-content: flex-start;">
+
+  <!-- Header -->
+  <div class="title" style="font-size: 2.75rem; margin-bottom: 0.25rem;">Architectural Numerical Representation</div>
+  <div class="subtitle" style="font-size: 1.5rem; margin-bottom: 0;">Finite precision: integers vs IEEE 754 floating point</div>
+
+  <!-- Main row: formats container (left, 1/3 width) and operations container (right) -->
+  <div style="display: flex; align-items: stretch; gap: 16px; margin-top: 14px;">
+
+    <!-- Left container: number formats, vertically ordered -->
+    <div class="panel panel-primary" data-step="1" style="box-sizing: border-box; width: 394px; flex: none; padding: 20px; margin: 0;">
+      <div class="text-primary" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 8px;">Number formats</div>
+
+      <!-- Fixed-width integer: sign + value -->
+      <div style="margin-bottom: 8px;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; font-size: 1.05rem; margin-bottom: 4px;">
+          <span style="font-weight: 700;">Integer · \(n\) bits</span>
+          <span class="text-muted">gap: \(1\)</span>
+        </div>
+        <div style="display: flex; gap: 6px;">
+          <div style="width: 56px; flex: none;">
+            <div style="box-sizing: border-box; height: 36px; display: flex; align-items: center; justify-content: center; border: 2px solid #ef4444; background: rgba(239,68,68,0.18); border-radius: 4px; font-size: 1rem;">Sign</div>
+            <div class="text-muted" style="text-align: center; font-size: 1rem; margin-top: 2px;">1 Bit</div>
+          </div>
+          <div style="flex: 1 1 0;">
+            <div style="box-sizing: border-box; height: 36px; display: flex; align-items: center; justify-content: center; border: 2px solid #3b82f6; background: rgba(59,130,246,0.18); border-radius: 4px; font-size: 1rem;">Value (2's compl.)</div>
+            <div class="text-muted" style="text-align: center; font-size: 1rem; margin-top: 2px;">← \(n-1\) Bits →</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Single precision: 1 | 8 | 23 -->
+      <div style="margin-bottom: 8px;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; font-size: 1.05rem; margin-bottom: 4px;">
+          <span style="font-weight: 700;">Single · 32 bits</span>
+          <span class="text-muted">gap at 1: \(1.2\cdot10^{-7}\)</span>
+        </div>
+        <div style="display: flex; gap: 6px;">
+          <div style="width: 56px; flex: none;">
+            <div style="box-sizing: border-box; height: 36px; display: flex; align-items: center; justify-content: center; border: 2px solid #ef4444; background: rgba(239,68,68,0.18); border-radius: 4px; font-size: 1rem;">Sign</div>
+            <div class="text-muted" style="text-align: center; font-size: 1rem; margin-top: 2px;">1 Bit</div>
+          </div>
+          <div style="width: 88px; flex: none;">
+            <div style="box-sizing: border-box; height: 36px; display: flex; align-items: center; justify-content: center; border: 2px solid #f59e0b; background: rgba(245,158,11,0.18); border-radius: 4px; font-size: 1rem;">Exp.</div>
+            <div class="text-muted" style="text-align: center; font-size: 1rem; margin-top: 2px;">8 Bits</div>
+          </div>
+          <div style="flex: 1 1 0;">
+            <div style="box-sizing: border-box; height: 36px; display: flex; align-items: center; justify-content: center; border: 2px solid #22c55e; background: rgba(34,197,94,0.18); border-radius: 4px; font-size: 1rem;">Mantissa</div>
+            <div class="text-muted" style="text-align: center; font-size: 1rem; margin-top: 2px;">23 Bits</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Double precision: 1 | 11 | 52 -->
+      <div style="margin-bottom: 8px;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; font-size: 1.05rem; margin-bottom: 4px;">
+          <span style="font-weight: 700;">Double · 64 bits</span>
+          <span class="text-muted">gap at 1: \(2.2\cdot10^{-16}\)</span>
+        </div>
+        <div style="display: flex; gap: 6px;">
+          <div style="width: 56px; flex: none;">
+            <div style="box-sizing: border-box; height: 36px; display: flex; align-items: center; justify-content: center; border: 2px solid #ef4444; background: rgba(239,68,68,0.18); border-radius: 4px; font-size: 1rem;">Sign</div>
+            <div class="text-muted" style="text-align: center; font-size: 1rem; margin-top: 2px;">1 Bit</div>
+          </div>
+          <div style="width: 88px; flex: none;">
+            <div style="box-sizing: border-box; height: 36px; display: flex; align-items: center; justify-content: center; border: 2px solid #f59e0b; background: rgba(245,158,11,0.18); border-radius: 4px; font-size: 1rem;">Exp.</div>
+            <div class="text-muted" style="text-align: center; font-size: 1rem; margin-top: 2px;">11 Bits</div>
+          </div>
+          <div style="flex: 1 1 0;">
+            <div style="box-sizing: border-box; height: 36px; display: flex; align-items: center; justify-content: center; border: 2px solid #22c55e; background: rgba(34,197,94,0.18); border-radius: 4px; font-size: 1rem;">Mantissa</div>
+            <div class="text-muted" style="text-align: center; font-size: 1rem; margin-top: 2px;">52 Bits</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quad precision: 1 | 15 | 112 -->
+      <div>
+        <div style="display: flex; justify-content: space-between; align-items: baseline; font-size: 1.05rem; margin-bottom: 4px;">
+          <span style="font-weight: 700;">Quad · 128 bits</span>
+          <span class="text-muted">gap at 1: \(1.9\cdot10^{-34}\)</span>
+        </div>
+        <div style="display: flex; gap: 6px;">
+          <div style="width: 56px; flex: none;">
+            <div style="box-sizing: border-box; height: 36px; display: flex; align-items: center; justify-content: center; border: 2px solid #ef4444; background: rgba(239,68,68,0.18); border-radius: 4px; font-size: 1rem;">Sign</div>
+            <div class="text-muted" style="text-align: center; font-size: 1rem; margin-top: 2px;">1 Bit</div>
+          </div>
+          <div style="width: 88px; flex: none;">
+            <div style="box-sizing: border-box; height: 36px; display: flex; align-items: center; justify-content: center; border: 2px solid #f59e0b; background: rgba(245,158,11,0.18); border-radius: 4px; font-size: 1rem;">Exp.</div>
+            <div class="text-muted" style="text-align: center; font-size: 1rem; margin-top: 2px;">15 Bits</div>
+          </div>
+          <div style="flex: 1 1 0;">
+            <div style="box-sizing: border-box; height: 36px; display: flex; align-items: center; justify-content: center; border: 2px solid #22c55e; background: rgba(34,197,94,0.18); border-radius: 4px; font-size: 1rem;">Mantissa</div>
+            <div class="text-muted" style="text-align: center; font-size: 1rem; margin-top: 2px;">112 Bits</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right container: animated 2x2 matrix examples, 2 rows of 2 cells -->
+    <div class="panel panel-accent" data-step="1" style="box-sizing: border-box; flex: 1; min-width: 0; padding: 20px; margin: 0;">
+      <div class="text-accent" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 10px;">Error-prone operations on 2×2 matrices</div>
+
+      <!-- Row 1: square rooting and inversion -->
+      <div style="display: flex; align-items: stretch; gap: 12px; margin-bottom: 12px;">
+
+        <!-- Example 1: matrix square rooting (Cholesky factor, 3 decimals) -->
+        <div style="box-sizing: border-box; flex: 1; min-width: 0; padding: 10px; border: 1px solid rgba(148,163,184,0.5); border-radius: 8px;">
+          <div data-step="2">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; font-size: 1.05rem; margin-bottom: 6px;">
+              <span style="font-weight: 700;">Square rooting</span>
+              <span class="text-muted">(4.23), (4.28)</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+              <!-- P -->
+              <div style="display: inline-grid; grid-template-columns: auto auto; gap: 4px 10px; padding: 4px 8px; border-left: 2px solid #94a3b8; border-right: 2px solid #94a3b8; border-radius: 6px; font-size: 1rem; text-align: center;">
+                <span>4</span><span>2</span><span>2</span><span>3</span>
+              </div>
+              <span class="arrow arrow-right" style="font-size: 1.4rem;">→</span>
+              <!-- S = chol(P), rounded to 3 decimals -->
+              <div style="display: inline-grid; grid-template-columns: auto auto; gap: 4px 10px; padding: 4px 8px; border-left: 2px solid #3b82f6; border-right: 2px solid #3b82f6; border-radius: 6px; font-size: 1rem; text-align: center;">
+                <span>2</span><span>0</span><span>1</span><span>1.414</span>
+              </div>
+            </div>
+          </div>
+          <div data-step="3">
+            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+              <span style="font-size: 1rem;">\(SS^T\)</span>
+              <span class="arrow" style="font-size: 1.4rem;">=</span>
+              <div style="display: inline-grid; grid-template-columns: auto auto; gap: 4px 10px; padding: 4px 8px; border-left: 2px solid #f59e0b; border-right: 2px solid #f59e0b; border-radius: 6px; font-size: 1rem; text-align: center;">
+                <span>4</span><span>2</span><span>2</span><span style="color: #f59e0b; font-weight: 700;">2.999</span>
+              </div>
+            </div>
+            <div class="text-muted" style="font-size: 1rem;">\(\sqrt{2}\) is rounded, so \(SS^T \neq P\)</div>
+          </div>
+        </div>
+
+        <!-- Example 2: matrix inversion of an ill-conditioned matrix -->
+        <div style="box-sizing: border-box; flex: 1; min-width: 0; padding: 10px; border: 1px solid rgba(148,163,184,0.5); border-radius: 8px;">
+          <div data-step="4">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; font-size: 1.05rem; margin-bottom: 6px;">
+              <span style="font-weight: 700;">Inversion</span>
+              <span class="text-muted">(4.34)</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+              <!-- A, nearly singular -->
+              <div style="display: inline-grid; grid-template-columns: auto auto; gap: 4px 10px; padding: 4px 8px; border-left: 2px solid #94a3b8; border-right: 2px solid #94a3b8; border-radius: 6px; font-size: 1rem; text-align: center;">
+                <span>1</span><span>1</span><span>1</span><span>1.0001</span>
+              </div>
+              <span class="arrow arrow-right" style="font-size: 1.4rem;">→</span>
+              <!-- A inverse -->
+              <div style="display: inline-grid; grid-template-columns: auto auto; gap: 4px 10px; padding: 4px 8px; border-left: 2px solid #f59e0b; border-right: 2px solid #f59e0b; border-radius: 6px; font-size: 1rem; text-align: center;">
+                <span>10001</span><span>−10000</span><span>−10000</span><span>10000</span>
+              </div>
+            </div>
+          </div>
+          <div data-step="5">
+            <div class="text-muted" style="font-size: 1rem;">Tiny change <span style="color: #f59e0b; font-weight: 700;">1.0001 → 1.0002</span> turns \(10001\) into \(5001\)</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Row 2: squared forms and subtraction -->
+      <div style="display: flex; align-items: stretch; gap: 12px;">
+
+        <!-- Example 3: squared form A^T A in single precision -->
+        <div style="box-sizing: border-box; flex: 1; min-width: 0; padding: 10px; border: 1px solid rgba(148,163,184,0.5); border-radius: 8px;">
+          <div data-step="6">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; font-size: 1.05rem; margin-bottom: 6px;">
+              <span style="font-weight: 700;">Squared form</span>
+              <span class="text-muted">(4.27), (4.32), (4.33)</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+              <!-- A -->
+              <div style="display: inline-grid; grid-template-columns: auto auto; gap: 4px 10px; padding: 4px 8px; border-left: 2px solid #94a3b8; border-right: 2px solid #94a3b8; border-radius: 6px; font-size: 1rem; text-align: center;">
+                <span>1</span><span>1</span><span>10⁻⁴</span><span>0</span>
+              </div>
+              <span class="arrow arrow-right" style="font-size: 1.4rem;">→</span>
+              <!-- exact A^T A -->
+              <div style="display: inline-grid; grid-template-columns: auto auto; gap: 4px 10px; padding: 4px 8px; border-left: 2px solid #3b82f6; border-right: 2px solid #3b82f6; border-radius: 6px; font-size: 1rem; text-align: center;">
+                <span>1+10⁻⁸</span><span>1</span><span>1</span><span>1</span>
+              </div>
+            </div>
+          </div>
+          <div data-step="7">
+            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+              <span style="font-size: 1rem;">Single</span>
+              <span class="arrow arrow-right" style="font-size: 1.4rem;">→</span>
+              <div style="display: inline-grid; grid-template-columns: auto auto; gap: 4px 10px; padding: 4px 8px; border-left: 2px solid #f59e0b; border-right: 2px solid #f59e0b; border-radius: 6px; font-size: 1rem; text-align: center;">
+                <span style="color: #f59e0b; font-weight: 700;">1</span><span>1</span><span>1</span><span>1</span>
+              </div>
+            </div>
+            <div class="text-muted" style="font-size: 1rem;">\(10^{-8}\) is lost, so det = 0: singular</div>
+          </div>
+        </div>
+
+        <!-- Example 4: subtraction of two positive-definite matrices -->
+        <div style="box-sizing: border-box; flex: 1; min-width: 0; padding: 10px; border: 1px solid rgba(148,163,184,0.5); border-radius: 8px;">
+          <div data-step="8">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; font-size: 1.05rem; margin-bottom: 6px;">
+              <span style="font-weight: 700;">Subtraction</span>
+              <span class="text-muted">(4.36)</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+              <!-- A, positive-definite -->
+              <div style="display: inline-grid; grid-template-columns: auto auto; gap: 4px 10px; padding: 4px 8px; border-left: 2px solid #94a3b8; border-right: 2px solid #94a3b8; border-radius: 6px; font-size: 1rem; text-align: center;">
+                <span>2</span><span>1</span><span>1</span><span>1</span>
+              </div>
+              <span class="arrow" style="font-size: 1.4rem;">−</span>
+              <!-- B, positive-definite -->
+              <div style="display: inline-grid; grid-template-columns: auto auto; gap: 4px 10px; padding: 4px 8px; border-left: 2px solid #94a3b8; border-right: 2px solid #94a3b8; border-radius: 6px; font-size: 1rem; text-align: center;">
+                <span>1</span><span>1</span><span>1</span><span>2</span>
+              </div>
+            </div>
+          </div>
+          <div data-step="9">
+            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+              <span class="arrow arrow-right" style="font-size: 1.4rem;">→</span>
+              <div style="display: inline-grid; grid-template-columns: auto auto; gap: 4px 10px; padding: 4px 8px; border-left: 2px solid #f59e0b; border-right: 2px solid #f59e0b; border-radius: 6px; font-size: 1rem; text-align: center;">
+                <span>1</span><span>0</span><span>0</span><span style="color: #f59e0b; font-weight: 700;">−1</span>
+              </div>
+            </div>
+            <div class="text-muted" style="font-size: 1rem;">Both PD, but the result has eigenvalue \(-1\)</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+</html>

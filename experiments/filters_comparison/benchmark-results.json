@@ -1,0 +1,38 @@
+{
+  "seed": 20261023,
+  "runs": 100,
+  "steps": 120,
+  "position_rmse_definition": "sqrt(mean(dx**2 + dy**2)) over all runs and steps",
+  "timing_definition": "median across runs of mean predict+update microseconds; includes point generation",
+  "environment": "Darwin arm64, Python 3.14.4, NumPy 2.5.1",
+  "model": "dt=1 s; CV; acceleration sd=0.5 m/s^2; radar range sd=20 m; bearing sd=3 deg",
+  "UKF": "alpha=1, beta=2, kappa=0; 9 measurement evaluations",
+  "CKF": "8 measurement evaluations; equal positive weights",
+  "KF": "Converted measurements [r cos(b), r sin(b)]; R_cart=J(z) R J(z)^T. First-order approximation, not an exact Gaussian KF. Conversion included in timing.",
+  "results": {
+    "KF": {
+      "rmse_m": 23.331186876983093,
+      "time_us": 18.974316420402225,
+      "time_p25_us": 18.89785438227894,
+      "time_p75_us": 19.23733501219734
+    },
+    "EKF": {
+      "rmse_m": 24.383501424567758,
+      "time_us": 17.222929333608285,
+      "time_p25_us": 17.12090661385446,
+      "time_p75_us": 17.426802272287507
+    },
+    "UKF": {
+      "rmse_m": 23.934750443336114,
+      "time_us": 41.25677593644165,
+      "time_p25_us": 41.06969587761947,
+      "time_p75_us": 41.847709841628486
+    },
+    "CKF": {
+      "rmse_m": 24.020823176824994,
+      "time_us": 34.66106706279486,
+      "time_p25_us": 34.4910409997586,
+      "time_p75_us": 34.886571180929124
+    }
+  }
+}

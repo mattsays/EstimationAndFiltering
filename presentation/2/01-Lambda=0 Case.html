@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>UKF vs CKF Weights and Lambda</title>
+  <link rel="stylesheet" href="slideui.css">
+  <script src="slideui.js" defer></script>
+  <style>
+    .arrow { font-size: 2rem; font-weight: bold; line-height: 1; color: #94a3b8; display: inline-block; }
+    .arrow-right { animation: nudge-x 1.2s ease-in-out infinite; }
+    @keyframes nudge-x { 0%, 100% { transform: translateX(-4px); } 50% { transform: translateX(4px); } }
+  </style>
+</head>
+<body>
+
+<div class="slide-layout" style="padding: 28px 48px; display: flex; flex-direction: column; justify-content: flex-start;">
+
+  <!-- Header Section (top, not vertically centered) -->
+  <div style="margin-bottom: 12px; text-align: center; width: 100%;">
+    <div class="title" style="font-size: 2.2rem; margin-bottom: 0.2rem;">UKF vs. CKF Weight Relationship</div>
+    <div class="subtitle" style="font-size: 1.15rem; margin-bottom: 0;">Equivalence of Cubature Kalman Filter to Unscented Kalman Filter with \(\lambda = 0\)</div>
+  </div>
+
+  <!-- Vertically centered wrapper for all remaining content -->
+  <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 20px; width: 100%;">
+
+    <!-- Main Content Row: UKF vs CKF Comparison (centered) -->
+    <div style="display: flex; align-items: stretch; justify-content: center; gap: 14px; width: 100%;">
+      
+      <!-- UKF Panel -->
+      <div class="panel panel-primary" style="flex: 1; max-width: 340px; padding: 14px; margin: 0;">
+        <div style="font-size: 1.15rem; font-weight: 700; margin-bottom: 6px;" class="text-primary">Unscented Kalman Filter (UKF)</div>
+        <div style="font-size: 0.95rem; margin-bottom: 6px;">Uses \(2n_x+1\) sigma points with scaling parameter \(\lambda\):</div>
+        <div class="math-block" style="padding: 6px; margin-bottom: 6px; font-size: 1rem;">
+          \(\displaystyle W_0 = \frac{\lambda}{n_x + \lambda}\)
+        </div>
+        <div class="math-block" style="padding: 6px; margin-bottom: 0; font-size: 1rem;">
+          \(\displaystyle W_i = \frac{1}{2(n_x + \lambda)}, \quad i = 1, \dots, 2n_x\)
+        </div>
+      </div>
+
+      <!-- Arrow Transition -->
+      <div data-step="1" style="display: flex; align-items: center; justify-content: center;">
+        <span class="arrow arrow-right">→</span>
+      </div>
+
+      <!-- Parameter Reduction Panel -->
+      <div data-step="1" class="panel panel-accent" style="flex: 1; max-width: 340px; padding: 14px; margin: 0;">
+        <div style="font-size: 1.15rem; font-weight: 700; margin-bottom: 6px;" class="text-accent">Setting Parameter \(\lambda = 0\)</div>
+        <div style="font-size: 0.95rem; margin-bottom: 6px;">Setting the scaling parameter to zero eliminates the central point weight:</div>
+        <div class="math-block" style="padding: 6px; margin-bottom: 6px; font-size: 1rem;">
+          \(\displaystyle W_0 = \frac{0}{n_x + 0} = 0\)
+        </div>
+        <div class="math-block" style="padding: 6px; margin-bottom: 0; font-size: 1rem;">
+          \(\displaystyle W_i = \frac{1}{2(n_x + 0)} = \frac{1}{2n_x}\)
+        </div>
+      </div>
+
+      <!-- Arrow Transition -->
+      <div data-step="2" style="display: flex; align-items: center; justify-content: center;">
+        <span class="arrow arrow-right">→</span>
+      </div>
+
+      <!-- CKF Panel -->
+      <div data-step="2" class="panel panel-primary" style="flex: 1; max-width: 340px; padding: 14px; margin: 0;">
+        <div style="font-size: 1.15rem; font-weight: 700; margin-bottom: 6px;" class="text-primary">Cubature Kalman Filter (CKF)</div>
+        <div style="font-size: 0.95rem; margin-bottom: 6px;">Employs spherical rule with \(2n_x\) cubature points:</div>
+        <div class="math-block" style="padding: 6px; margin-bottom: 6px; font-size: 1rem;">
+          \(\displaystyle \text{No Central Point } (\mathcal{X}_0 \text{ vanishes})\)
+        </div>
+        <div class="math-block" style="padding: 6px; margin-bottom: 0; font-size: 1rem;">
+          \(\displaystyle \omega_i = \frac{1}{2n_x}, \quad i = 1, \dots, 2n_x\)
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom Panel -->
+    <div data-step=4 class="panel panel-primary" style="width: 100%; max-width: 200px; padding: 14px 24px; margin: 0; text-align: center;">
+      <div class="math-block" style="padding: 6px; margin: 0; font-size: 1.2rem;">
+        From now on: \(\displaystyle 2n_x = m\)
+      </div>
+    </div>
+
+  </div>
+  
+</div>
+
+</body>
+</html>

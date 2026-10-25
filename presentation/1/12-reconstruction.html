@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>UKF: Reconstructing the Gaussian</title>
+  <link rel="stylesheet" href="slideui.css">
+  <script src="slideui.js" defer></script>
+  <style>
+    /* ONLY arrow animations allowed in head */
+    .arrow { font-size: 2rem; font-weight: bold; line-height: 1; color: #94a3b8; display: inline-block; }
+    .arrow-right { animation: nudge-x 1.2s ease-in-out infinite; }
+    .arrow-down { animation: nudge-y 1.2s ease-in-out infinite; }
+    @keyframes nudge-x { 0%, 100% { transform: translateX(-4px); } 50% { transform: translateX(4px); } }
+    @keyframes nudge-y { 0%, 100% { transform: translateY(-4px); } 50% { transform: translateY(4px); } }
+  </style>
+</head>
+<body>
+
+<div class="slide-layout" style="padding: 36px 48px; justify-content: flex-start; display: flex; flex-direction: column;">
+
+  <!-- HEADER -->
+  <div style="margin-bottom: 16px;">
+    <h1 class="title" style="font-size: 2.5rem; margin-bottom: 0.25rem;">Sigma Points \(\to\) Gaussian Distribution</h1>
+    <p class="subtitle text-muted" style="font-size: 1.35rem; margin-bottom: 0;">From discrete transformed points \(\mathbf{y}_i\) back to continuous moments \(\mathbf{\hat{x}}_{k+1|k}\) and \(\mathbf{P}_{k+1|k}\)</p>
+  </div>
+
+  <!-- ROW 1: 3 COLUMNS -->
+  <div style="display: flex; align-items: stretch; gap: 12px; margin-bottom: 16px;">
+
+    <!-- COL 1: Mapped Cloud -->
+    <div class="panel" style="flex: 1; padding: 16px; margin: 0; display: flex; flex-direction: column; justify-content: space-between;">
+      <div>
+        <p class="text-xl" style="font-size: 1.25rem; font-weight: 700; margin-bottom: 4px; color: #1e293b;">Mapped Cloud</p>
+        <p class="text-muted" style="font-size: 0.95rem; margin-bottom: 8px;">\(2n+1\) discrete points floating in distorted space:</p>
+      </div>
+
+      <!-- SVG 1: Mapped Points -->
+      <div style="background: white; border-radius: 6px; padding: 6px; border: 1px solid #e2e8f0; display: flex; justify-content: center;">
+        <svg width="100%" height="70" viewBox="0 0 160 80">
+          <circle cx="88" cy="46" r="5" fill="#1e40af"/>
+          <text x="88" y="34" font-size="10" font-weight="bold" fill="#1e40af" text-anchor="middle">\(\mathbf{y}_0\)</text>
+          <circle cx="25" cy="20" r="3" fill="#3b82f6"/>
+          <circle cx="135" cy="30" r="3" fill="#3b82f6"/>
+          <circle cx="45" cy="65" r="3" fill="#3b82f6"/>
+          <circle cx="120" cy="70" r="3" fill="#3b82f6"/>
+        </svg>
+      </div>
+
+      <div class="math-block" style="padding: 8px; margin: 10px 0 0 0; font-size: 1rem;">
+        \(\displaystyle \mathbf{y}_i = f_k(\mathbf{x}_i), \quad i=0,\dots,2n \)
+      </div>
+    </div>
+
+    <!-- ARROW 1 -->
+    <div data-step="1" style="width: 24px; align-self: center; display: flex; justify-content: center;">
+      <span class="arrow arrow-right">→</span>
+    </div>
+
+    <!-- COL 2: Center of Mass -->
+    <div class="panel panel-primary" data-step="1" style="flex: 1; padding: 16px; margin: 0; display: flex; flex-direction: column; justify-content: flex-start;">
+      <p class="text-xl text-primary" style="font-size: 1.25rem; font-weight: 700; margin-bottom: 4px;">Center of Mass \(=\) Mean (\(\mathbf{\hat{x}}\))</p>
+      <p class="text-muted" style="font-size: 0.95rem; margin-bottom: 12px;">Weighted average yields the predicted mean state:</p>
+
+      <div class="math-block" style="padding: 12px; margin: 0 0 12px 0; font-size: 1.1rem; background: white;">
+        \(\displaystyle \mathbf{\hat{x}}_{k+1|k} = \sum_{i=0}^{2n} w_i \mathbf{y}_i \)
+      </div>
+      
+      <p class="text-muted" style="font-size: 0.9rem; margin: 0; text-align: center;">
+        Uses base mass (mean) weights \(w_i\).
+      </p>
+    </div>
+
+    <!-- COL 3: Covariance -->
+    <div class="panel panel-accent" data-step="2" style="flex: 1.4; padding: 16px; margin: 0; display: flex; flex-direction: column; justify-content: space-between;">
+      <div>
+        <p class="text-xl text-accent" style="font-size: 1.25rem; font-weight: 700; margin-bottom: 4px;">Moment of Inertia \(=\) Covariance (\(\mathbf{P}\))</p>
+        <p class="text-muted" style="font-size: 0.95rem; margin-bottom: 6px;">Reconstructs the Gaussian covariance shape:</p>
+      </div>
+
+      <!-- Split Math Block -->
+      <div class="math-block" style="padding: 6px; margin: 0 0 8px 0; font-size: 0.95rem; background: white; text-align: center;">
+        \(\displaystyle \mathbf{P}_{k+1|k} = \sum_{i=1}^{2n} w_i (\mathbf{y}_i - \mathbf{\hat{x}})(\mathbf{y}_i - \mathbf{\hat{x}})^T \)<br>
+        
+        <div style="margin-top: 4px; position: relative; display: inline-block; padding: 2px 6px;">
+          <!-- Highlight box -->
+          <div data-step="5" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; border: 2px dashed #f59e0b; background-color: rgba(253, 230, 138, 0.4); border-radius: 6px; pointer-events: none;"></div>
+          \(\displaystyle + w_0^c (\mathbf{y}_0 - \mathbf{\hat{x}})(\mathbf{y}_0 - \mathbf{\hat{x}})^T \)
+        </div>
+      </div>
+      
+      <div data-step="3">
+        <p class="text-muted" style="font-size: 0.9rem; margin-bottom: 6px;">The result when plotting the two moments:</p>
+      </div>
+      
+      <!-- SVG 2: Reconstructed Gaussian -->
+      <div data-step="3" style="background: white; border-radius: 6px; padding: 6px; border: 1px solid #e2e8f0; display: flex; justify-content: center;">
+        <svg width="100%" height="70" viewBox="0 0 160 80">
+          <ellipse cx="80" cy="40" rx="60" ry="30" fill="rgba(34, 197, 94, 0.1)" stroke="#22c55e" stroke-width="1.5"/>
+          <path d="M 77 40 L 83 40 M 80 37 L 80 43" stroke="#166534" stroke-width="2"/>
+          <text x="73" y="44" font-size="10" font-weight="bold" fill="#166534" text-anchor="end">\(\mathbf{\hat{x}}\)</text>
+          
+          <circle cx="88" cy="46" r="5" fill="#1e40af"/>
+          <text x="96" y="50" font-size="9" font-weight="bold" fill="#1e40af" text-anchor="start">\(\mathbf{y}_0\)</text>
+          <circle cx="25" cy="20" r="3" fill="#3b82f6"/>
+          <circle cx="135" cy="30" r="3" fill="#3b82f6"/>
+          <circle cx="45" cy="65" r="3" fill="#3b82f6"/>
+          <circle cx="120" cy="70" r="3" fill="#3b82f6"/>
+        </svg>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ROW 2: TEASER BOX -->
+  <div class="panel" data-step="5" style="padding: 12px 24px; margin: 0 0 12px 0; background-color: #fffbeb; border: 2px dashed #f59e0b; border-radius: 12px;">
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 20px;">
+      
+      <div style="flex: 1;">
+        <span style="font-size: 1.1rem; font-weight: 800; color: #b45309; display: block; margin-bottom: 6px;">
+          Wait... Why is \(w_0^c\) added to the formula?
+        </span>
+        <ul style="font-size: 0.95rem; color: #1e293b; margin: 0; padding-left: 20px;">
+          <li><strong>Outer points (\(i \ge 1\)):</strong> use base weight \(w_i\)</li>
+          <li><strong>Central point (\(i = 0\)):</strong> uses <em>different</em> weight \(w_0^c\)</li>
+        </ul>
+      </div>
+
+      <div style="width: 2px; height: 40px; background: #fcd34d;"></div>
+
+      <div style="flex: 1.2;">
+        <span style="font-size: 1.05rem; font-weight: 700; color: #92400e; display: block;">
+          Why does the central point \(\mathbf{y}_0\) carry a special statistical significance that requires this extra term?
+        </span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- NOTE -->
+  <div data-step="6">
+    <p class="text-accent" style="font-size: 1.15rem; font-weight: bold; margin: 0;">
+      Note: in the professor slides \(w_i\) is \(w_i^m=w_i^c\) for \(i\ge 1\) but \(w_0^m \neq w_0^c\) just like \(w_0 \neq w_0^c\) in my slides
+    </p>
+  </div>
+
+</div>
+
+</body>
+</html>

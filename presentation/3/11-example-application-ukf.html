@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Example application: UKF</title>
+<link rel="stylesheet" href="slideui.css">
+<script src="slideui.js" defer></script>
+</head>
+<body>
+
+<div class="slide-layout">
+
+<section class="slide build ukf-scene" data-steps="4">
+  <h1>Example Application for UKF</h1>
+  <div class="body">
+    <div class="split">
+      <div class="split-figure">
+    <svg class="ukf-figure" viewBox="0 0 780 430" role="img" aria-label="Conceptual UKF illustration: eleven initial full-state sigma points become eleven propagated points. A single illustrative mean path connects the current estimate to the predicted mean. Point layouts and path are schematic, not numerical projections or confidence intervals.">
+      <defs>
+        <g id="ukf-rocket" stroke-linejoin="round" stroke-linecap="round">
+          <path d="M-25 -5 L-55 0 L-25 5" fill="var(--accent2)" opacity=".18"/>
+          <path d="M-25 -3 L-43 0 L-25 3" fill="var(--accent2)" opacity=".65"/>
+          <path d="M-17 -6 L-26 -18 L-10 -13 L1 -6 M-17 6 L-26 18 L-10 13 L1 6" fill="var(--accent)" stroke="var(--accent)" stroke-width="1.5"/>
+          <path d="M-24 -6 L8 -8 Q24 -7 34 0 Q24 7 8 8 L-24 6 Z" fill="var(--card)" stroke="var(--fg)" stroke-width="2"/>
+          <path d="M16 -7 Q27 -5 34 0 Q27 5 16 7 Z" fill="var(--accent)"/>
+          <path d="M-10 -7 V7" stroke="var(--accent)" stroke-width="3"/>
+          <path d="M-25 -4 V4" stroke="var(--muted)" stroke-width="3"/>
+          <path d="M-4 0 H10" stroke="var(--muted)" stroke-width="1.5"/>
+        </g>
+      </defs>
+      <g font-family="var(--font)">
+        <g stroke="var(--line)" stroke-width="1" opacity=".55">
+          <path d="M30 60 H750 M30 120 H750 M30 180 H750 M30 240 H750 M30 300 H750 M30 360 H750"/>
+        </g>
+        <path d="M40 300 H220" fill="none" stroke="var(--muted)" stroke-width="2" stroke-dasharray="5 7"/>
+        <text x="40" y="216" font-size="22" fill="var(--fg)" font-weight="650">Turning rocket</text>
+        <text x="40" y="241" font-size="17" fill="var(--muted)">Planar tracking illustration</text>
+        <use class="ukf-rocket-preview" href="#ukf-rocket" transform="translate(220 300)"/>
+        <ellipse cx="220" cy="300" rx="60" ry="26" fill="none" stroke="var(--muted)" stroke-width="2" stroke-dasharray="6 6" opacity=".6"/>
+        <circle cx="220" cy="300" r="4" fill="var(--accent2)"/>
+        <text x="60" y="350" font-size="20" fill="var(--muted)">initial estimate</text>
+        <path d="M160 330 L212 306" fill="none" stroke="var(--muted)" stroke-width="1.5"/>
+        <g data-step="2" fill="var(--accent2)">
+          <circle cx="280" cy="300" r="5"/><circle cx="268.5" cy="315.3" r="5"/><circle cx="238.5" cy="324.7" r="5"/>
+          <circle cx="201.5" cy="324.7" r="5"/><circle cx="171.5" cy="315.3" r="5"/><circle cx="160" cy="300" r="5"/>
+          <circle cx="171.5" cy="284.7" r="5"/><circle cx="201.5" cy="275.3" r="5"/><circle cx="238.5" cy="275.3" r="5"/>
+          <circle cx="268.5" cy="284.7" r="5"/>
+        </g>
+        <g data-step="2">
+          <text x="225" y="384" text-anchor="middle" font-size="21" fill="var(--accent2)">11 sigma points</text>
+        </g>
+        <g data-step="3">
+          <g fill="var(--accent2)" stroke="var(--bg)" stroke-width="2">
+            <circle cx="600" cy="186" r="6"/><circle cx="622" cy="164" r="6"/>
+            <circle cx="643" cy="140" r="6"/><circle cx="662" cy="113" r="6"/>
+            <circle cx="681" cy="92" r="6"/><circle cx="692" cy="135" r="6"/>
+            <circle cx="714" cy="153" r="6"/><circle cx="700" cy="179" r="6"/>
+            <circle cx="677" cy="205" r="6"/><circle cx="648" cy="216" r="6"/>
+            <circle cx="651" cy="174" r="6"/>
+          </g>
+          <path d="M220 300 C400 300 550 232 660 160" fill="none" stroke="var(--accent)" stroke-width="4"/>
+          <circle cx="660" cy="160" r="10" fill="var(--bg)" stroke="var(--accent)" stroke-width="3"/>
+          <text x="604" y="253" font-size="21" fill="var(--accent)" font-weight="650">predicted mean</text>
+          <path d="M654 232 L660 174" fill="none" stroke="var(--accent)" stroke-width="1.5"/>
+          <text x="546" y="66" font-size="21" fill="var(--accent2)">11 propagated points</text>
+        </g>
+        <g data-step="4">
+          <text x="40" y="48" font-size="23" font-weight="650" fill="var(--accent)">Point spread and weights: α, β, κ</text>
+        </g>
+        <g class="ukf-target" opacity="0">
+          <use href="#ukf-rocket"/>
+          <animateMotion id="ukf-fly" dur="8s" repeatCount="indefinite" begin="indefinite" rotate="auto"
+                         path="M220 300 C400 300 550 232 660 160"/>
+        </g>
+        <g font-size="20" data-step="3">
+          <circle cx="490" cy="340" r="6" fill="var(--accent2)"/>
+          <text x="510" y="346" fill="var(--muted)">full-state sigma points</text>
+          <path d="M470 378 H502" stroke="var(--accent)" stroke-width="4"/>
+          <text x="510" y="384" fill="var(--muted)">estimated mean path</text>
+        </g>
+      </g>
+    </svg>
+    <p style="font-size:20px;color:var(--muted)">Conceptual illustration: point layouts and mean path are schematic. The rocket represents the estimate, not ground truth.</p>
+      </div>
+  <div class="split-text">
+    <div class="rail" aria-hidden="true"></div>
+    <div class="rail-active" aria-hidden="true"></div>
+    <div class="step" data-n="1">
+      <span class="step-num">1</span>
+      <div>
+        <p class="step-title">Track a turning target</p>
+        <p class="step-note">Five states: position, velocity and turn rate. The unknown turn rate makes the motion model nonlinear.</p>
+      </div>
+    </div>
+    <div class="step" data-n="2">
+      <span class="step-num">2</span>
+      <div>
+        <p class="step-title">Spread the sigma points</p>
+        <p class="step-note">Generate 2n + 1 = 11 points from x̂ and P. Each represents a full state: position, velocity and turn rate. The point cloud here is an abstract illustration.</p>
+      </div>
+    </div>
+    <div class="step" data-n="3">
+      <span class="step-num">3</span>
+      <div>
+        <p class="step-title">Propagate and recombine</p>
+        <p class="step-note">Transform all 11 points through the motion model. Their weighted mean gives the predicted state; their weighted spread gives its covariance. The blue curve illustrates the evolution of the estimated mean.</p>
+      </div>
+    </div>
+    <div class="step" data-n="4">
+      <span class="step-num">4</span>
+      <div>
+        <p class="step-title">Why UKF?</p>
+        <p class="step-note">No model Jacobians. Tune the point spread and weights with α, β and κ. CKF handles the same task with a fixed rule.</p>
+      </div>
+    </div>
+  </div>
+    </div>
+  </div>
+</section>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Example application: EKF</title>
+<link rel="stylesheet" href="slideui.css">
+<script src="slideui.js" defer></script>
+</head>
+<body>
+
+<div class="slide-layout">
+
+<section class="slide build robot-scene" data-steps="4">
+  <h1>Example Application for EKF</h1>
+  <div class="body">
+    <svg viewBox="0 0 1100 440" role="img" aria-label="One perspective scene: wheel odometry predicts robot pose, a sensor observes known landmarks, EKF corrects the pose, then the robot moves. Planar localization shown in a three-dimensional illustration.">
+      <defs>
+        <g id="scene-bot">
+          <ellipse cx="0" cy="10" rx="47" ry="15" fill="var(--fg)" opacity=".07"/>
+          <path d="M-32 -12 L8 -28 L37 -13 L-3 4 Z" fill="currentColor"/>
+          <path d="M-32 -12 L-3 4 V25 L-32 9 Z" fill="currentColor" opacity=".75"/>
+          <path d="M-3 4 L37 -13 V8 L-3 25 Z" fill="currentColor" opacity=".9"/>
+          <ellipse cx="-21" cy="13" rx="7" ry="11" fill="var(--fg)"/><ellipse cx="24" cy="14" rx="7" ry="11" fill="var(--fg)"/>
+          <ellipse cx="5" cy="-17" rx="10" ry="5" fill="var(--bg)"/>
+          <path d="M5 -18 V-29" stroke="var(--fg)" stroke-width="3"/>
+        </g>
+        <g id="scene-landmark">
+          <ellipse cx="0" cy="7" rx="29" ry="11" fill="var(--fg)" opacity=".08"/>
+          <path d="M-20 0 L0 -9 L20 0 L0 9 Z" fill="var(--muted)"/>
+          <path d="M0 0 V-91" stroke="var(--muted)" stroke-width="7"/>
+          <path d="M-23 -120 L23 -120 L23 -78 L-23 -78 Z" fill="var(--bg)" stroke="var(--accent2)" stroke-width="3"/>
+          <path d="M-15 -112 H-3 V-100 H-15 Z M3 -96 H15 V-84 H3 Z M3 -112 H15 V-103 H3 Z M-15 -93 H-6 V-84 H-15 Z" fill="var(--accent2)"/>
+        </g>
+      </defs>
+      <g font-family="var(--font)">
+        <path d="M140 300 L590 80 L1000 245 L550 420 Z" fill="var(--card)" stroke="var(--line)" stroke-width="2"/>
+        <g fill="none" stroke="var(--line)" stroke-width="1.2">
+          <path d="M230 256 L640 376 M320 212 L730 332 M410 168 L820 288 M500 124 L910 244"/>
+          <path d="M222 333 L672 113 M304 366 L754 146 M386 399 L836 179"/>
+        </g>
+        <use href="#scene-landmark" transform="translate(800 179)"/>
+        <use href="#scene-landmark" transform="translate(405 190)"/>
+        <text x="840" y="83" font-size="24" fill="var(--muted)">Fixed markers</text>
+        <text x="840" y="113" font-size="21" fill="var(--muted)">Known map positions</text>
+        <g class="prediction-overlay">
+          <use href="#scene-bot" transform="translate(325 315)" color="var(--muted)" opacity=".35"/>
+          <path d="M368 309 L477 269 M464 264 L477 269 L470 280" stroke="var(--muted)" stroke-width="3" fill="none"/>
+          <ellipse cx="520" cy="260" rx="78" ry="34" fill="var(--muted)" fill-opacity=".04" stroke="var(--muted)" stroke-width="1.8" stroke-dasharray="5 7" stroke-linecap="round"/>
+          <use href="#scene-bot" transform="translate(520 260)" color="var(--muted)"/>
+          <path d="M510 302 L490 338 H350" stroke="var(--muted)" stroke-width="1.5" fill="none"/>
+          <text x="290" y="370" font-size="26" font-weight="650" fill="var(--muted)">Odometry prediction</text>
+        </g>
+        <g data-step="2" class="sensor-overlay">
+          <path id="robot-sensor-rays" d="M525 214 L405 91 M525 214 L800 80" stroke="var(--accent2)" stroke-width="2.2" stroke-dasharray="7 8" stroke-linecap="round" fill="none"/>
+          <circle id="robot-sensor-origin" cx="525" cy="214" r="4" fill="var(--accent2)"/>
+          <circle cx="405" cy="91" r="4" fill="var(--accent2)"/>
+          <circle cx="800" cy="80" r="4" fill="var(--accent2)"/>
+          <text x="570" y="70" font-size="25" fill="var(--accent2)" font-weight="650">Range + bearing</text>
+        </g>
+        <g data-step="3">
+          <g class="scene-driving">
+            <g class="corrected-position">
+              <ellipse cx="630" cy="220" rx="58" ry="26" fill="var(--accent)" fill-opacity=".08" stroke="var(--accent)" stroke-width="2"/>
+              <use href="#scene-bot" transform="translate(630 220) scale(1.15)" color="var(--accent)"/>
+            </g>
+          </g>
+          <g class="prediction-overlay">
+            <path d="M654 250 L710 290 H780" stroke="var(--accent)" stroke-width="1.5" fill="none"/>
+            <text x="716" y="323" font-size="26" font-weight="650" fill="var(--accent)">Corrected pose</text>
+          </g>
+        </g>
+        <g data-step="4">
+          <path id="robot-drive-path" d="M630 220 C675 190 775 205 750 245 C735 275 665 255 665 295 C660 345 550 365 515 320 C480 280 555 285 550 250 C545 220 585 245 630 220 Z" stroke="var(--accent)" stroke-width="1.8" opacity=".35" fill="none" stroke-dasharray="4 8" stroke-linecap="round"/>
+        </g>
+      </g>
+    </svg>
+    <div class="scene-caption caption-1"><b>1. Predict with wheel odometry</b><br>Wheel encoders estimate movement. The motion model predicts position and heading; wheel errors add uncertainty.</div>
+    <div class="scene-caption caption-2"><b>2. Observe with an external sensor</b><br>The sensor measures range and bearing to known landmarks.<br>Measured minus predicted observations give the innovation.</div>
+    <div class="scene-caption caption-3"><b>3. Correct the estimated pose</b><br>EKF combines the prediction with the landmark observations, weighted by uncertainty. The estimate shifts, not the physical robot.</div>
+    <div class="scene-caption caption-4"><b>Why EKF?</b><br>Motion uses sin/cos of heading; landmark range and bearing are nonlinear.<br>EKF linearizes locally around the estimated pose, a good fit when errors stay small.</div>
+  </div>
+</section>
+
+</div>
+
+</body>
+</html>

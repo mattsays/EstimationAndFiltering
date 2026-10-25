@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>2D Non-Linear Mapping & Weight Invariance</title>
+  <link rel="stylesheet" href="slideui.css">
+  <script src="slideui.js" defer></script>
+  <style>
+    /* Animated Arrows */
+    .arrow { font-size: 2rem; font-weight: bold; line-height: 1; color: #94a3b8; display: inline-block; }
+    .arrow-right { animation: nudge-x 1.2s ease-in-out infinite; }
+    .arrow-down { animation: nudge-y 1.2s ease-in-out infinite; }
+    @keyframes nudge-x { 0%, 100% { transform: translateX(-4px); } 50% { transform: translateX(4px); } }
+    @keyframes nudge-y { 0%, 100% { transform: translateY(-4px); } 50% { transform: translateY(4px); } }
+
+    /* Continuous flow along non-linear transformation paths */
+    @keyframes flow-path {
+      0% { stroke-dashoffset: 30; }
+      100% { stroke-dashoffset: 0; }
+    }
+
+    /* Pulse animation for output points */
+    @keyframes pulse-point {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="slide-layout" style="padding: 32px 48px; justify-content: flex-start;">
+
+  <!-- HEADER -->
+  <div style="margin-bottom: 12px; text-align: center;">
+    <h1 class="title" style="font-size: 2.6rem; margin-bottom: 0.25rem;">2D Non-Linear Mapping &amp; Weight Invariance</h1>
+    <p class="subtitle text-muted" style="font-size: 1.35rem; margin-bottom: 0;">Coordinates warp through non-linear function \(f_k(x)\), but statistical weights \(w_i\) remain strictly invariant</p>
+  </div>
+
+  <!-- MAIN GRAPHICAL CANVAS -->
+  <div style="width: 100%; display: flex; justify-content: center; align-items: center; margin-top: 4px;">
+    
+    <svg viewBox="0 0 1100 370" style="width: 100%; height: 370px; display: block; overflow: visible;">
+      
+      <defs>
+        <!-- Arrowhead Marker -->
+        <marker id="arrowhead" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1 L 10 5 L 0 9 z" fill="#d97706" />
+        </marker>
+      </defs>
+
+      <!-- ================= BACKGROUND CONTOURS & AXES ================= -->
+      <!-- Input Space Background -->
+      <g>
+        <line x1="50" y1="180" x2="350" y2="180" stroke="#cbd5e1" stroke-width="1.5"/>
+        <line x1="200" y1="40" x2="200" y2="320" stroke="#cbd5e1" stroke-width="1.5"/>
+        <text x="355" y="184" font-size="12" font-weight="bold" fill="#64748b" font-family="sans-serif">x₁</text>
+        <text x="200" y="30" font-size="12" font-weight="bold" fill="#64748b" text-anchor="middle" font-family="sans-serif">x₂</text>
+        <text x="200" y="18" font-size="15" font-weight="bold" fill="#1d4ed8" text-anchor="middle" font-family="sans-serif">Input Space (x)</text>
+        <ellipse cx="200" cy="180" rx="90" ry="90" fill="#eff6ff" stroke="#bfdbfe" stroke-width="2" stroke-dasharray="4,4"/>
+      </g>
+
+      <!-- Output Space Background (Rendered BEFORE arrows to avoid hiding them) -->
+      <g>
+        <line x1="670" y1="180" x2="1030" y2="180" stroke="#cbd5e1" stroke-width="1.5"/>
+        <line x1="850" y1="40" x2="850" y2="320" stroke="#cbd5e1" stroke-width="1.5"/>
+        <text x="1035" y="184" font-size="12" font-weight="bold" fill="#64748b" font-family="sans-serif">y₁</text>
+        <text x="850" y="30" font-size="12" font-weight="bold" fill="#64748b" text-anchor="middle" font-family="sans-serif">y₂</text>
+        <text x="850" y="18" font-size="15" font-weight="bold" fill="#d97706" text-anchor="middle" font-family="sans-serif">Distorted Output Space (y)</text>
+        <!-- Warped Distorted Contour -->
+        <path d="M 890 80 Q 1010 130 990 230 Q 900 320 790 300 Q 710 220 740 160 Z" fill="#fffbeb" stroke="#fde68a" stroke-width="2" stroke-dasharray="4,4"/>
+      </g>
+
+      <!-- ================= NON-LINEAR MAPPING ARROWS (WARPED PATHS) ================= -->
+      <g>
+        <!-- Center Label -->
+        <text x="540" y="35" font-size="16" font-weight="800" fill="#d97706" text-anchor="middle" font-family="sans-serif">Non-Linear Function f_k(x)</text>
+
+        <!-- Curved Path 0 (x0 -> y0) -->
+        <path d="M 200 180 C 350 100, 620 290, 828 202" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-dasharray="6,4" marker-end="url(#arrowhead)" style="animation: flow-path 1.5s linear infinite;"/>
+        
+        <!-- Curved Path 1 (x1 -> y1) -->
+        <path d="M 200 90 C 360 10, 640 150, 878 82" fill="none" stroke="#f59e0b" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#arrowhead)" opacity="0.85" style="animation: flow-path 1.5s linear infinite;"/>
+        
+        <!-- Curved Path 2 (x2 -> y2) -->
+        <path d="M 200 270 C 370 350, 600 210, 780 294" fill="none" stroke="#f59e0b" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#arrowhead)" opacity="0.85" style="animation: flow-path 1.5s linear infinite;"/>
+
+        <!-- Curved Path 3 (x3 -> y3) -->
+        <path d="M 110 180 C 270 70, 520 240, 728 162" fill="none" stroke="#f59e0b" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#arrowhead)" opacity="0.85" style="animation: flow-path 1.5s linear infinite;"/>
+
+        <!-- Curved Path 4 (x4 -> y4) -->
+        <path d="M 290 180 C 470 270, 780 130, 978 226" fill="none" stroke="#f59e0b" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#arrowhead)" opacity="0.85" style="animation: flow-path 1.5s linear infinite;"/>
+      </g>
+
+      <!-- ================= POINTS & LABELS (TOP LAYER) ================= -->
+      <!-- Input Points -->
+      <g>
+        <!-- Central Point x0 -->
+        <circle cx="200" cy="180" r="10" fill="#1e40af"/>
+        <text x="200" y="162" font-size="12" font-weight="bold" fill="#1e40af" text-anchor="middle" font-family="sans-serif">x₀</text>
+        <rect x="182" y="194" width="36" height="16" rx="4" fill="#dbeafe" stroke="#3b82f6" stroke-width="1"/>
+        <text x="200" y="206" font-size="10" font-weight="bold" fill="#1d4ed8" text-anchor="middle" font-family="sans-serif">w₀</text>
+
+        <!-- Point x1 (Top) -->
+        <circle cx="200" cy="90" r="7" fill="#3b82f6"/>
+        <text x="200" y="75" font-size="11" font-weight="bold" fill="#1d4ed8" text-anchor="middle" font-family="sans-serif">x₁</text>
+        <rect x="212" y="82" width="32" height="16" rx="4" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1"/>
+        <text x="228" y="94" font-size="10" font-weight="bold" fill="#475569" text-anchor="middle" font-family="sans-serif">w₁</text>
+
+        <!-- Point x2 (Bottom) -->
+        <circle cx="200" cy="270" r="7" fill="#3b82f6"/>
+        <text x="200" y="296" font-size="11" font-weight="bold" fill="#1d4ed8" text-anchor="middle" font-family="sans-serif">x₂</text>
+        <rect x="212" y="262" width="32" height="16" rx="4" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1"/>
+        <text x="228" y="274" font-size="10" font-weight="bold" fill="#475569" text-anchor="middle" font-family="sans-serif">w₂</text>
+
+        <!-- Point x3 (Left) -->
+        <circle cx="110" cy="180" r="7" fill="#3b82f6"/>
+        <text x="92" y="184" font-size="11" font-weight="bold" fill="#1d4ed8" text-anchor="end" font-family="sans-serif">x₃</text>
+        <rect x="94" y="192" width="32" height="16" rx="4" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1"/>
+        <text x="110" y="204" font-size="10" font-weight="bold" fill="#475569" text-anchor="middle" font-family="sans-serif">w₃</text>
+
+        <!-- Point x4 (Right) -->
+        <circle cx="290" cy="180" r="7" fill="#3b82f6"/>
+        <text x="308" y="184" font-size="11" font-weight="bold" fill="#1d4ed8" font-family="sans-serif">x₄</text>
+        <rect x="274" y="192" width="32" height="16" rx="4" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1"/>
+        <text x="290" y="204" font-size="10" font-weight="bold" fill="#475569" text-anchor="middle" font-family="sans-serif">w₄</text>
+      </g>
+
+      <!-- Output Points -->
+      <g>
+        <!-- Transformed Point y0 -->
+        <circle cx="840" cy="200" r="10" fill="#b45309" style="transform-origin: 840px 200px; animation: pulse-point 2s ease-in-out infinite;"/>
+        <text x="840" y="182" font-size="12" font-weight="bold" fill="#b45309" text-anchor="middle" font-family="sans-serif">y₀ = f_k(x₀)</text>
+        <rect x="822" y="214" width="36" height="16" rx="4" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+        <text x="840" y="226" font-size="10" font-weight="bold" fill="#b45309" text-anchor="middle" font-family="sans-serif">w₀</text>
+
+        <!-- Transformed Point y1 -->
+        <circle cx="890" cy="80" r="7" fill="#d97706" style="transform-origin: 890px 80px; animation: pulse-point 2s ease-in-out infinite;"/>
+        <text x="890" y="65" font-size="11" font-weight="bold" fill="#b45309" text-anchor="middle" font-family="sans-serif">y₁</text>
+        <rect x="902" y="72" width="32" height="16" rx="4" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+        <text x="918" y="84" font-size="10" font-weight="bold" fill="#b45309" text-anchor="middle" font-family="sans-serif">w₁</text>
+
+        <!-- Transformed Point y2 -->
+        <circle cx="790" cy="300" r="7" fill="#d97706" style="transform-origin: 790px 300px; animation: pulse-point 2s ease-in-out infinite;"/>
+        <text x="790" y="324" font-size="11" font-weight="bold" fill="#b45309" text-anchor="middle" font-family="sans-serif">y₂</text>
+        <rect x="802" y="292" width="32" height="16" rx="4" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+        <text x="818" y="304" font-size="10" font-weight="bold" fill="#b45309" text-anchor="middle" font-family="sans-serif">w₂</text>
+
+        <!-- Transformed Point y3 -->
+        <circle cx="740" cy="160" r="7" fill="#d97706" style="transform-origin: 740px 160px; animation: pulse-point 2s ease-in-out infinite;"/>
+        <text x="722" y="164" font-size="11" font-weight="bold" fill="#b45309" text-anchor="end" font-family="sans-serif">y₃</text>
+        <rect x="724" y="172" width="32" height="16" rx="4" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+        <text x="740" y="184" font-size="10" font-weight="bold" fill="#b45309" text-anchor="middle" font-family="sans-serif">w₃</text>
+
+        <!-- Transformed Point y4 -->
+        <circle cx="990" cy="230" r="7" fill="#d97706" style="transform-origin: 990px 230px; animation: pulse-point 2s ease-in-out infinite;"/>
+        <text x="1008" y="234" font-size="11" font-weight="bold" fill="#b45309" font-family="sans-serif">y₄</text>
+        <rect x="974" y="242" width="32" height="16" rx="4" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+        <text x="990" y="254" font-size="10" font-weight="bold" fill="#b45309" text-anchor="middle" font-family="sans-serif">w₄</text>
+      </g>
+
+    </svg>
+
+  </div>
+
+  <!-- INVARIANCE SUMMARY BLOCK -->
+  <div class="panel" style="padding: 12px 20px; background: #f8fafc; border: 2px solid #e2e8f0; text-align: center; margin-top: 6px;">
+    <div style="display: flex; justify-content: center; align-items: center; gap: 24px;">
+      <div style="font-size: 1.15rem; font-weight: 700; color: #1e293b;">
+        Transformation: \(\quad y_i = f_k(x_i)\)
+      </div>
+      <div style="width: 2px; height: 28px; background: #cbd5e1;"></div>
+      <div style="font-size: 1.15rem; font-weight: 700; color: #1d4ed8;">
+        Weight Invariance Rule: \(\quad w_i^{(y)} \equiv w_i^{(x)}\)
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>The Sigma Points Idea</title>
+  <link rel="stylesheet" href="slideui.css">
+  <script src="slideui.js" defer></script>
+  <style>
+    .arrow { font-size: 2rem; font-weight: bold; line-height: 1; color: #94a3b8; display: inline-block; }
+    .arrow-right { animation: nudge-x 1.2s ease-in-out infinite; }
+    .arrow-down { animation: nudge-y 1.2s ease-in-out infinite; }
+    @keyframes nudge-x { 0%, 100% { transform: translateX(-4px); } 50% { transform: translateX(4px); } }
+    @keyframes nudge-y { 0%, 100% { transform: translateY(-4px); } 50% { transform: translateY(4px); } }
+  </style>
+</head>
+<body>
+
+<div class="slide-layout" style="padding: 36px 48px; justify-content: flex-start; position: relative;">
+
+  <!-- HEADER -->
+  <div style="margin-bottom: 24px;">
+    <h1 class="title" style="font-size: 2.75rem; margin-bottom: 0.25rem;">The Top Down Solution</h1>
+    <p class="subtitle text-muted" style="font-size: 1.5rem; margin-bottom: 0;">Represent, Transform, and Reconstruct</p>
+  </div>
+
+  <!-- ROW 1: Text Panels + SVGs below them -->
+  <div style="display: flex; align-items: stretch; gap: 16px;">
+
+    <!-- 1. Represent Column -->
+    <div data-step="1" style="flex: 1.2; display: flex; flex-direction: column; gap: 12px;">
+      <div class="panel panel-primary" style="padding: 16px; margin: 0; flex: 1;">
+        <p style="font-size: 1.3rem; font-weight: 700; margin: 0 0 6px 0; color: #1e40af;">1. Represent</p>
+        <p class="text-muted" style="font-size: 0.95rem; margin: 0 0 10px 0;">Capture the Gaussian distribution using \(2n+1\) chosen <strong>Sigma Points</strong> \(x_i\) and <strong>weights</strong> \(w_i\).</p>
+        <div class="math-block" style="padding: 8px; margin: 0; font-size: 1.1rem;">
+          \(\displaystyle \{ x_i, w_i \}_{i=1}^{2n+1} \)
+        </div>
+      </div>
+      <!-- SVG 1: Initial Gaussian & Sigma Points -->
+      <div style="background: white; border-radius: 12px; padding: 12px; display: flex; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+        <svg width="100%" height="130" viewBox="0 0 200 130">
+          <ellipse cx="100" cy="65" rx="55" ry="35" fill="#eff6ff" stroke="#3b82f6" stroke-width="2" stroke-dasharray="4" opacity="0.8"/>
+          <!-- Center Point -->
+          <circle cx="100" cy="65" r="7" fill="#1e40af"/>
+          <text x="109" y="75" font-size="12" font-family="sans-serif" fill="#1e293b" font-weight="bold">w₀</text>
+          <!-- Surrounding Points -->
+          <circle cx="155" cy="65" r="4.5" fill="#3b82f6"/>
+          <circle cx="45" cy="65" r="4.5" fill="#3b82f6"/>
+          <circle cx="100" cy="30" r="4.5" fill="#3b82f6"/>
+          <circle cx="100" cy="100" r="4.5" fill="#3b82f6"/>
+          <text x="162" y="60" font-size="10" font-family="sans-serif" fill="#475569">wᵢ</text>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Arrow 1 -->
+    <div data-step="2" style="width: 30px; align-self: center; display: flex; justify-content: center;">
+      <span class="arrow arrow-right">→</span>
+    </div>
+
+    <!-- 2. Transform Column -->
+    <div data-step="2" style="flex: 1; display: flex; flex-direction: column; gap: 12px;">
+      <div class="panel" style="padding: 16px; margin: 0; flex: 1;">
+        <p style="font-size: 1.3rem; font-weight: 700; margin: 0 0 6px 0;">2. Transform</p>
+        <p class="text-muted" style="font-size: 0.95rem; margin: 0 0 10px 0;">Pass each Sigma Point through the non-linear function.</p>
+        <div class="math-block" style="padding: 8px; margin: 0; font-size: 1.1rem;">
+          \(\displaystyle y_i = f_k(x_i) \)
+        </div>
+      </div>
+      <!-- SVG 2: Transformed Points -->
+      <div style="background: white; border-radius: 12px; padding: 12px; display: flex; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+        <svg width="100%" height="130" viewBox="0 0 200 130">
+          <path d="M 30 70 Q 100 110 170 30" stroke="#e2e8f0" fill="none" stroke-width="2" stroke-dasharray="4"/>
+          <!-- Transformed Center Point -->
+          <circle cx="95" cy="85" r="7" fill="#1e40af"/>
+          <text x="104" y="95" font-size="12" font-family="sans-serif" fill="#1e293b" font-weight="bold">w₀</text>
+          <!-- Transformed Surrounding Points -->
+          <circle cx="160" cy="40" r="4.5" fill="#3b82f6"/>
+          <circle cx="40" cy="70" r="4.5" fill="#3b82f6"/>
+          <circle cx="120" cy="45" r="4.5" fill="#3b82f6"/>
+          <circle cx="75" cy="115" r="4.5" fill="#3b82f6"/>
+          <text x="167" y="35" font-size="10" font-family="sans-serif" fill="#475569">wᵢ</text>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Arrow 2 -->
+    <div data-step="3" style="width: 30px; align-self: center; display: flex; justify-content: center;">
+      <span class="arrow arrow-right">→</span>
+    </div>
+
+    <!-- 3. Reconstruct Column -->
+    <div data-step="3" style="flex: 1.2; display: flex; flex-direction: column; gap: 12px;">
+      <div class="panel panel-accent" style="padding: 16px; margin: 0; flex: 1;">
+        <p style="font-size: 1.3rem; font-weight: 700; margin: 0 0 6px 0; color: #166534;">3. Reconstruct</p>
+        <p class="text-muted" style="font-size: 0.95rem; margin: 0;">Recover the new Gaussian from \(y_i\), using the <strong>original weights</strong> \(w_i\).</p>
+      </div>
+      <!-- SVG 3: Reconstructed Gaussian -->
+      <div style="background: white; border-radius: 12px; padding: 12px; display: flex; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+        <svg width="100%" height="130" viewBox="0 0 200 130">
+          <!-- New Gaussian -->
+          <ellipse cx="100" cy="75" rx="65" ry="30" transform="rotate(-25 100 75)" fill="#f0fdf4" stroke="#16a34a" stroke-width="2" opacity="0.8"/>
+          <!-- Same Transformed Points -->
+          <circle cx="95" cy="85" r="7" fill="#1e40af"/>
+          <circle cx="160" cy="40" r="4.5" fill="#3b82f6"/>
+          <circle cx="40" cy="70" r="4.5" fill="#3b82f6"/>
+          <circle cx="120" cy="45" r="4.5" fill="#3b82f6"/>
+          <circle cx="75" cy="115" r="4.5" fill="#3b82f6"/>
+        </svg>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BLURRED QUESTIONS OVERLAY -->
+  <div data-step="4" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255, 255, 255, 0.75); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; z-index: 100;">
+    <div style="background: white; padding: 40px; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); border-left: 8px solid #f59e0b; max-width: 900px;">
+      <h2 style="font-size: 2.2rem; font-weight: 800; color: #b45309; margin: 0 0 20px 0;">Wait... How does that actually work?</h2>
+      
+      <ol style="font-size: 1.3rem; line-height: 1.6; margin: 0; padding-left: 28px; color: #334155; display: flex; flex-direction: column; gap: 16px;">
+        <li>
+          <strong>The Points & Weights:</strong> How do we approximate a distribution using exactly \(2n+1\) Sigma Points to perfectly match the two moments? <em>Where do we put them, and what weights do they get?</em>
+        </li>
+        <li>
+          <strong>The Reconstruction:</strong> How do we rebuild the distribution after the non-linear transformation? <em>And why do is the information about the distribution still in the points even after a non linear transformation?</em>
+        </li>
+      </ol>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
