@@ -19,7 +19,31 @@
   function notify(action) {
     if (window.parent !== window) window.parent.postMessage({ slideui: action }, '*');
   }
+  // F: schermo intero. Dentro un iframe la richiesta va inoltrata alla pagina che
+  // lo contiene, che è l'unica autorizzata a entrare in fullscreen.
+  function toggleFullscreen() {
+    if (window.parent !== window) { notify('fullscreen'); return; }
+    if (document.fullscreenElement) { document.exitFullscreen(); return; }
+    if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
+  }
+  // Il player passa indice e totale: il contatore sta nella tela e scala con lei,
+  // con lo stesso look del modulo 3.
+  function renderCounter() {
+    if (opts.index == null || !opts.total) return;
+    var host = document.querySelector('.slide-layout') || document.body;
+    var el = host.querySelector('.slideui-counter');
+    if (!el) {
+      el = document.createElement('div');
+      el.className = 'slideui-counter';
+      el.setAttribute('aria-hidden', 'true');
+      el.innerHTML = '<span class="current-slide"></span><span class="total-slides"></span>';
+      host.appendChild(el);
+    }
+    el.querySelector('.current-slide').textContent = String(opts.index + 1);
+    el.querySelector('.total-slides').textContent = ' / ' + opts.total;
+  }
   function handleKey(key) {
+    if (key === 'f' || key === 'F') { toggleFullscreen(); return true; }
     if (opts.showAll) return false;
     if (key === 'ArrowRight' || key === ' ' || key === 'PageDown' || key === 'Enter') {
       if (cur < values.length - 1) setStep(cur + 1); else notify('next');
@@ -45,6 +69,7 @@
   }
   function init() {
     fit();
+    renderCounter();
     window.addEventListener('resize', fit);
     items = Array.prototype.map.call(document.querySelectorAll('[data-step]'), function (el) {
       return { el: el, n: parseFloat(el.getAttribute('data-step')) || 0 };

@@ -17,6 +17,18 @@ body { position: relative; }
 }
 .slide-layout * { box-sizing: border-box; }
 
+/* Contatore slide: stesso look del modulo 3 (numero grande, totale piccolo e spento) */
+.slideui-counter {
+  position: absolute; right: 28px; bottom: 16px;
+  display: flex; align-items: baseline; gap: 7px;
+  font-family: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #11151b; line-height: 1.2; white-space: nowrap;
+  font-variant-numeric: tabular-nums; pointer-events: none;
+  -webkit-user-select: none; user-select: none; z-index: 10;
+}
+.slideui-counter .current-slide { font-size: 38px; font-weight: 650; }
+.slideui-counter .total-slides { font-size: 23px; font-weight: 400; color: #5b6472; }
+
 .title { font-size: 3.5rem; font-weight: 800; color: #0f172a; margin: 0 0 1rem; line-height: 1.1; letter-spacing: -0.02em; }
 .subtitle { font-size: 2rem; font-weight: 500; color: #475569; margin: 0 0 2.5rem; }
 .text-xl { font-size: 1.875rem; line-height: 1.5; margin-bottom: 1rem; }
