@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agenda</title>
+<link rel="stylesheet" href="slideui.css">
+<script src="slideui.js" defer></script>
+<style>
+  /* Same agenda as module 1, with the state of each block made visible. */
+  .agenda-list { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 14px; padding-bottom: 4px; }
+  .part { display: flex; align-items: center; gap: 26px; padding: 10px 0 10px 22px; border-left: 5px solid var(--tone); border-radius: 0 14px 14px 0; }
+  .part-who { flex: 0 0 176px; }
+  .part-tag { margin: 0 0 4px; font-size: 13px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--tone); }
+  .part-name { margin: 0; font-size: 22px; font-weight: 700; color: var(--fg); }
+  .part-topics { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+  .part-card { margin: 0; padding: 10px 18px; border-radius: 12px; background: var(--tint); border: 1px solid var(--edge); }
+  .part-card b { display: block; margin-bottom: 2px; font-size: 19px; font-weight: 700; color: var(--ink); }
+  .part-card span { display: block; font-size: 17px; line-height: 1.3; color: var(--muted); }
+  .part-state { flex: 0 0 88px; text-align: right; padding-right: 12px; }
+  .state-pill { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+  /* Covered: green edge and check, content still readable. */
+  .part.done { border-left-color: #22c55e; background: #f8fafc; }
+  .part.done .part-tag { color: #16a34a; }
+  .part.done .part-card { background: #fff; border-color: #e5e7eb; }
+  .part.done .part-card b { color: #475569; }
+  .part.done .part-card span { color: #94a3b8; }
+  .part.done .state-pill { background: #dcfce7; color: #15803d; }
+  /* Current: tinted row, coloured edge. */
+  .part.current { background: var(--tint); }
+  .part.current .part-card { background: #fff; }
+  .part.current .state-pill { background: #fff; color: var(--ink); border: 1px solid var(--edge); }
+  /* Still to come: faded. */
+  .part.next { border-left-color: #cbd5e1; opacity: .42; }
+  .part.next .state-pill { background: #eef2f7; color: #64748b; }
+</style>
+</head>
+<body>
+
+<div class="slide-layout">
+<section class="slide agenda-slide">
+  <h1>Agenda</h1>
+
+  <div class="body agenda-list">
+
+    <!-- PART 1: ALBERTO PINI - covered in the first block -->
+    <div class="part done" style="--tone:#3b82f6; --tint:#eff6ff; --edge:#bfdbfe; --ink:#1e40af;">
+      <div class="part-who">
+        <p class="part-tag">Part 1</p>
+        <p class="part-name">Alberto Pini</p>
+      </div>
+      <div class="part-topics">
+        <div class="part-card">
+          <b>1. EKF Reminder</b>
+          <span>Taylor linearization and the limits of the Extended Kalman Filter.</span>
+        </div>
+        <div class="part-card">
+          <b>2. Unscented Kalman Filter (UKF)</b>
+          <span>Solving non-linearity via Unscented Transform &amp; parameter constraints.</span>
+        </div>
+      </div>
+      <div class="part-state"><span class="state-pill">&#10003; done</span></div>
+    </div>
+
+    <!-- PART 2: MATTEO SCURATTI - covered before this block -->
+    <div class="part done" style="--tone:#10b981; --tint:#ecfdf5; --edge:#a7f3d0; --ink:#065f46;">
+      <div class="part-who">
+        <p class="part-tag">Part 2</p>
+        <p class="part-name">Matteo Scuratti</p>
+      </div>
+      <div class="part-topics">
+        <div class="part-card">
+          <b>3. Cubature Kalman Filter (CKF)</b>
+          <span>Spherical-radial integration rule: parameter-free state estimation.</span>
+        </div>
+      </div>
+      <div class="part-state"><span class="state-pill">&#10003; done</span></div>
+    </div>
+
+    <!-- PART 3: MATTIA SICOLI - this block -->
+    <div class="part current" style="--tone:#8b5cf6; --tint:#f5f3ff; --edge:#ddd6fe; --ink:#5b21b6;">
+      <div class="part-who">
+        <p class="part-tag">Part 3</p>
+        <p class="part-name">Mattia Sicoli</p>
+      </div>
+      <div class="part-topics">
+        <div class="part-card">
+          <b>4. Comprehensive Comparison</b>
+          <span>KF vs. EKF vs. UKF vs. CKF in real-world application scenarios.</span>
+        </div>
+      </div>
+      <div class="part-state"><span class="state-pill">now</span></div>
+    </div>
+
+  </div>
+</section>
+</div>
+
+</body>
+</html>
