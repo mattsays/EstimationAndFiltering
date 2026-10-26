@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unscented Transform (UKF) Interactive Lab</title>
+
+  <!-- KaTeX for LaTeX Math Rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+
+  <style>
+    :root {
+      --bg-main: #f8fafc;
+      --panel-bg: #ffffff;
+      --panel-border: #cbd5e1;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --accent-blue: #2563eb;
+      --accent-green: #16a34a;
+      --accent-orange: #ea580c;
+      --accent-red: #dc2626;
+      --accent-pink: #f87171;
+      --accent-purple: #7c3aed;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    header {
+      background: var(--panel-bg);
+      border-bottom: 1px solid var(--panel-border);
+      padding: 8px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--shadow-sm);
+      z-index: 10;
+    }
+
+    header h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .preset-container { display: flex; gap: 6px; }
+
+    .preset-btn {
+      background: #f1f5f9;
+      color: #334155;
+      border: 1px solid var(--panel-border);
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .preset-btn:hover { background: #e2e8f0; }
+    .preset-btn.primary { background: var(--accent-blue); color: #fff; border-color: var(--accent-blue); }
+    .preset-btn.primary:hover { background: #1d4ed8; }
+    .preset-btn.danger { background: #fee2e2; color: var(--accent-red); border-color: #fca5a5; }
+    .preset-btn.danger:hover { background: #fca5a5; color: #7f1d1d; }
+
+    .main-container {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* Viewport Area */
+    .viewport-container {
+      flex: 1;
+      display: flex;
+      gap: 12px;
+      padding: 10px;
+      background: #f1f5f9;
+      overflow: hidden;
+    }
+
+    .canvas-column {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      height: 100%;
+    }
+
+    .canvas-card {
+      flex: 1;
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .canvas-header {
+      padding: 6px 12px;
+      background: #f8fafc;
+      border-bottom: 1px solid var(--panel-border);
+      font-size: 0.82rem;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    canvas {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Floating Legend Boxes */
+    .legend-box {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid var(--panel-border);
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 0.72rem;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      box-shadow: var(--shadow-sm);
+      pointer-events: none;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+    }
+
+    .legend-line-solid {
+      width: 14px;
+      height: 2px;
+    }
+
+    .legend-line-dashed {
+      width: 14px;
+      height: 0;
+      border-top: 2px dashed var(--accent-pink);
+    }
+
+    .legend-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+    }
+
+    /* Sub-Cards for Equations */
+    .sub-card {
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .sub-card-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--accent-blue);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 4px;
+    }
+
+    .toggle-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+
+    .dist-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      gap: 12px;
+      background: #f8fafc;
+      border: 1px solid var(--panel-border);
+      border-radius: 6px;
+      padding: 8px;
+    }
+
+    .math-block {
+      display: flex;
+      align-items: center;
+      font-size: 0.95rem;
+    }
+
+    .matrix-box {
+      display: inline-flex;
+      align-items: center;
+      font-family: "Fira Code", monospace;
+      font-size: 0.92rem;
+      font-weight: 600;
+    }
+
+    .vector-bracket {
+      border-left: 2px solid var(--text-main);
+      border-right: 2px solid var(--text-main);
+      border-radius: 4px;
+      padding: 2px 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      text-align: right;
+      background: #ffffff;
+    }
+
+    .matrix-bracket {
+      border-left: 2.5px solid var(--text-main);
+      border-right: 2.5px solid var(--text-main);
+      border-radius: 4px;
+      padding: 3px 8px;
+      display: grid;
+      grid-template-columns: auto auto;
+      gap: 3px 12px;
+      text-align: right;
+      background: #ffffff;
+    }
+
+    /* Controls Sidebar */
+    .controls-panel {
+      width: 380px;
+      background: var(--panel-bg);
+      border-left: 1px solid var(--panel-border);
+      padding: 14px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: -2px 0 6px rgba(0,0,0,0.03);
+    }
+
+    .section-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--accent-blue);
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 3px;
+      margin-bottom: 4px;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .control-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .control-row label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-main);
+      width: 100px;
+    }
+
+    .control-row input[type="range"] {
+      flex: 1;
+      accent-color: var(--accent-blue);
+      cursor: pointer;
+    }
+
+    .play-btn {
+      background: #f1f5f9;
+      border: 1px solid var(--panel-border);
+      border-radius: 4px;
+      width: 24px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+      cursor: pointer;
+      color: #334155;
+      transition: all 0.15s;
+    }
+    .play-btn:hover { background: #e2e8f0; }
+    .play-btn.active { background: var(--accent-blue); color: white; border-color: var(--accent-blue); }
+
+    .val-badge {
+      font-family: "Fira Code", monospace;
+      font-size: 0.78rem;
+      background: #f8fafc;
+      padding: 1px 5px;
+      border-radius: 4px;
+      min-width: 44px;
+      text-align: right;
+      color: var(--accent-blue);
+      border: 1px solid var(--panel-border);
+      font-weight: 600;
+    }
+
+    .func-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: #f8fafc;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid var(--panel-border);
+    }
+
+    .func-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: "Fira Code", monospace;
+      font-size: 0.82rem;
+    }
+
+    .func-label {
+      min-width: 75px;
+      white-space: nowrap;
+      font-weight: bold;
+      color: var(--accent-orange);
+    }
+
+    .func-row input[type="text"] {
+      flex: 1;
+      padding: 5px 10px;
+      border: 1px solid var(--panel-border);
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 0.82rem;
+      background: #ffffff;
+      color: var(--text-main);
+    }
+    .func-row input[type="text"]:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 2px rgba(37,99,235,0.15);
+    }
+
+    .param-box {
+      background: #f8fafc;
+      border: 1px solid var(--panel-border);
+      border-radius: 6px;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.82rem;
+    }
+
+    .param-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .alert-box {
+      background: #fef2f2;
+      border: 1px solid #fca5a5;
+      color: #991b1b;
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      display: none;
+      line-height: 1.35;
+    }
+    .alert-box.active { display: block; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Unscented Transform (UKF) Interactive Lab</h1>
+    <div class="preset-container">
+      <button class="preset-btn primary" onclick="loadPreset('default')">Default Mapping</button>
+      <button class="preset-btn danger" onclick="loadPreset('crash')">Crash Test (NaN Trigger)</button>
+    </div>
+  </header>
+
+  <div class="main-container">
+    
+    <!-- Viewports & Sub-Cards Column -->
+    <div class="viewport-container">
+      
+      <!-- Space A Column -->
+      <div class="canvas-column">
+        <div class="canvas-card">
+          <div class="canvas-header">
+            <span>STATE SPACE <span class="tex-inline" data-tex="\mathbf{A}"></span> (Time step k)</span>
+            <span style="color: var(--accent-blue)">State Vector <span class="tex-inline" data-tex="\mathbf{x}_k \in \mathbb{R}^2"></span></span>
+          </div>
+          <canvas id="canvasX"></canvas>
+
+          <!-- Space A Legend -->
+          <div class="legend-box">
+            <div class="legend-item">
+              <div class="legend-line-solid" style="background: var(--accent-blue)"></div>
+              <span>1&sigma; Ellipse (<span class="tex-inline" data-tex="\mathbf{P}_k"></span>)</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-line-solid" style="background: var(--accent-green)"></div>
+              <span>&gamma;&sigma; Contour</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background: var(--accent-purple)"></div>
+              <span>Mean <span class="tex-inline" data-tex="\boldsymbol{\mu}_k"></span> (<span class="tex-inline" data-tex="S_0"></span>)</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background: var(--accent-green)"></div>
+              <span>Sigma Points (<span class="tex-inline" data-tex="S_{1..4}"></span>)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sub-card">
+          <div class="sub-card-title">
+            <span>Prior Distribution &amp; Cholesky Factor</span>
+          </div>
+
+          <!-- Mathematical Distribution Notation for Space A -->
+          <div class="dist-row">
+            <div class="math-block">
+              <span class="tex-inline" data-tex="\mathbf{x}_k \sim \mathcal{N}\Big("></span>
+              <div style="margin: 0 4px;" class="matrix-box">
+                <div class="vector-bracket">
+                  <span id="vec_mx">0.00</span>
+                  <span id="vec_my">0.00</span>
+                </div>
+              </div>
+              <span class="tex-inline" data-tex=","></span>
+              <div style="margin: 0 4px;" class="matrix-box">
+                <div class="matrix-bracket" id="mat_P">
+                  <span>0.00</span><span>0.00</span>
+                  <span>0.00</span><span>0.00</span>
+                </div>
+              </div>
+              <span class="tex-inline" data-tex="\Big)"></span>
+            </div>
+
+            <div class="math-block">
+              <span class="tex-inline" data-tex="\mathbf{L}_k ="></span>
+              <div style="margin-left: 6px;" class="matrix-box">
+                <div class="matrix-bracket" id="mat_L">
+                  <span>0.00</span><span>0.00</span>
+                  <span>0.00</span><span>0.00</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Space B Column -->
+      <div class="canvas-column">
+        <div class="canvas-card">
+          <div class="canvas-header">
+            <span>PREDICTED SPACE <span class="tex-inline" data-tex="\mathbf{B}"></span> (Time step k+1)</span>
+            <span style="color: var(--accent-orange)">Prediction <span class="tex-inline" data-tex="\mathbf{x}_{k+1} = \mathbf{f}(\mathbf{x}_k)"></span></span>
+          </div>
+          <canvas id="canvasY"></canvas>
+
+          <!-- Space B Legend -->
+          <div class="legend-box">
+            <div class="legend-item">
+              <div class="legend-line-dashed"></div>
+              <span>True Warped 1&sigma; Contour</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background: var(--accent-pink)"></div>
+              <span>True Mean <span class="tex-inline" data-tex="\boldsymbol{\mu}_{\text{true}}"></span></span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-line-solid" style="background: var(--accent-red)"></div>
+              <span>UKF Gaussian 1&sigma; Ellipse</span>
+            </div>
+            <div class="legend-item" id="legend_gamma_y">
+              <div class="legend-line-solid" style="background: var(--accent-orange)"></div>
+              <span>UKF &gamma;&sigma; Contour</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background: var(--accent-red)"></div>
+              <span>UKF Mean <span class="tex-inline" data-tex="\mathbf{M}_{k+1}"></span></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sub-card">
+          <div class="sub-card-title">
+            <span>Reconstructed Gaussian Moments</span>
+            <label class="toggle-label">
+              <input type="checkbox" id="toggle_LY" checked onchange="update()">
+              Show <span class="tex-inline" data-tex="\mathbf{L}_{k+1}"></span>
+            </label>
+          </div>
+
+          <!-- Mathematical Distribution Notation for Space B -->
+          <div class="dist-row">
+            <div class="math-block">
+              <span class="tex-inline" data-tex="\mathbf{x}_{k+1} \sim \mathcal{N}\Big("></span>
+              <div style="margin: 0 4px;" class="matrix-box">
+                <div class="vector-bracket">
+                  <span id="vec_mYx">0.00</span>
+                  <span id="vec_mYy">0.00</span>
+                </div>
+              </div>
+              <span class="tex-inline" data-tex=","></span>
+              <div style="margin: 0 4px;" class="matrix-box">
+                <div class="matrix-bracket" id="mat_PY">
+                  <span>0.00</span><span>0.00</span>
+                  <span>0.00</span><span>0.00</span>
+                </div>
+              </div>
+              <span class="tex-inline" data-tex="\Big)"></span>
+            </div>
+
+            <div class="math-block" id="block_LY">
+              <span class="tex-inline" data-tex="\mathbf{L}_{k+1} ="></span>
+              <div style="margin-left: 6px;" class="matrix-box">
+                <div class="matrix-bracket" id="mat_LY">
+                  <span>0.00</span><span>0.00</span>
+                  <span>0.00</span><span>0.00</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Alert Banner inside Sub-Card -->
+          <div id="instabilityAlert" class="alert-box">
+            <strong>⚠️ Real Cholesky Failure (NaN Crash)!</strong><br>
+            The matrix <span class="tex-inline" data-tex="\mathbf{P}_{k+1}"></span> lost positive-definiteness (<span class="tex-inline" data-tex="P_{22} - L_{21}^2 < 0"></span>). Cholesky factor <span class="tex-inline" data-tex="\mathbf{L}_{k+1}"></span> yields <strong>NaN</strong>!
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right Controls Panel -->
+    <div class="controls-panel">
+
+      <!-- Section 1: Non-Linear Function -->
+      <div class="control-group">
+        <div class="section-title">Non-Linear Mapping <span class="tex-inline" data-tex="\mathbf{f}(x,y)"></span></div>
+        <div class="func-input-group">
+          <div class="func-row">
+            <span class="func-label tex-inline" data-tex="f_1(x,y)="></span>
+            <input type="text" id="f1_expr" value="x + 0.2*y^2">
+          </div>
+          <div class="func-row">
+            <span class="func-label tex-inline" data-tex="f_2(x,y)="></span>
+            <input type="text" id="f2_expr" value="y + 0.5*cos(x^2)">
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2: Initial State Params -->
+      <div class="control-group">
+        <div class="section-title">Initial State <span class="tex-inline" data-tex="\boldsymbol{\mu}_k"></span> &amp; Covariance <span class="tex-inline" data-tex="\mathbf{P}_k"></span></div>
+        
+        <div class="control-row">
+          <label>Mean <span class="tex-inline" data-tex="m_x"></span></label>
+          <button class="play-btn" id="play_mx" onclick="togglePlay('mx')">▶</button>
+          <input type="range" id="mx" min="-5" max="5" step="0.1" value="1.7">
+          <span class="val-badge" id="val_mx">1.7</span>
+        </div>
+
+        <div class="control-row">
+          <label>Mean <span class="tex-inline" data-tex="m_y"></span></label>
+          <button class="play-btn" id="play_my" onclick="togglePlay('my')">▶</button>
+          <input type="range" id="my" min="-5" max="5" step="0.1" value="-0.1">
+          <span class="val-badge" id="val_my">-0.1</span>
+        </div>
+
+        <div class="control-row">
+          <label>Std Dev <span class="tex-inline" data-tex="\sigma_x"></span></label>
+          <button class="play-btn" id="play_sx" onclick="togglePlay('sx')">▶</button>
+          <input type="range" id="sx" min="0.2" max="4" step="0.1" value="1.5">
+          <span class="val-badge" id="val_sx">1.5</span>
+        </div>
+
+        <div class="control-row">
+          <label>Std Dev <span class="tex-inline" data-tex="\sigma_y"></span></label>
+          <button class="play-btn" id="play_sy" onclick="togglePlay('sy')">▶</button>
+          <input type="range" id="sy" min="0.2" max="4" step="0.1" value="1.6">
+          <span class="val-badge" id="val_sy">1.6</span>
+        </div>
+
+        <div class="control-row">
+          <label>Corr. <span class="tex-inline" data-tex="\rho"></span></label>
+          <button class="play-btn" id="play_r" onclick="togglePlay('r')">▶</button>
+          <input type="range" id="r" min="-0.95" max="0.95" step="0.05" value="0.32">
+          <span class="val-badge" id="val_r">0.32</span>
+        </div>
+      </div>
+
+      <!-- Section 3: UKF Hyperparameters -->
+      <div class="control-group">
+        <div class="section-title">Hyperparameters <span class="tex-inline" data-tex="(\alpha, \kappa, \beta)"></span></div>
+
+        <div class="control-row">
+          <label>Spread <span class="tex-inline" data-tex="\alpha"></span></label>
+          <button class="play-btn" id="play_alpha" onclick="togglePlay('alpha')">▶</button>
+          <input type="range" id="alpha" min="0.01" max="1" step="0.01" value="0.8">
+          <span class="val-badge" id="val_alpha">0.80</span>
+        </div>
+
+        <div class="control-row">
+          <label>Scaling <span class="tex-inline" data-tex="\kappa"></span></label>
+          <button class="play-btn" id="play_kappa" onclick="togglePlay('kappa')">▶</button>
+          <input type="range" id="kappa" min="-2.5" max="3" step="0.1" value="1">
+          <span class="val-badge" id="val_kappa">1.0</span>
+        </div>
+
+        <div class="control-row">
+          <label>Distr. <span class="tex-inline" data-tex="\beta"></span></label>
+          <button class="play-btn" id="play_beta" onclick="togglePlay('beta')">▶</button>
+          <input type="range" id="beta" min="-3" max="4" step="0.1" value="2">
+          <span class="val-badge" id="val_beta">2.0</span>
+        </div>
+      </div>
+
+      <!-- Section 4: Scaling Parameters -->
+      <div class="control-group">
+        <div class="section-title">Scaling Parameters</div>
+        <div class="param-box">
+          <div class="param-line">
+            <span class="tex-inline" data-tex="\lambda = \alpha^2(n+\kappa)-n ="></span>
+            <strong id="val_lambda_math" style="color:var(--accent-blue)">0.0000</strong>
+          </div>
+          <div class="param-line">
+            <span class="tex-inline" data-tex="\gamma = \sqrt{n+\lambda} ="></span>
+            <strong id="val_gamma_math" style="color:var(--accent-green)">0.0000</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 5: Quadrature Weights with Formulas -->
+      <div class="control-group">
+        <div class="section-title">Quadrature Weights</div>
+        <div class="param-box">
+          <div class="param-line">
+            <span class="tex-inline" data-tex="W_0^m = \frac{\lambda}{n+\lambda} ="></span>
+            <strong id="w0m_val">0.0000</strong>
+          </div>
+          <div class="param-line">
+            <span class="tex-inline" data-tex="W_0^c = W_0^m + 1 - \alpha^2 + \beta ="></span>
+            <strong id="w0c_val">0.0000</strong>
+          </div>
+          <div class="param-line">
+            <span class="tex-inline" data-tex="W_i^{m,c} = \frac{1}{2(n+\lambda)} ="></span>
+            <strong id="wi_val">0.0000</strong>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // State Variables
+    const state = {
+      mx: 1.7, my: -0.1,
+      sx: 1.5, sy: 1.6,
+      r: 0.32,
+      n: 2,
+      alpha: 0.8,
+      kappa: 1.0,
+      beta: 2.0
+    };
+
+    const animState = {};
+    const inputs = ['mx', 'my', 'sx', 'sy', 'r', 'alpha', 'kappa', 'beta'];
+
+    let fn1 = (x, y) => x + 0.2 * y * y;
+    let fn2 = (x, y) => y + 0.5 * Math.cos(x * x);
+
+    const canvasX = document.getElementById('canvasX');
+    const canvasY = document.getElementById('canvasY');
+    const ctxX = canvasX.getContext('2d');
+    const ctxY = canvasY.getContext('2d');
+
+    // Executed ONLY ONCE on initialization
+    function initMath() {
+      document.querySelectorAll('.tex-inline').forEach(el => {
+        const tex = el.getAttribute('data-tex');
+        if (tex) katex.render(tex, el, { throwOnError: false });
+      });
+    }
+
+    inputs.forEach(id => {
+      const el = document.getElementById(id);
+      el.addEventListener('input', (e) => {
+        state[id] = parseFloat(e.target.value);
+        document.getElementById(`val_${id}`).innerText = state[id].toFixed(id === 'alpha' ? 2 : 1);
+        update();
+      });
+    });
+
+    document.getElementById('f1_expr').addEventListener('input', updateFunctions);
+    document.getElementById('f2_expr').addEventListener('input', updateFunctions);
+
+    function parseMathExpr(expr) {
+      let cleaned = expr
+        .replace(/\^/g, '**')
+        .replace(/\bsin\b/g, 'Math.sin')
+        .replace(/\bcos\b/g, 'Math.cos')
+        .replace(/\bsqrt\b/g, 'Math.sqrt')
+        .replace(/\babs\b/g, 'Math.abs')
+        .replace(/\bPI\b/g, 'Math.PI');
+      return new Function('x', 'y', `return ${cleaned};`);
+    }
+
+    function updateFunctions() {
+      try {
+        fn1 = parseMathExpr(document.getElementById('f1_expr').value);
+        fn2 = parseMathExpr(document.getElementById('f2_expr').value);
+        fn1(1, 1); fn2(1, 1);
+        update();
+      } catch (err) {}
+    }
+
+    function togglePlay(id) {
+      const btn = document.getElementById(`play_${id}`);
+      if (animState[id]) {
+        delete animState[id];
+        btn.classList.remove('active');
+        btn.innerText = '▶';
+      } else {
+        const input = document.getElementById(id);
+        animState[id] = {
+          min: parseFloat(input.min),
+          max: parseFloat(input.max),
+          step: parseFloat(input.step) || 0.05,
+          dir: 1
+        };
+        btn.classList.add('active');
+        btn.innerText = '❚❚';
+      }
+    }
+
+    function animate() {
+      let changed = false;
+      Object.keys(animState).forEach(id => {
+        const config = animState[id];
+        let val = state[id] + config.dir * config.step * 0.2;
+        if (val >= config.max) { val = config.max; config.dir = -1; }
+        if (val <= config.min) { val = config.min; config.dir = 1; }
+        state[id] = val;
+        document.getElementById(id).value = val;
+        document.getElementById(`val_${id}`).innerText = val.toFixed(id === 'alpha' ? 2 : 1);
+        changed = true;
+      });
+
+      if (changed) update();
+      requestAnimationFrame(animate);
+    }
+    requestAnimationFrame(animate);
+
+    function loadPreset(type) {
+      Object.keys(animState).forEach(id => togglePlay(id));
+
+      if (type === 'default') {
+        state.mx = 1.7; state.my = -0.1; state.sx = 1.5; state.sy = 1.6; state.r = 0.32;
+        state.alpha = 0.8; state.kappa = 1.0; state.beta = 2.0;
+        document.getElementById('f1_expr').value = "x + 0.2*y^2";
+        document.getElementById('f2_expr').value = "y + 0.5*cos(x^2)";
+      } else if (type === 'crash') {
+        state.mx = 2.5; state.my = 2.0; state.sx = 2.5; state.sy = 2.5; state.r = 0.5;
+        state.alpha = 0.2; state.kappa = -1.0; state.beta = -2.0;
+        document.getElementById('f1_expr').value = "x + 0.8*y^2";
+        document.getElementById('f2_expr').value = "y + 0.5*cos(x^2)";
+      }
+
+      updateFunctions();
+      inputs.forEach(id => {
+        document.getElementById(id).value = state[id];
+        document.getElementById(`val_${id}`).innerText = state[id].toFixed(id === 'alpha' ? 2 : 1);
+      });
+      update();
+    }
+
+    function calculateUKF() {
+      const { mx, my, sx, sy, r, n, alpha, kappa, beta } = state;
+
+      const lambda = Math.pow(alpha, 2) * (n + kappa) - n;
+      const gamma = (n + lambda) >= 0 ? Math.sqrt(n + lambda) : NaN;
+
+      const P11 = sx * sx;
+      const P22 = sy * sy;
+      const P12 = r * sx * sy;
+
+      const L11 = sx;
+      const L21 = r * sy;
+      const L22 = sy * Math.sqrt(Math.max(0, 1 - r * r));
+
+      const mu = [mx, my];
+      const S = [
+        [mu[0], mu[1]],
+        [mu[0] + gamma * L11, mu[1] + gamma * L21],
+        [mu[0] - gamma * L11, mu[1] - gamma * L21],
+        [mu[0], mu[1] + gamma * L22],
+        [mu[0], mu[1] - gamma * L22]
+      ];
+
+      const W0m = lambda / (n + lambda);
+      const Wim = 1 / (2 * (n + lambda));
+      const W0c = W0m + (1 - Math.pow(alpha, 2) + beta);
+      const Wic = Wim;
+
+      const Y = S.map(pt => {
+        try { return [fn1(pt[0], pt[1]), fn2(pt[0], pt[1])]; }
+        catch(e) { return [NaN, NaN]; }
+      });
+
+      let mYx = W0m * Y[0][0];
+      let mYy = W0m * Y[0][1];
+      for (let i = 1; i <= 4; i++) {
+        mYx += Wim * Y[i][0];
+        mYy += Wim * Y[i][1];
+      }
+      const MY = [mYx, mYy];
+
+      let PY11 = W0c * Math.pow(Y[0][0] - mYx, 2);
+      let PY22 = W0c * Math.pow(Y[0][1] - mYy, 2);
+      let PY12 = W0c * (Y[0][0] - mYx) * (Y[0][1] - mYy);
+
+      for (let i = 1; i <= 4; i++) {
+        PY11 += Wic * Math.pow(Y[i][0] - mYx, 2);
+        PY22 += Wic * Math.pow(Y[i][1] - mYy, 2);
+        PY12 += Wic * (Y[i][0] - mYx) * (Y[i][1] - mYy);
+      }
+
+      // Real Cholesky with True NaN
+      let LY11 = Math.sqrt(PY11);
+      let LY21 = !isNaN(LY11) && LY11 > 0 ? PY12 / LY11 : NaN;
+      let LY22_sq = PY22 - LY21 * LY21;
+      let LY22 = Math.sqrt(LY22_sq);
+
+      const isIndefinite = isNaN(LY11) || isNaN(LY21) || isNaN(LY22) || isNaN(gamma);
+
+      // True Non-Linear Contour & Monte Carlo Mean
+      const trueContourY = [];
+      const contourSteps = 120;
+      for (let i = 0; i <= contourSteps; i++) {
+        const t = (i / contourSteps) * 2 * Math.PI;
+        const u = Math.cos(t);
+        const v = Math.sin(t);
+        const x = mu[0] + L11 * u;
+        const y = mu[1] + L21 * u + L22 * v;
+        try { trueContourY.push([fn1(x, y), fn2(x, y)]); }
+        catch(e) {}
+      }
+
+      let trueSumX = 0, trueSumY = 0, totalW = 0;
+      const rSteps = 15, tSteps = 24;
+      for (let ri = 1; ri <= rSteps; ri++) {
+        const rVal = (ri / rSteps) * 3.0;
+        const wVal = rVal * Math.exp(-0.5 * rVal * rVal);
+        for (let ti = 0; ti < tSteps; ti++) {
+          const tVal = (ti / tSteps) * 2 * Math.PI;
+          const u = rVal * Math.cos(tVal);
+          const v = rVal * Math.sin(tVal);
+          const x = mu[0] + L11 * u;
+          const y = mu[1] + L21 * u + L22 * v;
+          try {
+            trueSumX += fn1(x, y) * wVal;
+            trueSumY += fn2(x, y) * wVal;
+            totalW += wVal;
+          } catch(e) {}
+        }
+      }
+      const trueMY = totalW > 0 ? [trueSumX / totalW, trueSumY / totalW] : [NaN, NaN];
+
+      return {
+        lambda, gamma, W0m, Wim, W0c, Wic,
+        mu, P: [[P11, P12], [P12, P22]], L: [[L11, 0], [L21, L22]],
+        S, Y, MY,
+        PY: [[PY11, PY12], [PY12, PY22]],
+        LY: [[LY11, 0], [LY21, LY22]],
+        isIndefinite,
+        trueContourY, trueMY
+      };
+    }
+
+    function resizeCanvas() {
+      [canvasX, canvasY].forEach(canvas => {
+        const rect = canvas.parentElement.getBoundingClientRect();
+        canvas.width = rect.width * window.devicePixelRatio;
+        canvas.height = rect.height * window.devicePixelRatio;
+      });
+    }
+
+    function toScreen(x, y, canvas, center, span) {
+      const w = canvas.width;
+      const h = canvas.height;
+      const xMin = center[0] - span;
+      const xMax = center[0] + span;
+      const yMin = center[1] - span;
+      const yMax = center[1] + span;
+
+      const sx = (x - xMin) / (xMax - xMin) * w;
+      const sy = h - (y - yMin) / (yMax - yMin) * h;
+      return [sx, sy];
+    }
+
+    function drawGridAndBorderAxes(ctx, canvas, center, span) {
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+
+      const xMin = center[0] - span;
+      const xMax = center[0] + span;
+      const yMin = center[1] - span;
+      const yMax = center[1] + span;
+
+      ctx.strokeStyle = '#f1f5f9';
+      ctx.lineWidth = 1;
+
+      const step = Math.ceil(span / 3);
+      for (let x = Math.floor(xMin); x <= xMax; x += step) {
+        const [ptX] = toScreen(x, 0, canvas, center, span);
+        ctx.beginPath(); ctx.moveTo(ptX, 0); ctx.lineTo(ptX, h); ctx.stroke();
+      }
+      for (let y = Math.floor(yMin); y <= yMax; y += step) {
+        const [, ptY] = toScreen(0, y, canvas, center, span);
+        ctx.beginPath(); ctx.moveTo(0, ptY); ctx.lineTo(w, ptY); ctx.stroke();
+      }
+
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.fillStyle = '#64748b';
+      ctx.font = `${10 * window.devicePixelRatio}px sans-serif`;
+      ctx.lineWidth = 1.5 * window.devicePixelRatio;
+
+      ctx.strokeRect(0, 0, w, h);
+
+      for (let x = Math.floor(xMin); x <= xMax; x += step) {
+        const [ptX] = toScreen(x, 0, canvas, center, span);
+        ctx.beginPath(); ctx.moveTo(ptX, h); ctx.lineTo(ptX, h - 5); ctx.stroke();
+        ctx.fillText(x.toFixed(0), ptX - 4, h - 7);
+      }
+
+      for (let y = Math.floor(yMin); y <= yMax; y += step) {
+        const [, ptY] = toScreen(0, y, canvas, center, span);
+        ctx.beginPath(); ctx.moveTo(0, ptY); ctx.lineTo(5, ptY); ctx.stroke();
+        ctx.fillText(y.toFixed(0), 8, ptY + 3);
+      }
+    }
+
+    function drawEllipse(ctx, canvas, center, L, scale, color, span) {
+      if (isNaN(L[0][0]) || isNaN(L[1][0]) || isNaN(L[1][1])) return;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2.2 * window.devicePixelRatio;
+      ctx.beginPath();
+
+      const steps = 100;
+      for (let i = 0; i <= steps; i++) {
+        const t = (i / steps) * 2 * Math.PI;
+        const u = Math.cos(t);
+        const v = Math.sin(t);
+
+        const x = center[0] + scale * (L[0][0] * u);
+        const y = center[1] + scale * (L[1][0] * u + L[1][1] * v);
+
+        const [sX, sY] = toScreen(x, y, canvas, center, span);
+        if (i === 0) ctx.moveTo(sX, sY);
+        else ctx.lineTo(sX, sY);
+      }
+      ctx.stroke();
+    }
+
+    function drawWarpedContour(ctx, canvas, pts, color, center, span) {
+      if (!pts || pts.length === 0) return;
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2 * window.devicePixelRatio;
+      ctx.setLineDash([5 * window.devicePixelRatio, 4 * window.devicePixelRatio]);
+      ctx.beginPath();
+
+      pts.forEach((pt, i) => {
+        if (isNaN(pt[0]) || isNaN(pt[1])) return;
+        const [sX, sY] = toScreen(pt[0], pt[1], canvas, center, span);
+        if (i === 0) ctx.moveTo(sX, sY);
+        else ctx.lineTo(sX, sY);
+      });
+
+      ctx.closePath();
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawPoint(ctx, canvas, pt, color, label, center, span) {
+      if (isNaN(pt[0]) || isNaN(pt[1])) return;
+      const [sX, sY] = toScreen(pt[0], pt[1], canvas, center, span);
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(sX, sY, 5.5 * window.devicePixelRatio, 0, 2 * Math.PI);
+      ctx.fill();
+
+      if (label) {
+        ctx.fillStyle = '#0f172a';
+        ctx.font = `bold ${11 * window.devicePixelRatio}px sans-serif`;
+        ctx.fillText(label, sX + 7, sY - 7);
+      }
+    }
+
+    function renderMatrixHTML(id, mat) {
+      const el = document.getElementById(id);
+      const fmt = (val) => isNaN(val) ? '<span style="color:var(--accent-red);font-weight:bold;">NaN</span>' : val.toFixed(2);
+      el.innerHTML = `
+        <span>${fmt(mat[0][0])}</span><span>${fmt(mat[0][1])}</span>
+        <span>${fmt(mat[1][0])}</span><span>${fmt(mat[1][1])}</span>
+      `;
+    }
+
+    function update() {
+      resizeCanvas();
+      const ukf = calculateUKF();
+
+      // Toggle Cholesky L_k+1 Block & Orange Contour Visibility
+      const showLY = document.getElementById('toggle_LY').checked;
+      document.getElementById('block_LY').style.display = showLY ? 'flex' : 'none';
+      document.getElementById('legend_gamma_y').style.display = showLY ? 'flex' : 'none';
+
+      // Update Vector Displays
+      document.getElementById('vec_mx').innerText = ukf.mu[0].toFixed(2);
+      document.getElementById('vec_my').innerText = ukf.mu[1].toFixed(2);
+      document.getElementById('vec_mYx').innerText = isNaN(ukf.MY[0]) ? 'NaN' : ukf.MY[0].toFixed(2);
+      document.getElementById('vec_mYy').innerText = isNaN(ukf.MY[1]) ? 'NaN' : ukf.MY[1].toFixed(2);
+
+      // Update Scaling Formulas & Weights in Right Sidebar
+      document.getElementById('val_lambda_math').innerText = isNaN(ukf.lambda) ? 'NaN' : ukf.lambda.toFixed(4);
+      document.getElementById('val_gamma_math').innerText = isNaN(ukf.gamma) ? 'NaN' : ukf.gamma.toFixed(4);
+
+      document.getElementById('w0m_val').innerText = isNaN(ukf.W0m) ? 'NaN' : ukf.W0m.toFixed(4);
+      const w0cEl = document.getElementById('w0c_val');
+      w0cEl.innerText = isNaN(ukf.W0c) ? 'NaN' : ukf.W0c.toFixed(4);
+      if (ukf.W0c < 0) w0cEl.style.color = 'var(--accent-red)';
+      else w0cEl.style.color = 'var(--text-main)';
+
+      document.getElementById('wi_val').innerText = isNaN(ukf.Wim) ? 'NaN' : ukf.Wim.toFixed(4);
+
+      // Alert display
+      const alertEl = document.getElementById('instabilityAlert');
+      if (ukf.isIndefinite) alertEl.classList.add('active');
+      else alertEl.classList.remove('active');
+
+      renderMatrixHTML('mat_P', ukf.P);
+      renderMatrixHTML('mat_L', ukf.L);
+      renderMatrixHTML('mat_PY', ukf.PY);
+      renderMatrixHTML('mat_LY', ukf.LY);
+
+      // Dynamic Centering & Spans
+      const spanX = Math.max(5, (isNaN(ukf.gamma) ? 1 : ukf.gamma) * Math.max(state.sx, state.sy) * 1.6);
+      const distY = isNaN(ukf.Y[1][0]) ? 5 : Math.hypot(ukf.Y[1][0] - ukf.MY[0], ukf.Y[1][1] - ukf.MY[1]);
+      const spanY = Math.max(6, distY * 1.8);
+
+      // Render Space A
+      drawGridAndBorderAxes(ctxX, canvasX, ukf.mu, spanX);
+      drawEllipse(ctxX, canvasX, ukf.mu, ukf.L, 1.0, '#2563eb', spanX);
+      if (!isNaN(ukf.gamma)) drawEllipse(ctxX, canvasX, ukf.mu, ukf.L, ukf.gamma, '#16a34a', spanX);
+
+      ukf.S.forEach((pt, idx) => {
+        const color = idx === 0 ? '#7c3aed' : '#16a34a';
+        drawPoint(ctxX, canvasX, pt, color, `S_${idx}`, ukf.mu, spanX);
+      });
+
+      // Render Space B
+      const centerY = isNaN(ukf.MY[0]) ? [0, 0] : ukf.MY;
+      drawGridAndBorderAxes(ctxY, canvasY, centerY, spanY);
+
+      // 1. Draw True Warped Contour & Monte Carlo Mean
+      drawWarpedContour(ctxY, canvasY, ukf.trueContourY, '#f87171', centerY, spanY);
+      drawPoint(ctxY, canvasY, ukf.trueMY, '#f87171', 'μ_true', centerY, spanY);
+
+      // 2. Draw UKF Gaussian Ellipses & Sigma Points
+      if (!ukf.isIndefinite) {
+        // Red 1-sigma ellipse (always visible when valid)
+        drawEllipse(ctxY, canvasY, ukf.MY, ukf.LY, 1.0, '#dc2626', spanY);
+        
+        // Orange gamma-sigma ellipse (only when Show L_k+1 is checked)
+        if (showLY) {
+          drawEllipse(ctxY, canvasY, ukf.MY, ukf.LY, ukf.gamma, '#ea580c', spanY);
+        }
+      }
+
+      ukf.Y.forEach((pt, idx) => {
+        drawPoint(ctxY, canvasY, pt, '#ea580c', `Y_${idx}`, centerY, spanY);
+      });
+      drawPoint(ctxY, canvasY, centerY, '#dc2626', 'M_{k+1}', centerY, spanY);
+    }
+
+    window.addEventListener('resize', update);
+    window.addEventListener('load', () => {
+      initMath();
+      updateFunctions();
+      update();
+    });
+  </script>
+</body>
+</html>
