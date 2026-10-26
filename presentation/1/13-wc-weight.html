@@ -34,55 +34,69 @@
   ===================================================================
 -->
 
-<div class="slide-layout" style="padding: 36px 48px; justify-content: flex-start; display: flex; flex-direction: column;">
+<div class="slide-layout" style="padding: 24px 48px; justify-content: flex-start; display: flex; flex-direction: column;">
 
   <!-- HEADER -->
-  <div style="margin-bottom: 24px;">
-    <h1 class="title" style="font-size: 2.75rem; margin-bottom: 0.25rem;">What is \(w_0^c\)?</h1>
-    <p class="subtitle text-muted" style="font-size: 1.5rem; margin-bottom: 0;">Encoding higher-order moment information into the covariance \(\mathbf{P}_{k+1|k}\)</p>
+  <div style="margin-bottom: 12px;">
+    <h1 class="title" style="font-size: 2.3rem; margin-bottom: 0.25rem;">What is \(w_0^c\)?</h1>
+    <p class="subtitle text-muted" style="font-size: 1.25rem; margin-bottom: 0;">Encoding higher-order moment information into the covariance \(\mathbf{P}_{k+1|k}\)</p>
   </div>
 
   <!-- ROW 1: 2 COLUMNS (Concept & Math) -->
-  <div style="display: flex; align-items: stretch; gap: 20px; margin-bottom: 24px;">
+  <div style="display: flex; align-items: stretch; gap: 16px; margin-bottom: 16px;">
 
     <!-- COL 1: The "Why" -->
-    <div class="panel" style="flex: 1; padding: 24px; margin: 0; display: flex; flex-direction: column; justify-content: space-between;">
+    <div class="panel" style="flex: 1; padding: 16px; margin: 0; display: flex; flex-direction: column; justify-content: space-between;">
       <div>
-        <p class="text-xl" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 8px; color: #1e293b;">1. The Truncation Problem</p>
-        <p class="text-muted" style="font-size: 1.05rem; margin-bottom: 12px; line-height: 1.5;">
+        <p class="text-xl" style="font-size: 1.25rem; font-weight: 700; margin-bottom: 6px; color: #1e293b;">1. The Truncation Problem</p>
+        <p class="text-muted" style="font-size: 1rem; margin-bottom: 10px; line-height: 1.4;">
           Non-linear functions \(f_k(\mathbf{x})\) distort the <strong>higher-order moments</strong> (e.g., skewness, kurtosis) of the prior distribution. 
         </p>
+        
+        <div class="math-block" style="padding: 12px; margin: 0 0 10px 0; font-size: 1.05rem; background: white; border-radius: 6px; border: 1px solid #e2e8f0;">
+          \(\displaystyle 
+          \begin{array}{ccc}
+            \textbf{Prior} & \xrightarrow{\ f_k(\mathbf{x})\ } & \textbf{Distorted} \\
+            (\text{Skew} = 0) & \longrightarrow & (\text{Skew} \neq 0) \\
+            (\text{Kurtosis} = 3) & \longrightarrow & (\text{Kurtosis} \neq 3) \\
+            \vdots & & \vdots
+          \end{array}
+          \)
+        </div>
       </div>
       
       <div data-step="1">
-        <p class="text-xl" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 8px; color: #b45309; margin-top: 16px;">2. The Solution</p>
-        <p class="text-muted" style="font-size: 1.05rem; margin-bottom: 0; line-height: 1.5;">
-          To correct the covariance approximation error without shifting the already-computed mean \(\mathbf{\hat{x}}\), we inject extra shape information <strong>only into the central weight</strong> of the covariance formula.
+        <p class="text-xl" style="font-size: 1.25rem; font-weight: 700; margin-bottom: 6px; color: #b45309; margin-top: 8px;">2. The Solution</p>
+        <p class="text-muted" style="font-size: 1rem; margin-bottom: 0; line-height: 1.4;">
+          We compensate for the distorted kurtosis by tuning <strong>only the central weight </strong>\(w_0^c\). This safely adjusts the covariance spread without affecting the first moment (the mean \(\mathbf{\hat{x}}\) never moves!).
         </p>
       </div>
     </div>
 
     <!-- ARROW -->
-    <div data-step="2" style="width: 32px; align-self: center; display: flex; justify-content: center;">
+    <div data-step="2" style="width: 24px; align-self: center; display: flex; justify-content: center;">
       <span class="arrow arrow-right">→</span>
     </div>
 
     <!-- COL 2: The Math -->
-    <div class="panel panel-accent" data-step="2" style="flex: 1.2; padding: 24px; margin: 0; display: flex; flex-direction: column; justify-content: flex-start;">
-      <p class="text-xl text-accent" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 8px;">3. The Mathematical Formula</p>
-      <p class="text-muted" style="font-size: 1.05rem; margin-bottom: 16px;">
+    <div class="panel panel-accent" data-step="2" style="flex: 1.2; padding: 16px; margin: 0; display: flex; flex-direction: column; justify-content: flex-start;">
+      <p class="text-xl text-accent" style="font-size: 1.25rem; font-weight: 700; margin-bottom: 6px;">3. The Mathematical Formula</p>
+      <p class="text-muted" style="font-size: 1rem; margin-bottom: 10px;">
         The central covariance weight adds a specific compensation term:
       </p>
 
-      <div class="math-block" style="padding: 16px; margin: 0 0 16px 0; font-size: 1.15rem; background: white; border-radius: 8px;">
+      <div class="math-block" style="padding: 12px; margin: 0 0 12px 0; font-size: 1.15rem; background: white; border-radius: 6px;">
         \(\displaystyle w_0^c = w_0 + (1 - \alpha^2 + \beta) \)
       </div>
       
-      <div data-step="3" style="background: white; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px; margin-top: auto;">
-        <p style="font-size: 1.05rem; font-weight: 700; color: #1d4ed8; margin: 0 0 4px 0;">What is \(\beta\)?</p>
+      <div data-step="3" style="background: white; border: 1px solid #bfdbfe; border-radius: 6px; padding: 12px; margin-top: auto;">
+        <p style="font-size: 1.05rem; font-weight: 700; color: #1d4ed8; margin: 0 0 6px 0;">What is \(\beta\)?</p>
         <p class="text-muted" style="font-size: 0.95rem; margin: 0; line-height: 1.4;">
-          \(\beta\) encodes prior knowledge about the distribution's shape (4th moment / kurtosis).<br>
-          <strong>For Gaussian distributions, the optimal value is \(\beta = 2\).</strong>
+          The Unscented Transform is exact up to the 3rd moment, but truncation errors appear at the 4th moment (kurtosis).
+          So we need to fix the taylor truncation error!
+          
+          <br><br>
+          \(\beta\) directly encodes this missing shape information. <strong>For a Gaussian prior, setting \(\beta = 2\) rigorously neutralizes this 4th-order error.</strong>
         </p>
       </div>
     </div>
@@ -90,22 +104,22 @@
   </div>
 
   <!-- ROW 2: GEOMETRIC INTUITION (Animation) -->
-  <div class="panel panel-primary" data-step="4" style="padding: 16px 24px; margin: 0; display: flex; align-items: center; justify-content: space-between; gap: 24px;">
+  <div class="panel panel-primary" data-step="4" style="padding: 12px 20px; margin: 0; display: flex; align-items: center; justify-content: space-between; gap: 16px;">
     
     <div style="flex: 1.5;">
-      <span style="font-size: 1.25rem; font-weight: 700; color: #1e40af; display: block; margin-bottom: 6px;">
+      <span style="font-size: 1.15rem; font-weight: 700; color: #1e40af; display: block; margin-bottom: 4px;">
         Geometric Intuition: Tuning the Covariance
       </span>
-      <span class="text-muted" style="font-size: 1.05rem; line-height: 1.5;">
-        The extra term acts as a "dial" that safely inflates or deflates the covariance spread \(\mathbf{P}_{k+1|k}\) to capture non-linear distortion, <strong>while keeping the mean \(\mathbf{\hat{x}}\) exactly anchored</strong> to the mapped cloud.
+      <span class="text-muted" style="font-size: 1rem; line-height: 1.4;">
+        The extra term acts as a "dial" that safely inflates or deflates the covariance spread \(\mathbf{P}_{k+1|k}\) to capture non-linear distortion, <strong>while keeping the mean \(\mathbf{\hat{x}}\) exactly anchored</strong>.
       </span>
     </div>
 
-    <div style="width: 2px; height: 64px; background: #cbd5e1;"></div>
+    <div style="width: 2px; height: 50px; background: #cbd5e1;"></div>
 
     <!-- SVG Animation showing Covariance tuning -->
     <div style="flex: 1; display: flex; justify-content: center; align-items: center;">
-      <svg width="100%" height="80" viewBox="0 0 160 80" style="overflow: visible;">
+      <svg width="100%" height="70" viewBox="0 0 160 80" style="overflow: visible;">
         <!-- The pulsing ellipse representing the tuning of P -->
         <g style="transform-origin: 80px 40px; animation: tune-covariance 3s ease-in-out infinite;">
           <ellipse cx="80" cy="40" rx="55" ry="28" stroke-width="2" stroke-dasharray="4,4"/>
