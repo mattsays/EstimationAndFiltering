@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Third-degree spherical-radial cubature rule</title>
+  <link rel="stylesheet" href="slideui.css">
+  <script src="slideui.js" defer></script>
+  <style>
+    .arrow { font-size: 2rem; font-weight: bold; line-height: 1; color: #94a3b8; display: inline-block; }
+    .arrow-right { animation: nudge-x 1.2s ease-in-out infinite; }
+    .arrow-down { animation: nudge-y 1.2s ease-in-out infinite; }
+    @keyframes nudge-x { 0%, 100% { transform: translateX(-4px); } 50% { transform: translateX(4px); } }
+    @keyframes nudge-y { 0%, 100% { transform: translateY(-4px); } 50% { transform: translateY(4px); } }
+  </style>
+</head>
+<body>
+
+<div class="slide-layout" style="padding: 36px 48px; justify-content: flex-start;">
+
+  <!-- Header -->
+  <div class="title" style="font-size: 2.75rem; margin-bottom: 0.25rem;">Where do the 2n cubature points come from?</div>
+  <div class="subtitle" style="font-size: 1.5rem; margin-bottom: 0;">Third-degree spherical-radial rule: exact for monomials up to degree 3</div>
+
+  <!-- Row 1: the three derivation steps -->
+  <div style="display: flex; align-items: center; gap: 12px; margin-top: 16px;">
+
+    <!-- Step 1: change of variables -->
+    <div data-step="1" class="panel panel-primary" style="flex: 1; min-width: 0; padding: 20px; margin: 0;">
+      <div style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">1. Change of variables</div>
+      <div style="font-size: 1.05rem; margin-bottom: 10px;">Split the Gaussian integral into a radial and a spherical part.</div>
+      <div class="math-block" style="padding: 12px; margin: 0; font-size: 1.2rem;">
+        \(\displaystyle x = r\,y,\quad y^\top y = 1\)
+      </div>
+    </div>
+
+    <div data-step="2" style="display: flex; justify-content: center;"><span class="arrow arrow-right">→</span></div>
+
+    <!-- Step 2: spherical rule -->
+    <div data-step="2" class="panel" style="flex: 1; min-width: 0; padding: 20px; margin: 0;">
+      <div style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">2. Spherical rule</div>
+      <div style="font-size: 1.05rem; margin-bottom: 10px;">2n points on the sphere's axes, matched on \(f=1,\ y_1^2\).</div>
+      <div class="math-block" style="padding: 12px; margin: 0; font-size: 1.2rem;">
+        \(\displaystyle u=1,\ \ \omega_s=\tfrac{A_n}{2n}\)
+      </div>
+    </div>
+
+    <div data-step="3" style="display: flex; justify-content: center;"><span class="arrow arrow-right">→</span></div>
+
+    <!-- Step 3: radial rule -->
+    <div data-step="3" class="panel" style="flex: 1; min-width: 0; padding: 20px; margin: 0;">
+      <div style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">3. Radial rule</div>
+      <div style="font-size: 1.05rem; margin-bottom: 10px;">First-degree Gauss–Laguerre, matched on \(f=1,\ x^2\).</div>
+      <div class="math-block" style="padding: 12px; margin: 0; font-size: 1.2rem;">
+        \(\displaystyle r=\sqrt{n/2}\)
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Arrow between rows -->
+  <div data-step="4" style="display: flex; justify-content: center; margin: 8px 0;">
+    <span class="arrow arrow-down">↓</span>
+  </div>
+
+  <!-- Row 2: final weight and point equations -->
+  <div data-step="4" class="panel panel-accent" style="padding: 20px; margin: 0;">
+    <div style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">Result: weight and generic point for N(μ, Σ)</div>
+    <div style="font-size: 1.05rem; margin-bottom: 10px;">Radius rescaled by \(\sqrt{2}\) for the Gaussian weight; \([1]_i=\pm e_j\); \(\Sigma=SS^\top\).</div>
+    <div style="display: flex; align-items: center; gap: 16px;">
+      <div class="math-block" style="flex: 1.3; padding: 12px; margin: 0; font-size: 1.2rem;">
+        \(\displaystyle \omega_i=\tfrac{1}{\pi^{n/2}}\tfrac{\Gamma(n/2)}{2}\tfrac{A_n}{2n}=\tfrac{1}{2n}\)
+      </div>
+      <div class="math-block" style="flex: 1; padding: 12px; margin: 0; font-size: 1.2rem;">
+        \(\displaystyle x_i=\mu+S\xi_i,\ \ \xi_i=\sqrt{n}\,[1]_i\)
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

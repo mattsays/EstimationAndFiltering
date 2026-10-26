@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Do We Need Higher-Degree Cubature Rules?</title>
+  <link rel="stylesheet" href="slideui.css">
+  <script src="slideui.js" defer></script>
+  <style>
+    .arrow { font-size: 2rem; font-weight: bold; line-height: 1; color: #94a3b8; display: inline-block; }
+    .arrow-right { animation: nudge-x 1.2s ease-in-out infinite; }
+    .arrow-down { animation: nudge-y 1.2s ease-in-out infinite; }
+    @keyframes nudge-x { 0%, 100% { transform: translateX(-4px); } 50% { transform: translateX(4px); } }
+    @keyframes nudge-y { 0%, 100% { transform: translateY(-4px); } 50% { transform: translateY(4px); } }
+  </style>
+</head>
+<body>
+
+<div class="slide-layout" style="padding: 36px 48px; justify-content: flex-start;">
+
+  <!-- Header -->
+  <div class="title" style="font-size: 2.75rem; margin-bottom: 0.25rem;">Do We Need Higher-Degree Cubature Rules?</div>
+  <div class="subtitle" style="font-size: 1.5rem; margin-bottom: 12px;">The third-degree spherical-radial rule is enough</div>
+
+  <!-- Main row: figure on the left, arguments on the right -->
+  <div style="display: flex; align-items: stretch; gap: 16px;">
+
+    <!-- Figure 4.2 reproduced as SVG -->
+    <div class="panel" style="padding: 12px 20px; margin: 0; flex: 1.2; display: flex; flex-direction: column; align-items: center;">
+      <svg viewBox="0 0 620 450" xmlns="http://www.w3.org/2000/svg" style="height: 395px; max-width: 100%;" font-family="Helvetica, Arial, sans-serif" font-size="12">
+        <!-- clipping region for the plot area -->
+        <defs><clipPath id="plotclip"><rect x="70" y="20" width="520" height="380"/></clipPath></defs>
+        <rect x="70" y="20" width="520" height="380" fill="#fff"/>
+
+        <!-- dotted grid -->
+        <path d="M70.0,20V400M144.3,20V400M218.6,20V400M292.9,20V400M367.1,20V400M441.4,20V400M515.7,20V400M590.0,20V400M70,400.0H590M70,362.0H590M70,324.0H590M70,286.0H590M70,248.0H590M70,210.0H590M70,172.0H590M70,134.0H590M70,96.0H590M70,58.0H590M70,20.0H590" stroke="#000" stroke-width="0.8" stroke-dasharray="1 4" fill="none" opacity="0.7"/>
+
+        <!-- Monte Carlo samples, true / 3rd / 5th degree ellipses and means -->
+        <g clip-path="url(#plotclip)">
+          <path d="M290,388h0M523,183h0M475,148h0M436,159h0M505,159h0M506,196h0M473,169h0M502,144h0M510,137h0M149,62h0M524,175h0M369,82h0M543,140h0M272,64h0M470,158h0M376,66h0M347,71h0M255,101h0M428,297h0M342,67h0M496,242h0M470,128h0M344,50h0M249,56h0M508,226h0M372,70h0M510,209h0M293,361h0M392,74h0M416,132h0M317,82h0M456,222h0M239,48h0M448,183h0M522,188h0M545,264h0M520,242h0M498,113h0M434,307h0M346,46h0M244,47h0M524,192h0M493,211h0M510,296h0M480,159h0M368,75h0M413,299h0M225,58h0M446,96h0M411,101h0M312,69h0M426,118h0M370,81h0M151,39h0M443,169h0M364,88h0M230,92h0M521,275h0M488,211h0M352,74h0M538,130h0M456,101h0M349,45h0M547,248h0M510,213h0M367,53h0M497,172h0M529,199h0M369,95h0M555,133h0M487,252h0M355,97h0M481,115h0M453,109h0M472,293h0M436,117h0M485,176h0M475,162h0M526,162h0M314,68h0M110,58h0M288,94h0M433,115h0M258,47h0M462,98h0M536,143h0M317,69h0M501,163h0M334,67h0M392,97h0M134,65h0M260,69h0M495,229h0M482,253h0M267,58h0M357,73h0M454,81h0M498,150h0M310,90h0M327,97h0M245,59h0M514,214h0M521,182h0M452,121h0M481,143h0M463,148h0M427,153h0M243,76h0M426,344h0M481,134h0M358,93h0M424,310h0M473,140h0M501,262h0M339,61h0M481,197h0M509,184h0M468,86h0M487,210h0M440,113h0M480,123h0M574,173h0M455,101h0M519,258h0M521,122h0M515,227h0M357,88h0M339,55h0M350,54h0M310,65h0M489,128h0M207,47h0M506,159h0M468,134h0M223,60h0M372,113h0M550,213h0M395,61h0M421,110h0M468,188h0M567,225h0M518,117h0M479,110h0M448,190h0M509,253h0M380,107h0M431,302h0M299,74h0M285,69h0M493,106h0M463,262h0M300,64h0M375,76h0M408,101h0M484,159h0M432,286h0M493,246h0M334,85h0M540,190h0M421,83h0M248,69h0M167,348h0M536,188h0M557,191h0M156,79h0M410,115h0M478,99h0M446,114h0M540,212h0M373,70h0M561,146h0M322,82h0M411,102h0M235,56h0M457,137h0M442,219h0M559,196h0M480,256h0M449,101h0M331,88h0M331,65h0M114,78h0M487,132h0M476,151h0M515,146h0M379,64h0M327,47h0M409,325h0M323,63h0M371,77h0M488,165h0M193,72h0M512,175h0M447,148h0M411,67h0M178,70h0M286,40h0M240,47h0M329,60h0M164,72h0M315,98h0M525,154h0M334,63h0M527,179h0M269,62h0M477,102h0M434,104h0M539,244h0M416,124h0M481,189h0M385,82h0M307,82h0M345,102h0M453,257h0M521,163h0M483,173h0M480,125h0M261,60h0M487,176h0M234,66h0M207,44h0M480,139h0M525,161h0M344,59h0M455,136h0M109,71h0M539,113h0M338,349h0M468,122h0M310,82h0M446,155h0M501,264h0M264,47h0M447,271h0M481,121h0M462,160h0M477,138h0M416,81h0M183,33h0M259,49h0M353,53h0M295,82h0M132,63h0M376,80h0M116,62h0M497,150h0M514,168h0M467,122h0M448,123h0M343,75h0M481,200h0M370,80h0M507,177h0M364,92h0M439,79h0M394,84h0M470,160h0M412,100h0M499,259h0M106,52h0M394,92h0M324,64h0M146,85h0M213,65h0M504,164h0M296,65h0M477,166h0M432,305h0M383,61h0M236,59h0M448,138h0M288,36h0M128,320h0M256,75h0M475,148h0M532,222h0M322,64h0M408,84h0M368,89h0M204,64h0M589,203h0M444,177h0M264,54h0M547,210h0M213,70h0M249,75h0M323,71h0M330,58h0M535,236h0M467,119h0M220,53h0M507,201h0M476,159h0M537,213h0M440,85h0M484,271h0M344,68h0M228,84h0M440,75h0M550,225h0M481,139h0M319,351h0M535,191h0M483,135h0M518,149h0M362,90h0M534,149h0M450,85h0M157,69h0M266,72h0M381,92h0M480,215h0M457,95h0M506,169h0M495,282h0M453,146h0M491,201h0M477,137h0M125,69h0M221,43h0M508,177h0M459,166h0M453,191h0M126,54h0M543,220h0M530,210h0M496,128h0M502,156h0M96,50h0M439,121h0M448,152h0M495,125h0M468,276h0M322,62h0M436,94h0M116,87h0M478,138h0M373,352h0M477,137h0M193,53h0M433,325h0M425,108h0M498,268h0M346,100h0M473,122h0M119,94h0M421,175h0M534,124h0M509,256h0M529,276h0M449,108h0M291,79h0M474,199h0M502,167h0M294,56h0M502,182h0M486,164h0M508,140h0M484,129h0M297,76h0M437,131h0M549,251h0M460,298h0M460,285h0M500,182h0M139,61h0M352,69h0M488,148h0M412,309h0M130,64h0M523,179h0M550,162h0M483,256h0M465,154h0M538,131h0M483,191h0M438,308h0M341,69h0M364,72h0M417,296h0M256,40h0M400,120h0M371,79h0M514,176h0M444,107h0M419,321h0M430,210h0M392,118h0M437,92h0M444,120h0M549,202h0M348,58h0M169,56h0M282,72h0M489,208h0M373,99h0M434,126h0M254,76h0M466,83h0M392,58h0M497,93h0M170,84h0M507,239h0M440,296h0M504,243h0M365,53h0M430,278h0M397,321h0M465,128h0M489,184h0M175,52h0M492,107h0M540,204h0M525,231h0M517,266h0M440,132h0M493,287h0M431,116h0M522,216h0M494,150h0M389,61h0M337,328h0M232,57h0M301,61h0M474,273h0M465,107h0M502,282h0M519,191h0M535,184h0M495,188h0M488,109h0M489,235h0M173,75h0M463,216h0M234,49h0M320,69h0M281,50h0M124,65h0M147,59h0M276,77h0M444,278h0M531,212h0M524,241h0M494,104h0M408,115h0M542,202h0M478,111h0M347,82h0M185,339h0M493,237h0" stroke="#0000ff" stroke-width="3.5" stroke-linecap="round" opacity="0.55"/>
+          <path d="M318,175 L310,169 L301,162 L294,155 L288,148 L282,141 L278,134 L274,127 L271,120 L269,113 L269,107 L269,101 L270,95 L273,90 L276,85 L280,81 L286,77 L292,74 L299,71 L306,69 L315,68 L324,67 L334,67 L344,67 L354,68 L365,69 L377,72 L388,74 L399,78 L411,82 L422,86 L434,91 L445,96 L455,102 L465,108 L475,114 L484,121 L492,128 L500,135 L507,142 L513,149 L518,156 L522,163 L525,170 L527,176 L529,183 L529,189 L528,195 L526,200 L523,205 L520,210 L515,214 L509,217 L503,220 L495,223 L487,225 L478,226 L469,226 L459,226 L449,226 L438,224 L427,223 L415,220 L404,217 L392,213 L381,209 L370,205 L359,199 L348,194 L337,188 L328,182 L318,175Z" fill="none" stroke="#0000ff" stroke-width="2.2"/>
+          <path d="M326,172 L317,165 L308,157 L300,150 L293,143 L287,136 L281,128 L277,121 L273,115 L271,108 L269,102 L268,96 L268,90 L270,85 L272,81 L275,77 L280,73 L285,70 L291,68 L297,66 L305,65 L313,64 L322,64 L332,65 L342,67 L352,69 L363,71 L374,75 L385,79 L397,83 L408,88 L419,93 L430,99 L441,105 L451,111 L461,118 L471,125 L480,132 L488,139 L495,147 L502,154 L508,161 L513,168 L517,175 L520,182 L523,188 L524,194 L524,200 L523,205 L521,210 L519,215 L515,218 L510,222 L505,224 L498,226 L491,228 L483,229 L474,229 L465,228 L455,227 L445,225 L434,223 L424,220 L412,217 L401,212 L390,208 L379,203 L367,197 L356,191 L346,185 L336,178 L326,172Z" fill="none" stroke="#ff0000" stroke-width="2.2"/>
+          <path d="M311,177 L302,171 L295,164 L288,157 L282,150 L278,144 L274,137 L271,130 L269,123 L268,117 L268,110 L269,104 L271,99 L274,93 L279,88 L284,84 L290,80 L296,76 L304,74 L312,71 L322,69 L331,68 L341,68 L352,68 L363,68 L374,69 L386,71 L398,74 L409,77 L421,80 L432,84 L443,89 L454,94 L464,99 L474,105 L484,111 L492,117 L500,123 L507,130 L513,137 L519,144 L523,151 L527,158 L529,164 L530,171 L531,177 L530,183 L529,189 L526,195 L522,200 L518,205 L512,209 L506,213 L498,216 L490,218 L482,221 L472,222 L462,223 L452,223 L441,223 L430,222 L418,221 L407,218 L395,216 L384,212 L372,209 L361,204 L350,200 L339,195 L329,189 L320,183 L311,177Z" fill="none" stroke="#000" stroke-width="1.6"/>
+          <circle cx="398.8" cy="146.5" r="4.5" fill="#0000ff"/>
+          <path d="M392.1,146.5h8M396.1,142.5v8" stroke="#ff0000" stroke-width="2"/>
+          <circle cx="399.3" cy="145.4" r="4.5" fill="none" stroke="#000" stroke-width="1.6"/>
+        </g>
+
+        <!-- axes frame, ticks and labels -->
+        <rect x="70" y="20" width="520" height="380" fill="none" stroke="#000" stroke-width="1"/>
+        <g fill="#000">
+          <text x="70.0" y="416" text-anchor="middle">−40</text>
+          <text x="144.3" y="416" text-anchor="middle">−20</text>
+          <text x="218.6" y="416" text-anchor="middle">0</text>
+          <text x="292.9" y="416" text-anchor="middle">20</text>
+          <text x="367.1" y="416" text-anchor="middle">40</text>
+          <text x="441.4" y="416" text-anchor="middle">60</text>
+          <text x="515.7" y="416" text-anchor="middle">80</text>
+          <text x="590.0" y="416" text-anchor="middle">100</text>
+          <text x="62" y="404.0" text-anchor="end">−100</text>
+          <text x="62" y="366.0" text-anchor="end">−80</text>
+          <text x="62" y="328.0" text-anchor="end">−60</text>
+          <text x="62" y="290.0" text-anchor="end">−40</text>
+          <text x="62" y="252.0" text-anchor="end">−20</text>
+          <text x="62" y="214.0" text-anchor="end">0</text>
+          <text x="62" y="176.0" text-anchor="end">20</text>
+          <text x="62" y="138.0" text-anchor="end">40</text>
+          <text x="62" y="100.0" text-anchor="end">60</text>
+          <text x="62" y="62.0" text-anchor="end">80</text>
+          <text x="62" y="24.0" text-anchor="end">100</text>
+          <text x="330" y="436" text-anchor="middle">x</text>
+          <text x="28" y="210" text-anchor="middle">y</text>
+        </g>
+
+        <!-- annotation boxes and arrows -->
+        <g fill="#000">
+          <rect x="98" y="28" width="150" height="22" fill="#fff" stroke="#000" stroke-width="1"/><text x="173.0" y="43.0" text-anchor="middle">Covariance− 5th Degree</text>
+          <rect x="82" y="138" width="150" height="22" fill="#fff" stroke="#000" stroke-width="1"/><text x="157.0" y="153.0" text-anchor="middle">Covariance− 3rd Degree</text>
+          <rect x="449" y="40" width="102" height="22" fill="#fff" stroke="#000" stroke-width="1"/><text x="500.0" y="55.0" text-anchor="middle">True Covariance</text>
+          <line x1="220" y1="52" x2="251.6" y2="67.4" stroke="#000" stroke-width="1"/><polygon points="257.0,70.0 247.1,68.5 249.7,63.2" fill="#000"/>
+          <line x1="170" y1="138" x2="241.0" y2="91.3" stroke="#000" stroke-width="1"/><polygon points="246.0,88.0 239.6,95.7 236.4,90.8" fill="#000"/>
+          <line x1="520" y1="64" x2="494.8" y2="82.5" stroke="#000" stroke-width="1"/><polygon points="490.0,86.0 496.0,78.0 499.5,82.7" fill="#000"/>
+          <line x1="280" y1="258" x2="388.5" y2="163.9" stroke="#000" stroke-width="1"/><polygon points="393.0,160.0 387.7,168.5 383.8,164.0" fill="#000"/>
+        </g>
+
+        <!-- legend -->
+        <rect x="170" y="258" width="125" height="64" fill="#fff" stroke="#000"/>
+        <circle cx="187" cy="274" r="4.5" fill="#0000ff"/><text x="207" y="278">True mean</text>
+        <path d="M183,291h8M187,287v8" stroke="#ff0000" stroke-width="2"/><text x="207" y="295">3rd Degree CR</text>
+        <circle cx="187" cy="308" r="4.5" fill="none" stroke="#000" stroke-width="1.6"/><text x="207" y="312">5th Degree CR</text>
+      </svg>
+      <div class="text-muted" style="font-size: 1rem; margin-top: 4px;">Fig. 4.2: mean and covariance of a generic \(\mathbf{z}_c=[r\cos\theta,\ r\sin\theta]^T\)</div>
+    </div>
+
+    <!-- Right column: two stacked panels -->
+    <div class="flex-col" style="flex: 1; gap: 16px; justify-content: center;">
+
+      <!-- Numerical evidence -->
+      <div class="panel panel-primary" data-step="1" style="padding: 20px; margin: 0;">
+        <div class="text-primary" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">Little accuracy gain</div>
+        <div style="font-size: 1.05rem; margin-bottom: 10px;">Polar → Cartesian test (\(\bar r=80\), \(\bar\theta=0.61\)), Monte Carlo with 5000 samples.</div>
+        <div style="font-size: 1.05rem; margin-bottom: 0;">Both rules hit the true mean; the 3rd-degree covariance is close to the 5th-degree one, and both deviate slightly from the truth.</div>
+      </div>
+
+      <!-- Cost and numerical stability -->
+      <div class="panel panel-accent" data-step="2" style="padding: 20px; margin: 0;">
+        <div class="text-accent" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">Cost and stability</div>
+        <div style="font-size: 1.05rem; margin-bottom: 10px;">3rd degree: \(2n\) points, all weights equal and positive (linear in \(n\)).</div>
+        <div style="font-size: 1.05rem; margin-bottom: 0;">5th degree: of order \(n^2\) points, some with negative weights, causing numerical instability and the curse of dimensionality.</div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

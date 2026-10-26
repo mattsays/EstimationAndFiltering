@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Spherical-Radial Decomposition</title>
+  <link rel="stylesheet" href="slideui.css">
+  <script src="slideui.js" defer></script>
+  <style>
+    .arrow { font-size: 2rem; font-weight: bold; line-height: 1; color: #94a3b8; display: inline-block; }
+    .arrow-right { animation: nudge-x 1.2s ease-in-out infinite; }
+    .arrow-down { animation: nudge-y 1.2s ease-in-out infinite; }
+    @keyframes nudge-x { 0%, 100% { transform: translateX(-4px); } 50% { transform: translateX(4px); } }
+    @keyframes nudge-y { 0%, 100% { transform: translateY(-4px); } 50% { transform: translateY(4px); } }
+  </style>
+</head>
+<body>
+
+<div class="slide-layout" style="padding: 36px 48px; justify-content: flex-start;">
+
+  <!-- Header -->
+  <div class="title text-primary" style="font-size: 2.75rem; margin-bottom: 0.25rem;">Spherical-Radial Decomposition</div>
+  <div class="subtitle text-muted" style="font-size: 1.5rem; margin-bottom: 0;">How a Gaussian-weighted integral splits into a radial and a spherical one</div>
+
+  <!-- Row 1: starting integral -> change of variables -->
+  <div style="display: flex; align-items: center; gap: 16px; margin-top: 14px;">
+
+    <!-- Step 1: the weighted nonlinear integral -->
+    <div class="panel" data-step="1" style="flex: 1; min-width: 0; padding: 20px; margin: 0;">
+      <div class="text-primary" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">1. Weighted integral</div>
+      <div style="font-size: 1.05rem; margin-bottom: 10px;">Nonlinear function times a Gaussian weight over \(\mathbb{R}^n\):</div>
+      <div class="math-block" style="padding: 12px; margin: 0; font-size: 1.2rem;">
+        \(\displaystyle I(f)=\int_{\mathbb{R}^n} f(x)\,e^{-x^{T}x}\,dx\)
+      </div>
+    </div>
+
+    <!-- Arrow 1 -->
+    <div data-step="2" style="display: flex; justify-content: center;"><span class="arrow arrow-right">→</span></div>
+
+    <!-- Step 2: change of variables, Jacobian gives r^(n-1) -->
+    <div class="panel panel-primary" data-step="2" style="flex: 1; min-width: 0; padding: 20px; margin: 0;">
+      <div class="text-accent" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">2. Change of variables \(x=ry\)</div>
+      <div style="font-size: 1.05rem; margin-bottom: 10px;">With \(r\ge 0\) and \(y\) on the unit sphere \(U_n\): \(x^Tx=r^2\) and \(dx=r^{n-1}\,dr\,d\sigma(y)\).</div>
+      <div class="math-block" style="padding: 12px; margin: 0; font-size: 1.2rem;">
+        \(\displaystyle I(f)=\int_0^\infty\!\!\int_{U_n} f(ry)\,r^{n-1}e^{-r^2}\,d\sigma(y)\,dr\)
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Arrow row: from the double integral down to the two separated integrals -->
+  <div data-step="3" style="display: flex; justify-content: center; margin-top: 6px;"><span class="arrow arrow-down">↓</span></div>
+
+  <!-- Row 2: spherical integral -> radial integral -> separate rules -->
+  <div style="display: flex; align-items: center; gap: 8px; margin-top: 6px;">
+
+    <!-- Step 3: inner spherical integral (math on the left, Cartesian diagram on the right) -->
+    <div class="panel" data-step="3" style="flex: 0 0 400px; box-sizing: border-box; min-width: 0; padding: 20px; margin: 0;">
+      <div class="text-primary" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">3. Spherical integral</div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+
+        <!-- Equation and caption -->
+        <div style="flex: 1; min-width: 0;">
+          <div style="font-size: 1.05rem; margin-bottom: 10px;">Inner part, unit weight \(w(y)=1\):</div>
+          <div class="math-block" style="padding: 12px; margin: 0; font-size: 1.2rem;">
+            \(\displaystyle S(r)=\int_{U_n} f(ry)\,d\sigma(y)\)
+          </div>
+        </div>
+
+        <!-- Diagram: at fixed r, f is evaluated and summed over the circle of radius r -->
+        <svg width="110" height="110" viewBox="0 0 110 110" xmlns="http://www.w3.org/2000/svg" style="flex: 0 0 110px;">
+          <!-- Cartesian axes -->
+          <line x1="6" y1="55" x2="104" y2="55" stroke="#94a3b8" stroke-width="1.5"/>
+          <line x1="55" y1="104" x2="55" y2="6" stroke="#94a3b8" stroke-width="1.5"/>
+          <text x="90" y="72" font-size="14" fill="#94a3b8">x₁</text>
+          <text x="60" y="15" font-size="14" fill="#94a3b8">x₂</text>
+          <!-- Sphere of fixed radius r -->
+          <circle cx="55" cy="55" r="34" fill="none" stroke="#38bdf8" stroke-width="3"/>
+          <!-- Radius r -->
+          <line x1="55" y1="55" x2="81" y2="33" stroke="#f59e0b" stroke-width="2"/>
+          <text x="72" y="55" font-size="15" font-weight="700" fill="#f59e0b">r</text>
+          <!-- Sample points ry on the sphere -->
+          <circle cx="89" cy="55" r="3.5" fill="#38bdf8"/>
+          <circle cx="81" cy="33" r="4.5" fill="#f59e0b"/>
+          <circle cx="55" cy="21" r="3.5" fill="#38bdf8"/>
+          <circle cx="31" cy="31" r="3.5" fill="#38bdf8"/>
+          <circle cx="21" cy="55" r="3.5" fill="#38bdf8"/>
+          <circle cx="31" cy="79" r="3.5" fill="#38bdf8"/>
+          <circle cx="55" cy="89" r="3.5" fill="#38bdf8"/>
+          <circle cx="79" cy="79" r="3.5" fill="#38bdf8"/>
+        </svg>
+
+      </div>
+    </div>
+
+    <!-- Arrow 2 -->
+    <div data-step="4" style="display: flex; justify-content: center;"><span class="arrow arrow-down">&</span></div>
+
+    <!-- Step 4: outer radial integral (math on the left, Cartesian diagram on the right) -->
+    <div class="panel" data-step="4" style="flex: 0 0 430px; box-sizing: border-box; min-width: 0; padding: 20px; margin: 0;">
+      <div class="text-primary" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">4. Radial integral</div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+
+        <!-- Equation and caption -->
+        <div style="flex: 1; min-width: 0;">
+          <div style="font-size: 1.05rem; margin-bottom: 10px;">Outer part, weight \(r^{n-1}e^{-r^2}\):</div>
+          <div class="math-block" style="padding: 12px; margin: 0; font-size: 1.2rem;">
+            \(\displaystyle \int_0^\infty S(r)\,r^{n-1}e^{-r^2}\,dr\)
+          </div>
+        </div>
+
+        <!-- Diagram: concentric spheres of growing radius, weight fading outward -->
+        <svg width="110" height="110" viewBox="0 0 110 110" xmlns="http://www.w3.org/2000/svg" style="flex: 0 0 110px;">
+          <defs>
+            <radialGradient id="gaussFade" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.55"/>
+              <stop offset="100%" stop-color="#38bdf8" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <!-- Gaussian weight fading with distance from the origin -->
+          <circle cx="55" cy="55" r="48" fill="url(#gaussFade)"/>
+          <!-- Cartesian axes -->
+          <line x1="6" y1="55" x2="104" y2="55" stroke="#94a3b8" stroke-width="1.5"/>
+          <line x1="55" y1="104" x2="55" y2="6" stroke="#94a3b8" stroke-width="1.5"/>
+          <!-- Concentric spheres, one per radius r -->
+          <circle cx="55" cy="55" r="12" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-opacity="0.95"/>
+          <circle cx="55" cy="55" r="23" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-opacity="0.7"/>
+          <circle cx="55" cy="55" r="34" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-opacity="0.5"/>
+          <circle cx="55" cy="55" r="45" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-opacity="0.3" stroke-dasharray="4 3"/>
+          <!-- Radial direction r going to infinity -->
+          <line x1="55" y1="55" x2="86" y2="29" stroke="#f59e0b" stroke-width="2"/>
+          <polygon points="90,25 84,31 87,34" fill="#f59e0b"/>
+          <text x="78" y="52" font-size="15" font-weight="700" fill="#f59e0b">r</text>
+        </svg>
+
+      </div>
+    </div>
+
+    <!-- Arrow 3 -->
+    <div data-step="5" style="display: flex; justify-content: center;"><span class="arrow arrow-right">→</span></div>
+
+    <!-- Step 5: each integral gets its own numerical rule -->
+    <div class="panel panel-accent" data-step="5" style="flex: 1; box-sizing: border-box; min-width: 0; padding: 20px; margin: 0;">
+      <div class="text-accent" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">5. Decoupled rules</div>
+      <div style="font-size: 1.05rem; margin-bottom: 10px;">Each integral gets its own rule: a spherical cubature rule for \(S(r)\) and Gaussian quadrature for the radial part.</div>
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+</html>

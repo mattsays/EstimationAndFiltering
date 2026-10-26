@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>What is a Cubature?</title>
+  <link rel="stylesheet" href="slideui.css">
+  <script src="slideui.js" defer></script>
+  <style>
+    .arrow { font-size: 2rem; font-weight: bold; line-height: 1; color: #94a3b8; display: inline-block; }
+    .arrow-right { animation: nudge-x 1.2s ease-in-out infinite; }
+    .arrow-down { animation: nudge-y 1.2s ease-in-out infinite; }
+    @keyframes nudge-x { 0%, 100% { transform: translateX(-4px); } 50% { transform: translateX(4px); } }
+    @keyframes nudge-y { 0%, 100% { transform: translateY(-4px); } 50% { transform: translateY(4px); } }
+  </style>
+</head>
+<body>
+
+<div class="slide-layout" style="padding: 36px 48px; justify-content: flex-start;">
+
+  <!-- Header -->
+  <div class="title" style="font-size: 2.75rem; margin-bottom: 0.25rem;">What is a Cubature?</div>
+  <div class="subtitle" style="font-size: 1.5rem; margin-bottom: 20px;">Integration as a weighted sum of function values</div>
+
+  <!-- Single row: quadrature panel -> cubature panel -->
+  <div style="display: flex; align-items: center; gap: 16px;">
+
+    <!-- Quadrature panel (1D) -->
+    <div class="panel panel-primary" data-step="1" style="flex: 1; padding: 20px; margin: 0;">
+      <div class="text-primary" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">Quadrature (1D)</div>
+      <div style="font-size: 1.05rem; margin-bottom: 10px;">Weights \(w_i\) and nodes \(x_i\) on a line</div>
+      <div style="font-size: 1.2rem; margin-bottom: 10px;">\(\displaystyle \int_a^b f(x)\,dx \approx \sum_i w_i f(x_i)\)</div>
+
+      <!-- Diagram: area under a curve sampled at a few nodes on the line -->
+      <svg viewBox="0 0 520 260" width="100%" height="260" xmlns="http://www.w3.org/2000/svg">
+        <!-- shaded area under f -->
+        <path d="M 50 210 L 50 150 C 100 50, 150 50, 210 105 C 270 160, 330 190, 400 75 C 430 30, 460 60, 480 90 L 480 210 Z"
+              fill="#3b82f6" fill-opacity="0.18"/>
+        <!-- curve f(x) -->
+        <path d="M 50 150 C 100 50, 150 50, 210 105 C 270 160, 330 190, 400 75 C 430 30, 460 60, 480 90"
+              fill="none" stroke="#3b82f6" stroke-width="3"/>
+        <!-- x axis -->
+        <line x1="30" y1="210" x2="500" y2="210" stroke="#94a3b8" stroke-width="2"/>
+        <!-- nodes x_i: vertical stems and points on the curve -->
+        <g stroke="#f59e0b" stroke-width="2" stroke-dasharray="4 3">
+          <line x1="100" y1="210" x2="100" y2="84"/>
+          <line x1="210" y1="210" x2="210" y2="105"/>
+          <line x1="330" y1="210" x2="330" y2="170"/>
+          <line x1="440" y1="210" x2="440" y2="48"/>
+        </g>
+        <g fill="#f59e0b">
+          <circle cx="100" cy="84" r="7"/>
+          <circle cx="210" cy="105" r="7"/>
+          <circle cx="330" cy="170" r="7"/>
+          <circle cx="440" cy="48" r="7"/>
+        </g>
+        <!-- labels -->
+        <g fill="#94a3b8" font-size="18" text-anchor="middle" font-family="serif" font-style="italic">
+          <text x="100" y="236">x₁</text>
+          <text x="210" y="236">x₂</text>
+          <text x="330" y="236">x₃</text>
+          <text x="440" y="236">x₄</text>
+          <text x="50" y="236">a</text>
+          <text x="480" y="236">b</text>
+          <text x="500" y="40" font-size="20" fill="#3b82f6">f(x)</text>
+        </g>
+      </svg>
+    </div>
+
+    <!-- Arrow between panels -->
+    <div data-step="2" style="display: flex; justify-content: center;"><span class="arrow arrow-right">→</span></div>
+
+    <!-- Cubature panel (n-D), isometric view of a non-linear surface -->
+    <div class="panel panel-accent" data-step="2" style="flex: 1; padding: 20px; margin: 0;">
+      <div class="text-accent" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">Cubature (n-D)</div>
+      <div style="font-size: 1.05rem; margin-bottom: 10px;">Weights \(w_k\) and sigma points \(x_k\) in space</div>
+      <div style="font-size: 1.2rem; margin-bottom: 10px;">\(\displaystyle \int_{\mathbb{R}^n} f(x)\,w(x)\,dx \approx \sum_k w_k f(x_k)\)</div>
+
+      <!-- Diagram: isometric floor plane, non-linear surface above it, sigma points lifted onto the surface -->
+      <svg viewBox="0 0 520 260" width="100%" height="260" xmlns="http://www.w3.org/2000/svg">
+        <g transform="translate(0,35) scale(1,1.25) translate(0,-20)">
+
+          <!-- isometric floor (x1, x2 plane) -->
+          <polygon points="260,172 430,128 260,84 90,128" fill="#94a3b8" fill-opacity="0.10" stroke="#94a3b8" stroke-width="1.5"/>
+          <!-- floor grid lines -->
+          <g stroke="#94a3b8" stroke-width="1" stroke-opacity="0.45">
+            <line x1="175" y1="150" x2="345" y2="106"/>
+            <line x1="217" y1="161" x2="387" y2="117"/>
+            <line x1="133" y1="139" x2="303" y2="95"/>
+            <line x1="175" y1="106" x2="345" y2="150"/>
+            <line x1="133" y1="117" x2="303" y2="161"/>
+            <line x1="217" y1="95" x2="387" y2="139"/>
+          </g>
+
+          <!-- non-linear surface lifted above the floor -->
+          <path d="M 90 100 C 140 40, 200 90, 260 56 C 320 22, 380 70, 430 100
+                   C 400 140, 330 150, 260 146 C 200 142, 140 130, 90 100 Z"
+                fill="#a855f7" fill-opacity="0.28" stroke="#a855f7" stroke-width="2.5"/>
+          <!-- surface mesh lines for depth -->
+          <g fill="none" stroke="#a855f7" stroke-width="1.2" stroke-opacity="0.7">
+            <path d="M 120 82 C 170 70, 220 115, 290 100 C 340 92, 390 110, 415 112"/>
+            <path d="M 150 62 C 200 78, 240 100, 290 78 C 330 64, 370 80, 405 98"/>
+            <path d="M 110 94 C 170 115, 240 138, 330 128 C 370 122, 400 114, 425 102"/>
+            <path d="M 170 62 C 175 100, 190 125, 215 140"/>
+            <path d="M 230 70 C 235 100, 245 125, 255 145"/>
+            <path d="M 300 52 C 305 85, 310 120, 305 146"/>
+            <path d="M 360 62 C 360 90, 355 120, 345 140"/>
+          </g>
+
+          <!-- drop lines from sigma points to the floor -->
+          <g stroke="#f59e0b" stroke-width="1.8" stroke-dasharray="4 3">
+            <line x1="260" y1="86" x2="260" y2="128"/>
+            <line x1="190" y1="94" x2="190" y2="110"/>
+            <line x1="330" y1="82" x2="330" y2="146"/>
+            <line x1="225" y1="70" x2="225" y2="108"/>
+            <line x1="295" y1="106" x2="295" y2="146"/>
+          </g>
+          <!-- footprints on the floor -->
+          <g fill="#f59e0b" fill-opacity="0.45">
+            <ellipse cx="260" cy="128" rx="7" ry="3"/>
+            <ellipse cx="190" cy="110" rx="7" ry="3"/>
+            <ellipse cx="330" cy="146" rx="7" ry="3"/>
+            <ellipse cx="225" cy="108" rx="7" ry="3"/>
+            <ellipse cx="295" cy="146" rx="7" ry="3"/>
+          </g>
+          <!-- sigma points on the surface -->
+          <g fill="#f59e0b" stroke="#ffffff" stroke-width="1.5">
+            <circle cx="260" cy="86" r="6"/>
+            <circle cx="190" cy="94" r="6"/>
+            <circle cx="330" cy="82" r="6"/>
+            <circle cx="225" cy="70" r="6"/>
+            <circle cx="295" cy="106" r="6"/>
+          </g>
+
+          <!-- isometric axes -->
+          <g stroke="#94a3b8" stroke-width="2" fill="#94a3b8" font-size="16" font-family="serif" font-style="italic">
+            <line x1="430" y1="128" x2="480" y2="141"/>

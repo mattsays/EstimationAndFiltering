@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>The radial rule</title>
+  <link rel="stylesheet" href="slideui.css">
+  <script src="slideui.js" defer></script>
+  <style>
+    .arrow { font-size: 2rem; font-weight: bold; line-height: 1; color: #94a3b8; display: inline-block; }
+    .arrow-right { animation: nudge-x 1.2s ease-in-out infinite; }
+    .arrow-down { animation: nudge-y 1.2s ease-in-out infinite; }
+    @keyframes nudge-x { 0%, 100% { transform: translateX(-4px); } 50% { transform: translateX(4px); } }
+    @keyframes nudge-y { 0%, 100% { transform: translateY(-4px); } 50% { transform: translateY(4px); } }
+  </style>
+</head>
+<body>
+
+<div class="slide-layout" style="padding: 36px 48px; justify-content: flex-start;">
+
+  <!-- Header -->
+  <div class="title" style="font-size: 2.75rem; margin-bottom: 0.25rem;">The radial rule</div>
+  <div class="subtitle" style="font-size: 1.5rem; margin-bottom: 0;">One Gauss–Laguerre point fixes the radius of the cubature points</div>
+
+  <!-- Row 1: the integral, the change of variable and the first-degree rule -->
+  <div style="display: flex; align-items: center; gap: 12px; margin-top: 16px;">
+
+    <!-- Starting point: the radial integral -->
+    <div data-step="1" class="panel panel-primary" style="flex: 1; min-width: 0; padding: 20px; margin: 0;">
+      <div style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">The integral</div>
+      <div style="font-size: 1.05rem; margin-bottom: 10px;">Radial part of the Gaussian-weighted integral.</div>
+      <div class="math-block" style="padding: 12px; margin: 0; font-size: 1.2rem;">
+        \(\displaystyle \int_0^\infty f(x)\,x^{n-1}e^{-x^2}dx\)
+      </div>
+    </div>
+
+    <div data-step="2" style="display: flex; justify-content: center;"><span class="arrow arrow-right">→</span></div>
+
+    <!-- Step 1: change of variable -->
+    <div data-step="2" class="panel" style="flex: 1; min-width: 0; padding: 20px; margin: 0;">
+      <div style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">1. Change of variable</div>
+      <div style="font-size: 1.05rem; margin-bottom: 10px;">Put \(t=x^2\), \(\tilde f(t)=f(\sqrt t)\): the integral is ½ × this.</div>
+      <div class="math-block" style="padding: 12px; margin: 0; font-size: 1.2rem;">
+        \(\displaystyle \int_0^\infty \tilde f(t)\,t^{n/2-1}e^{-t}dt\)
+      </div>
+    </div>
+
+    <div data-step="3" style="display: flex; justify-content: center;"><span class="arrow arrow-right">→</span></div>
+
+    <!-- Step 2: first-degree Gauss-Laguerre rule -->
+    <div data-step="3" class="panel" style="flex: 1; min-width: 0; padding: 20px; margin: 0;">
+      <div style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">2. First-degree rule</div>
+      <div style="font-size: 1.05rem; margin-bottom: 10px;">Approximate it with one point \(t_1\) and one weight \(\omega_1\).</div>
+      <div class="math-block" style="padding: 12px; margin: 0; font-size: 1.2rem;">
+        \(\displaystyle \approx\omega_1\,\tilde f(t_1)\)
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Arrow between rows -->
+  <div data-step="4" style="display: flex; justify-content: center; margin: 8px 0;">
+    <span class="arrow arrow-down">↓</span>
+  </div>
+
+  <!-- Row 2: moment matching and result -->
+  <div data-step="4" class="panel panel-accent" style="padding: 20px; margin: 0;">
+    <div style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">3. Match \(\tilde f=1\) and \(\tilde f=t\), the intersections with the unti sphere </div>
+    <div style="font-size: 1.05rem; margin-bottom: 10px;">Odd-degree terms vanish by symmetry once combined with the spherical rule.</div>
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <div class="math-block" style="flex: 1; padding: 12px; margin: 0; font-size: 1.2rem;">
+        \(\displaystyle \omega_1=\Gamma(\tfrac n2)\)
+      </div>
+      <span class="arrow arrow-right">→</span>
+      <div class="math-block" style="flex: 1.4; padding: 12px; margin: 0; font-size: 1.2rem;">
+        \(\displaystyle t_1=\tfrac{\Gamma(n/2+1)}{\Gamma(n/2)}=\tfrac n2\)
+      </div>
+      <span class="arrow arrow-right">→</span>
+      <div class="math-block" style="flex: 1.2; padding: 12px; margin: 0; font-size: 1.2rem;">
+        \(\displaystyle \tfrac12\Gamma(\tfrac n2)\,f(\sqrt{n/2})\)
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

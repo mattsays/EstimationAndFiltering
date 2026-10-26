@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>The spherical rule</title>
+  <link rel="stylesheet" href="slideui.css">
+  <script src="slideui.js" defer></script>
+  <style>
+    .arrow { font-size: 2rem; font-weight: bold; line-height: 1; color: #94a3b8; display: inline-block; }
+    .arrow-right { animation: nudge-x 1.2s ease-in-out infinite; }
+    .arrow-down { animation: nudge-y 1.2s ease-in-out infinite; }
+    @keyframes nudge-x { 0%, 100% { transform: translateX(-4px); } 50% { transform: translateX(4px); } }
+    @keyframes nudge-y { 0%, 100% { transform: translateY(-4px); } 50% { transform: translateY(4px); } }
+  </style>
+</head>
+<body>
+
+<div class="slide-layout" style="padding: 36px 48px; justify-content: flex-start;">
+
+  <!-- Header -->
+  <div class="title" style="font-size: 2.75rem; margin-bottom: 0.25rem;">The spherical rule</div>
+  <div class="subtitle" style="font-size: 1.5rem; margin-bottom: 0;">2n symmetric points on the unit sphere fix the direction of the cubature points</div>
+
+  <!-- Row 1: the integral, the symmetric rule and the symmetry argument -->
+  <div style="display: flex; align-items: center; gap: 12px; margin-top: 16px;">
+
+    <!-- Starting point: the spherical integral -->
+    <div data-step="1" class="panel panel-primary" style="flex: 1; min-width: 0; padding: 20px; margin: 0;">
+      <div style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">The integral</div>
+      <div style="font-size: 1.05rem; margin-bottom: 10px;">Directional part of the Gaussian-weighted integral over the unit sphere.</div>
+      <div class="math-block" style="padding: 12px; margin: 0; font-size: 1.2rem;">
+        \(\displaystyle \int_{U_n} f(y)\,d\sigma(y)\)
+      </div>
+    </div>
+
+    <div data-step="2" style="display: flex; justify-content: center;"><span class="arrow arrow-right">→</span></div>
+
+    <!-- Step 1: symmetric rule -->
+    <div data-step="2" class="panel" style="flex: 1; min-width: 0; padding: 20px; margin: 0;">
+      <div style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">1. Symmetric rule</div>
+      <div style="font-size: 1.05rem; margin-bottom: 10px;">2n points \(\pm u\,e_j\) on the axes, all with the same weight \(\omega\).</div>
+      <div class="math-block" style="padding: 12px; margin: 0; font-size: 1.2rem;">
+        \(\displaystyle \approx\ \omega\sum_{i=1}^{2n} f([u]_i)\)
+      </div>
+    </div>
+
+    <div data-step="3" style="display: flex; justify-content: center;"><span class="arrow arrow-right">→</span></div>
+
+    <!-- Step 2: symmetry kills odd monomials -->
+    <div data-step="3" class="panel" style="flex: 1; min-width: 0; padding: 20px; margin: 0;">
+      <div style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">2. Symmetry</div>
+      <div style="font-size: 1.05rem; margin-bottom: 10px;">The point set is invariant to permutations and sign changes.</div>
+      <div class="math-block" style="padding: 12px; margin: 0; font-size: 1.2rem;">
+        \(\displaystyle \textstyle\sum_i d_i\ \text{odd}\ \Rightarrow\ 0\)
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Arrow between rows -->
+  <div data-step="4" style="display: flex; justify-content: center; margin: 8px 0;">
+    <span class="arrow arrow-down">↓</span>
+  </div>
+
+  <!-- Row 2: moment matching and result -->
+  <div data-step="4" class="panel panel-accent" style="padding: 20px; margin: 0;">
+    <div style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">3. Match the even monomials \(f=1\) and \(f=y_1^2\)</div>
+    <div style="font-size: 1.05rem; margin-bottom: 10px;">Odd monomials are already exact, so only degrees 0 and 2 remain; \(A_n=2\pi^{n/2}/\Gamma(n/2)\) is the sphere's area.</div>
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <div class="math-block" style="flex: 1; padding: 12px; margin: 0; font-size: 1.2rem;">
+        \(\displaystyle 2n\,\omega=A_n\)
+      </div>
+      <span class="arrow arrow-right">→</span>
+      <div class="math-block" style="flex: 1; padding: 12px; margin: 0; font-size: 1.2rem;">
+        \(\displaystyle 2\,\omega\,u^2=\tfrac{A_n}{n}\)
+      </div>
+      <span class="arrow arrow-right">→</span>
+      <div class="math-block" style="flex: 1.2; padding: 12px; margin: 0; font-size: 1.2rem;">
+        \(\displaystyle u^2=1,\ \ \omega=\tfrac{A_n}{2n}\)
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
