@@ -2,139 +2,192 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <title>UKF: The Role of the Central Weight</title>
+  <title>What is w_0^c?</title>
   <link rel="stylesheet" href="slideui.css">
   <script src="slideui.js" defer></script>
   <style>
-    /* ONLY arrow animations allowed in head */
+    /* Required Arrow Animations */
     .arrow { font-size: 2rem; font-weight: bold; line-height: 1; color: #94a3b8; display: inline-block; }
     .arrow-right { animation: nudge-x 1.2s ease-in-out infinite; }
     .arrow-down { animation: nudge-y 1.2s ease-in-out infinite; }
     @keyframes nudge-x { 0%, 100% { transform: translateX(-4px); } 50% { transform: translateX(4px); } }
     @keyframes nudge-y { 0%, 100% { transform: translateY(-4px); } 50% { transform: translateY(4px); } }
-    
-    /* Animation for the covariance tuning effect */
+
+    /* Custom Geometric & Slider Animations */
     @keyframes tune-covariance {
-      0%, 100% { transform: scale(1); stroke: #22c55e; fill: rgba(34, 197, 94, 0.1); }
-      50% { transform: scale(1.15); stroke: #f59e0b; fill: rgba(245, 158, 11, 0.15); }
+      0%, 20% { 
+        transform: scale(1); 
+        stroke: #ef4444; 
+        fill: rgba(239, 68, 68, 0.05); 
+        stroke-dasharray: 4,4;
+      }
+      45%, 75% { 
+        transform: scale(1.3, 1.15); 
+        stroke: #22c55e; 
+        fill: rgba(34, 197, 94, 0.15);
+        stroke-dasharray: 0;
+      }
+      100% { 
+        transform: scale(1); 
+        stroke: #ef4444; 
+        fill: rgba(239, 68, 68, 0.05); 
+        stroke-dasharray: 4,4;
+      }
+    }
+    
+    @keyframes slide-thumb {
+      0%, 20% { transform: translateX(0); fill: #ef4444; }
+      45%, 75% { transform: translateX(90px); fill: #16a34a; }
+      100% { transform: translateX(0); fill: #ef4444; }
+    }
+
+    @keyframes fade-text {
+      0%, 20% { opacity: 1; }
+      30%, 80% { opacity: 0; }
+      90%, 100% { opacity: 1; }
+    }
+    
+    @keyframes fade-text-alt {
+      0%, 30% { opacity: 0; }
+      45%, 75% { opacity: 1; }
+      85%, 100% { opacity: 0; }
     }
   </style>
 </head>
 <body>
 
-<!-- 
-  ===================================================================
-  GUIDA PER L'ORATORE:
-  ===================================================================
-  1. (Apertura) "Perché abbiamo introdotto w_0^c? Quando i Sigma Points passano attraverso una funzione non lineare, non viene distorta solo la covarianza, ma anche i momenti di ordine superiore (come la curtosi, ovvero la 'forma' delle code della distribuzione)."
-  2. (Step 1) "Se usassimo lo stesso peso w_0 per la covarianza, perderemmo precisione. Aggiungendo un termine correttivo solo al peso centrale della covarianza, compensiamo questo errore di troncamento SENZA alterare il calcolo della media (che deve rimanere centrata)."
-  3. (Step 2) "Matematicamente, la formula di w_0^c include il peso base w_0 più un termine aggiuntivo (1 - alpha^2 + beta). Il parametro chiave qui è beta."
-  4. (Step 3) "Beta codifica la conoscenza a priori sulla forma della distribuzione originale. Per una distribuzione Gaussiana, il valore ottimo è rigorosamente beta = 2. Questo cattura le informazioni del quarto momento."
-  5. (Step 4) "Geometricamente (come vedete dall'animazione in basso), w_0^c agisce come un 'sintonizzatore': permette di espandere o contrarre l'ellisse di incertezza (la covarianza) per farla aderire meglio alla vera distribuzione non lineare, lasciando la media inalterata."
-  ===================================================================
--->
-
-<div class="slide-layout" style="padding: 24px 48px; justify-content: flex-start; display: flex; flex-direction: column;">
+<!-- SLIDE CONTAINER (Fixed size 1280x720) -->
+<div class="slide-layout" style="padding: 24px 48px; justify-content: flex-start; display: flex; flex-direction: column; box-sizing: border-box; overflow: hidden; height: 720px;">
 
   <!-- HEADER -->
   <div style="margin-bottom: 12px;">
-    <h1 class="title" style="font-size: 2.3rem; margin-bottom: 0.25rem;">What is \(w_0^c\)?</h1>
-    <p class="subtitle text-muted" style="font-size: 1.25rem; margin-bottom: 0;">Encoding higher-order moment information into the covariance \(\mathbf{P}_{k+1|k}\)</p>
+    <h1 class="title" style="font-size: 2.3rem; margin-bottom: 0.15rem;">What is \(w_0^c\)?</h1>
+    <p class="subtitle text-muted" style="font-size: 1.25rem; margin-bottom: 0;">Encoding missing shape information into the covariance \(\mathbf{P}_{k+1|k}\)</p>
   </div>
 
-  <!-- ROW 1: 2 COLUMNS (Concept & Math) -->
-  <div style="display: flex; align-items: stretch; gap: 16px; margin-bottom: 16px;">
+  <!-- ROW 1: PROBLEM & TAYLOR MATH -->
+  <div style="display: flex; align-items: stretch; gap: 16px; margin-bottom: 12px; flex: 1;">
 
-    <!-- COL 1: The "Why" -->
+    <!-- COL 1: Problem & Solution -->
     <div class="panel" style="flex: 1; padding: 16px; margin: 0; display: flex; flex-direction: column; justify-content: space-between;">
       <div>
-        <p class="text-xl" style="font-size: 1.25rem; font-weight: 700; margin-bottom: 6px; color: #1e293b;">1. The Truncation Problem</p>
-        <p class="text-muted" style="font-size: 1rem; margin-bottom: 10px; line-height: 1.4;">
-          Non-linear functions \(f_k(\mathbf{x})\) distort the <strong>higher-order moments</strong> (e.g., skewness, kurtosis) of the prior distribution. 
+        <p style="font-size: 1.25rem; font-weight: 700; margin-bottom: 6px; color: #1e293b;">1. The Truncation Problem</p>
+        <p class="text-muted" style="font-size: 0.95rem; margin-bottom: 8px; line-height: 1.3;">
+          Non-linear functions distort the distribution. The basic algorithm matches moments perfectly up to the 3rd, but introduces a <strong>truncation error at the 4th moment</strong> (kurtosis).
         </p>
         
-        <div class="math-block" style="padding: 12px; margin: 0 0 10px 0; font-size: 1.05rem; background: white; border-radius: 6px; border: 1px solid #e2e8f0;">
+        <div class="math-block" style="padding: 8px; margin: 0 0 8px 0; font-size: 0.9rem; background: white; border-radius: 6px; border: 1px solid #e2e8f0;">
           \(\displaystyle 
           \begin{array}{ccc}
             \textbf{Prior} & \xrightarrow{\ f_k(\mathbf{x})\ } & \textbf{Distorted} \\
-            (\text{Skew} = 0) & \longrightarrow & (\text{Skew} \neq 0) \\
-            (\text{Kurtosis} = 3) & \longrightarrow & (\text{Kurtosis} \neq 3) \\
-            \vdots & & \vdots
+            (\text{Skew} = 0) & \longrightarrow & \text{Exact Match} \\
+            (\text{Kurtosis} = 3) & \longrightarrow & \text{Truncation Error}
           \end{array}
           \)
         </div>
       </div>
       
-      <div data-step="1">
-        <p class="text-xl" style="font-size: 1.25rem; font-weight: 700; margin-bottom: 6px; color: #b45309; margin-top: 8px;">2. The Solution</p>
-        <p class="text-muted" style="font-size: 1rem; margin-bottom: 0; line-height: 1.4;">
-          We compensate for the distorted kurtosis by tuning <strong>only the central weight </strong>\(w_0^c\). This safely adjusts the covariance spread without affecting the first moment (the mean \(\mathbf{\hat{x}}\) never moves!).
+      <div data-step="1" style="margin-top: 8px;">
+        <p style="font-size: 1.25rem; font-weight: 700; margin-bottom: 4px; color: #b45309;">2. The Solution</p>
+        <p class="text-muted" style="font-size: 0.95rem; margin-bottom: 0; line-height: 1.3;">
+          We fix this by tuning <strong>only the central weight </strong>\(w_0^c\). This safely resizes the covariance spread without shifting the mean \(\mathbf{\hat{x}}\).
         </p>
       </div>
     </div>
 
     <!-- ARROW -->
-    <div data-step="2" style="width: 24px; align-self: center; display: flex; justify-content: center;">
+    <div data-step="2" style="display: flex; flex-direction: column; justify-content: center; align-items: center; width: 30px;">
       <span class="arrow arrow-right">→</span>
     </div>
 
-    <!-- COL 2: The Math -->
-    <div class="panel panel-accent" data-step="2" style="flex: 1.2; padding: 16px; margin: 0; display: flex; flex-direction: column; justify-content: flex-start;">
-      <p class="text-xl text-accent" style="font-size: 1.25rem; font-weight: 700; margin-bottom: 6px;">3. The Mathematical Formula</p>
-      <p class="text-muted" style="font-size: 1rem; margin-bottom: 10px;">
-        The central covariance weight adds a specific compensation term:
+    <!-- COL 2: Fixing Taylor Error -->
+    <div class="panel panel-accent" data-step="2" style="flex: 1.3; padding: 16px; margin: 0; display: flex; flex-direction: column; justify-content: space-between;">
+      <p style="font-size: 1.25rem; font-weight: 700; margin-bottom: 4px;" class="text-accent">3. Fixing the Taylor Error</p>
+      <p class="text-muted" style="font-size: 0.95rem; margin-bottom: 8px; line-height: 1.3;">
+        Adding a compensation term to the central weight forces the Unscented Transform to match the exact Taylor Series at the 4th order:
       </p>
 
-      <div class="math-block" style="padding: 12px; margin: 0 0 12px 0; font-size: 1.15rem; background: white; border-radius: 6px;">
-        \(\displaystyle w_0^c = w_0 + (1 - \alpha^2 + \beta) \)
+      <div class="math-block" style="padding: 8px; margin: 0 0 8px 0; font-size: 0.85rem; background: white; border-radius: 6px; border: 1px solid #bfdbfe;">
+        \(\displaystyle \mathbf{P}_{\text{UT}}^{\text{(uncorrected)}} = \sum_{i=0}^{2n} w_i (\cdots)(\cdots)^T = [\text{2nd}] + [\text{3rd}] + {\color{red}[\text{Wrong 4th}]} + \cdots \)
+        <div style="margin: 6px 0; border-bottom: 1px dashed #cbd5e1;"></div>
+        \(\displaystyle \mathbf{P}_{\text{UT}}^{\text{(corrected)}} = \sum_{i=1}^{2n} w_i (\cdots)(\cdots)^T + {\color{blue}w_0^c} (\cdots)(\cdots)^T = [\text{2nd}] + [\text{3rd}] + {\color{green}[\text{Correct 4th}]} + \cdots \)
       </div>
       
-      <div data-step="3" style="background: white; border: 1px solid #bfdbfe; border-radius: 6px; padding: 12px; margin-top: auto;">
-        <p style="font-size: 1.05rem; font-weight: 700; color: #1d4ed8; margin: 0 0 6px 0;">What is \(\beta\)?</p>
-        <p class="text-muted" style="font-size: 0.95rem; margin: 0; line-height: 1.4;">
-          The Unscented Transform is exact up to the 3rd moment, but truncation errors appear at the 4th moment (kurtosis).
-          So we need to fix the taylor truncation error!
-          
-          <br><br>
-          \(\beta\) directly encodes this missing shape information. <strong>For a Gaussian prior, setting \(\beta = 2\) rigorously neutralizes this 4th-order error.</strong>
-        </p>
+      <div class="math-block" style="padding: 6px; margin: 0 0 10px 0; font-size: 1.05rem; background: white; border-radius: 6px; border: 2px solid #3b82f6;">
+        \(\displaystyle w_0^c = w_0 + (1 - \alpha^2 + \beta) \)
       </div>
+
+      <p class="text-muted" style="font-size: 0.95rem; margin-bottom: 0; padding: 10px; background: rgba(255,255,255,0.7); border-left: 4px solid #1d4ed8; border-radius: 4px; line-height: 1.3;">
+        <strong>For a Gaussian prior, setting \(\beta = 2\) neutralizes the 4th-order error.</strong> Higher odd moments remain zero natively due to symmetry.
+      </p>
     </div>
 
   </div>
 
-  <!-- ROW 2: GEOMETRIC INTUITION (Animation) -->
-  <div class="panel panel-primary" data-step="4" style="padding: 12px 20px; margin: 0; display: flex; align-items: center; justify-content: space-between; gap: 16px;">
+  <!-- ROW 2: GEOMETRIC INTUITION (Animation with Beta Slider) -->
+  <div class="panel panel-primary" data-step="4" style="padding: 16px 20px; margin: 0; display: flex; align-items: center; justify-content: space-between; gap: 16px;">
     
-    <div style="flex: 1.5;">
-      <span style="font-size: 1.15rem; font-weight: 700; color: #1e40af; display: block; margin-bottom: 4px;">
-        Geometric Intuition: Tuning the Covariance
-      </span>
-      <span class="text-muted" style="font-size: 1rem; line-height: 1.4;">
-        The extra term acts as a "dial" that safely inflates or deflates the covariance spread \(\mathbf{P}_{k+1|k}\) to capture non-linear distortion, <strong>while keeping the mean \(\mathbf{\hat{x}}\) exactly anchored</strong>.
-      </span>
+    <div style="flex: 1;">
+      <p style="font-size: 1.25rem; font-weight: 700; margin-bottom: 4px; color: #1e40af;">Geometric Intuition</p>
+      <p class="text-muted" style="font-size: 0.95rem; line-height: 1.3; margin-bottom: 0;">
+        The \(\beta\) parameter safely <strong>inflates the covariance</strong> \(\mathbf{P}_{k+1|k}\) to capture the heavier tails (4th moment), <strong>anchoring the mean \(\mathbf{\hat{x}}\)</strong> in its exact position.
+      </p>
     </div>
 
-    <div style="width: 2px; height: 50px; background: #cbd5e1;"></div>
-
-    <!-- SVG Animation showing Covariance tuning -->
-    <div style="flex: 1; display: flex; justify-content: center; align-items: center;">
-      <svg width="100%" height="70" viewBox="0 0 160 80" style="overflow: visible;">
-        <!-- The pulsing ellipse representing the tuning of P -->
-        <g style="transform-origin: 80px 40px; animation: tune-covariance 3s ease-in-out infinite;">
-          <ellipse cx="80" cy="40" rx="55" ry="28" stroke-width="2" stroke-dasharray="4,4"/>
+    <!-- Animated Dashboard -->
+    <div style="flex: 1.5; display: flex; justify-content: center; align-items: center;">
+      <svg width="100%" height="120" viewBox="0 0 450 120" style="overflow: visible;">
+        
+        <!-- Left Part: Distribution & Covariance Ellipse -->
+        <path d="M 40 60 C 40 20, 80 10, 120 10 C 160 10, 200 20, 200 60 C 200 100, 160 110, 120 110 C 80 110, 40 100, 40 60 Z" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1"/>
+        
+        <!-- Pulsing Ellipse -->
+        <g style="transform-origin: 120px 60px; animation: tune-covariance 4s ease-in-out infinite;">
+          <ellipse cx="120" cy="60" rx="60" ry="30" stroke-width="2.5" />
         </g>
         
-        <!-- Mean anchored in place -->
-        <path d="M 76 40 L 84 40 M 80 36 L 80 44" stroke="#166534" stroke-width="2"/>
-        <text x="73" y="44" font-size="12" font-weight="bold" fill="#166534" text-anchor="end">\(\mathbf{\hat{x}}\)</text>
+        <!-- Anchored Mean -->
+        <path d="M 115 60 L 125 60 M 120 55 L 120 65" stroke="#166534" stroke-width="2.5"/>
+        <text x="110" y="65" font-size="14" font-weight="bold" fill="#166534" text-anchor="end">\(\mathbf{\hat{x}}\)</text>
         
-        <!-- Central mapped point y0 -->
-        <circle cx="86" cy="44" r="4" fill="#1e40af"/>
-        <text x="92" y="48" font-size="9" font-weight="bold" fill="#1e40af" text-anchor="start">\(\mathbf{y}_0\)</text>
+        <text x="120" y="118" font-size="11" font-weight="bold" fill="#ef4444" text-anchor="middle" style="animation: fade-text 4s infinite;">Uncorrected P (Truncated)</text>
+        <text x="120" y="118" font-size="11" font-weight="bold" fill="#16a34a" text-anchor="middle" style="animation: fade-text-alt 4s infinite;">Corrected P captures tails</text>
+
+        <!-- Divider Line -->
+        <line x1="240" y1="10" x2="240" y2="110" stroke="#e2e8f0" stroke-width="2" stroke-dasharray="4,4"/>
+
+        <!-- Right Part: Beta Slider and Central Weight Label -->
+        
+        <!-- Beta Slider Track -->
+        <line x1="285" y1="35" x2="375" y2="35" stroke="#cbd5e1" stroke-width="4" stroke-linecap="round"/>
+        <text x="285" y="20" font-size="12" font-weight="bold" fill="#64748b" text-anchor="middle">\(\beta = 0\)</text>
+        <text x="375" y="20" font-size="12" font-weight="bold" fill="#64748b" text-anchor="middle">\(\beta = 2\)</text>
+        
+        <!-- Beta Slider Thumb -->
+        <g style="animation: slide-thumb 4s ease-in-out infinite;">
+          <circle cx="285" cy="35" r="7" />
+        </g>
+
+        <!-- Central Weight Output -->
+        <text x="330" y="70" font-size="12" fill="#475569" text-anchor="middle">Central Weight Update:</text>
+        
+        <!-- FIX: Replaced LaTeX with native SVG tspan for robust rendering -->
+        <g style="animation: fade-text 4s infinite;">
+          <rect x="270" y="78" width="120" height="28" rx="4" fill="#fef2f2" stroke="#fca5a5" />
+          <text x="330" y="97" font-size="14" font-weight="bold" fill="#ef4444" text-anchor="middle">
+            <tspan font-style="italic" font-family="serif">w</tspan><tspan baseline-shift="sub" font-size="10">0</tspan><tspan baseline-shift="super" font-size="10">c</tspan> = <tspan font-style="italic" font-family="serif">w</tspan><tspan baseline-shift="sub" font-size="10">0</tspan>
+          </text>
+        </g>
+        
+        <g style="animation: fade-text-alt 4s infinite;">
+          <rect x="270" y="78" width="120" height="28" rx="4" fill="#f0fdf4" stroke="#86efac" />
+          <text x="330" y="97" font-size="14" font-weight="bold" fill="#16a34a" text-anchor="middle">
+            <tspan font-style="italic" font-family="serif">w</tspan><tspan baseline-shift="sub" font-size="10">0</tspan><tspan baseline-shift="super" font-size="10">c</tspan> = <tspan font-style="italic" font-family="serif">w</tspan><tspan baseline-shift="sub" font-size="10">0</tspan> + 2
+          </text>
+        </g>
+
       </svg>
     </div>
-
   </div>
 
 </div>

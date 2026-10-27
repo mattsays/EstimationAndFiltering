@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Unscented Transform (UKF) Interactive Lab</title>
+  <link rel="stylesheet" href="slideui.css">
+  <script src="slideui.js" defer></script>
+
+  <!-- Tool styles, all scoped under #ukf / #chol so the rest of the slide is untouched -->
+  <style>
+    #ukf { --panel-border:#cbd5e1; --text-main:#0f172a; --text-muted:#64748b;
+           --accent-blue:#2563eb; --accent-green:#16a34a; --accent-orange:#ea580c;
+           --accent-red:#dc2626; --accent-pink:#f87171; --accent-purple:#7c3aed;
+           display:flex; gap:10px; width:100%; height:520px; flex:none; text-align:left;
+           color:var(--text-main); font-size:0.85rem; line-height:1.2; }
+    #ukf * { box-sizing:border-box; }
+    #ukf .col { flex:1; min-width:0; display:flex; flex-direction:column; gap:8px; }
+    #ukf .card { background:#fff; border:1px solid var(--panel-border); border-radius:8px;
+                 box-shadow:0 1px 3px rgba(0,0,0,0.08); }
+    #ukf .cv-card { flex:1; min-height:0; display:flex; flex-direction:column; position:relative; overflow:hidden; }
+    #ukf .cv-head { padding:5px 10px; background:#f8fafc; border-bottom:1px solid var(--panel-border);
+                    font-size:0.8rem; font-weight:700; display:flex; justify-content:space-between; align-items:center; }
+    #ukf .cv-wrap { flex:1; min-height:0; position:relative; }
+    #ukf canvas { position:absolute; left:0; top:0; width:100%; height:100%; display:block; }
+    #ukf .legend { position:absolute; bottom:6px; right:6px; background:rgba(255,255,255,0.94);
+                   border:1px solid var(--panel-border); border-radius:6px; padding:4px 8px;
+                   font-size:0.7rem; display:flex; flex-direction:column; gap:3px; pointer-events:none; }
+    #ukf .legend-item { display:flex; align-items:center; gap:6px; font-weight:600; }
+    #ukf .l-solid { width:14px; height:2px; }
+    #ukf .l-dash { width:14px; height:0; border-top:2px dashed var(--accent-pink); }
+    #ukf .l-dot { width:7px; height:7px; border-radius:50%; }
+    #ukf .sub { padding:6px 10px; display:flex; flex-direction:column; gap:5px; }
+    #ukf .sub-title { font-size:0.8rem; font-weight:700; color:var(--accent-blue);
+                      display:flex; justify-content:space-between; align-items:center;
+                      border-bottom:1px solid #e2e8f0; padding-bottom:3px; }
+    #ukf .toggle { font-size:0.75rem; font-weight:600; color:var(--text-muted);
+                   display:flex; align-items:center; gap:4px; cursor:pointer; }
+    #ukf .dist-row { display:flex; align-items:center; justify-content:center; gap:4px;
+                     background:#f8fafc; border:1px solid var(--panel-border); border-radius:6px;
+                     padding:4px 6px; min-height:46px; }
+    #ukf .mono { font-family:"Fira Code", monospace; font-size:0.82rem; font-weight:600; }
+    #ukf .vec { border-left:2px solid var(--text-main); border-right:2px solid var(--text-main);
+                border-radius:4px; padding:2px 6px; display:flex; flex-direction:column; gap:2px;
+                text-align:right; background:#fff; }
+    #ukf .mat { border-left:2.5px solid var(--text-main); border-right:2.5px solid var(--text-main);
+                border-radius:4px; padding:2px 7px; display:grid; grid-template-columns:auto auto;
+                gap:2px 10px; text-align:right; background:#fff; }
+    #ukf .alert { position:absolute; top:34px; left:6px; right:6px; background:#fef2f2;
+                  border:1px solid #fca5a5; color:#991b1b; padding:5px 8px; border-radius:6px;
+                  font-size:0.74rem; display:none; z-index:5; }
+    #ukf .alert.active { display:block; }
+
+    /* Controls panel: compact so everything fits, scrollbar hidden */
+    #ukf .controls { width:330px; flex:none; padding:6px 10px; overflow-y:auto;
+                     display:flex; flex-direction:column; gap:4px;
+                     scrollbar-width:none; -ms-overflow-style:none; }
+    #ukf .controls::-webkit-scrollbar { display:none; width:0; height:0; }
+    #ukf .sec { font-size:0.8rem; font-weight:700; color:var(--accent-blue);
+                border-bottom:2px solid #e2e8f0; padding-bottom:2px; margin-top:2px; flex:none; }
+    #ukf .crow { display:flex; align-items:center; gap:5px; height:21px; flex:none; }
+    #ukf .crow label { font-size:0.8rem; font-weight:600; width:78px; flex:none; }
+    #ukf .crow input[type=range] { flex:1; min-width:0; accent-color:var(--accent-blue); cursor:pointer; }
+    #ukf .play { background:#f1f5f9; border:1px solid var(--panel-border); border-radius:4px;
+                 width:22px; height:19px; font-size:0.6rem; cursor:pointer; color:#334155; padding:0; }
+    #ukf .play.active { background:var(--accent-blue); color:#fff; border-color:var(--accent-blue); }
+    #ukf .badge { font-family:"Fira Code", monospace; font-size:0.74rem; background:#f8fafc;
+                  padding:1px 4px; border-radius:4px; min-width:38px; text-align:right;
+                  color:var(--accent-blue); border:1px solid var(--panel-border); font-weight:600; }
+    #ukf .fbox { display:flex; flex-direction:column; gap:4px; background:#f8fafc; padding:5px;
+                 border-radius:6px; border:1px solid var(--panel-border); flex:none; }
+    #ukf .frow { display:flex; align-items:center; gap:8px; font-family:"Fira Code", monospace; }
+    #ukf .frow .fl { min-width:62px; font-weight:bold; color:var(--accent-orange); }
+    #ukf .frow input { flex:1; min-width:0; padding:2px 7px; border:1px solid var(--panel-border);
+                       border-radius:6px; font-family:inherit; font-size:0.8rem; }
+    #ukf .pbox { background:#f8fafc; border:1px solid var(--panel-border); border-radius:6px;
+                 padding:4px 8px; display:flex; flex-direction:column; gap:2px; flex:none; }
+    #ukf .pline { display:flex; align-items:center; justify-content:space-between; }
+    #ukf .pnote { font-size:0.7rem; color:var(--text-muted); border-top:1px dashed var(--panel-border);
+                  padding-top:2px; margin-top:1px; }
+    #ukf .presets { display:flex; gap:6px; flex:none; }
+    #ukf .pbtn { flex:1; border:1px solid var(--panel-border); background:#f1f5f9; color:#334155;
+                 padding:3px 6px; border-radius:6px; font-size:0.75rem; font-weight:600; cursor:pointer; }
+    #ukf .pbtn.primary { background:var(--accent-blue); color:#fff; border-color:var(--accent-blue); }
+    #ukf .pbtn.danger { background:#fee2e2; color:var(--accent-red); border-color:#fca5a5; }
+
+    /* Cholesky step-by-step box (narrower than the canvas so the slide counter stays visible) */
+    #chol { width:1060px; height:134px; flex:none; margin-top:10px; background:#fff;
+            border:1px solid #cbd5e1; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,0.08);
+            padding:5px 12px 6px; display:flex; flex-direction:column; text-align:left; color:#0f172a;
+            font-size:0.9rem; box-sizing:border-box; }
+    #chol * { box-sizing:border-box; }
+    #chol .ch-title { font-size:0.8rem; font-weight:700; color:#2563eb;
+                      border-bottom:1px solid #e2e8f0; padding-bottom:2px; }
+    #chol .ch-row { flex:1; display:flex; align-items:stretch; gap:6px; padding-top:5px; min-height:0; }
+    #chol .ch-cell { flex:1; min-width:0; display:flex; flex-direction:column; align-items:center;
+                     justify-content:center; gap:2px; border:1px solid #e2e8f0; border-radius:6px;
+                     background:#f8fafc; padding:2px 4px; }
+    #chol .ch-cell.bad { border-color:#dc2626; background:#fef2f2; }
+    #chol .ch-label { font-size:0.68rem; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.03em; }
+    #chol .ch-num { font-family:"Fira Code", monospace; font-size:0.74rem; font-weight:600; line-height:1.3;
+                    white-space:nowrap; color:#0f172a; }
+    #chol .ch-num .res { color:#2563eb; }
+    #chol .ch-num .neg, #chol .ch-num .nan { color:#dc2626; font-weight:700; }
+    #chol .ch-arrow { align-self:center; color:#94a3b8; font-size:1.3rem; font-weight:bold; flex:none; }
+    #chol .mat { border-left:2.5px solid #0f172a; border-right:2.5px solid #0f172a; border-radius:4px;
+                 padding:2px 7px; display:grid; grid-template-columns:auto auto; gap:2px 10px;
+                 text-align:right; background:#fff; font-family:"Fira Code", monospace;
+                 font-size:0.78rem; font-weight:600; }
+  </style>
+</head>
+<body>
+
+<!-- Clicking the slide must not advance it: stop propagation before slideui.js sees the click (arrow keys only) -->
+<div class="slide-layout" style="padding: 18px 32px; justify-content: flex-start; align-items: flex-start;" onclick="event.stopPropagation()">
+
+  <!-- Interactive lab -->
+  <div id="ukf">
+
+    <!-- Space A column -->
+    <div class="col">
+      <div class="card cv-card">
+        <div class="cv-head">
+          <span>STATE SPACE A (step \(k\))</span>
+          <span style="color:var(--accent-blue)">\(\mathbf{x}_k \in \mathbb{R}^2\)</span>
+        </div>
+        <div class="cv-wrap"><canvas id="canvasX"></canvas></div>
+        <div class="legend">
+          <div class="legend-item"><div class="l-solid" style="background:var(--accent-blue)"></div><span>\(1\sigma\) ellipse (\(\mathbf{P}_k\))</span></div>
+          <div class="legend-item"><div class="l-solid" style="background:var(--accent-green)"></div><span>\(\gamma\sigma\) contour</span></div>
+          <div class="legend-item"><div class="l-dot" style="background:var(--accent-purple)"></div><span>Mean (\(S_0\))</span></div>
+          <div class="legend-item"><div class="l-dot" style="background:var(--accent-green)"></div><span>Sigma points (\(S_{1..4}\))</span></div>
+        </div>
+      </div>
+      <div class="card sub">
+        <div class="sub-title"><span>Prior distribution and Cholesky factor</span></div>
+        <div class="dist-row">
+          <span>\(\mathbf{x}_k \sim \mathcal{N}\Big(\)</span>
+          <div class="mono"><div class="vec"><span id="vec_mx">0.00</span><span id="vec_my">0.00</span></div></div>
+          <span>\(,\)</span>
+          <div class="mono"><div class="mat" id="mat_P"><span>0</span><span>0</span><span>0</span><span>0</span></div></div>
+          <span>\(\Big)\)</span>
+        </div>
+        <div class="dist-row">
+          <span>\(\mathbf{L}_k =\)</span>
+          <div class="mono"><div class="mat" id="mat_L"><span>0</span><span>0</span><span>0</span><span>0</span></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Space B column -->
+    <div class="col">
+      <div class="card cv-card">
+        <div class="cv-head">
+          <span>PREDICTED SPACE B (step \(k+1\))</span>
+          <span style="color:var(--accent-orange)">\(\mathbf{x}_{k+1} = \mathbf{f}(\mathbf{x}_k)\)</span>
+        </div>
+        <div class="cv-wrap"><canvas id="canvasY"></canvas></div>
+        <div id="instabilityAlert" class="alert">
+          <strong>Cholesky failure (NaN)!</strong>
+          \(\mathbf{P}_{k+1}\) lost positive-definiteness: \(\mathbf{L}_{k+1}\) contains <strong>NaN</strong>.
+        </div>
+        <div class="legend">
+          <div class="legend-item"><div class="l-dash"></div><span>True warped \(1\sigma\) contour</span></div>
+          <div class="legend-item"><div class="l-dot" style="background:var(--accent-pink)"></div><span>True mean \(\boldsymbol{\mu}_{\text{true}}\)</span></div>
+          <div class="legend-item"><div class="l-solid" style="background:var(--accent-red)"></div><span>UKF \(1\sigma\) ellipse</span></div>
+          <div class="legend-item" id="legend_gamma_y"><div class="l-solid" style="background:var(--accent-orange)"></div><span>UKF \(\gamma\sigma\) contour</span></div>
+          <div class="legend-item"><div class="l-dot" style="background:var(--accent-red)"></div><span>UKF mean \(\mathbf{M}_{k+1}\)</span></div>
+        </div>
+      </div>
+      <div class="card sub">
+        <div class="sub-title">
+          <span>Reconstructed Gaussian moments</span>
+          <label class="toggle"><input type="checkbox" id="toggle_LY"> show \(\mathbf{L}_{k+1}\)</label>
+        </div>
+        <div class="dist-row">
+          <span>\(\mathbf{x}_{k+1} \sim \mathcal{N}\Big(\)</span>
+          <div class="mono"><div class="vec"><span id="vec_mYx">0.00</span><span id="vec_mYy">0.00</span></div></div>
+          <span>\(,\)</span>
+          <div class="mono"><div class="mat" id="mat_PY"><span>0</span><span>0</span><span>0</span><span>0</span></div></div>
+          <span>\(\Big)\)</span>
+        </div>
+        <div class="dist-row" id="block_LY">
+          <span>\(\mathbf{L}_{k+1} =\)</span>
+          <div class="mono"><div class="mat" id="mat_LY"><span>0</span><span>0</span><span>0</span><span>0</span></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Controls panel -->
+    <div class="card controls">
+
+      <!-- Presets -->
+      <div class="presets">
+        <button class="pbtn primary" id="preset_default">Default mapping</button>
+        <button class="pbtn danger" id="preset_crash">Crash test (NaN)</button>
+      </div>
+
+      <!-- Non-linear function -->
+      <div class="sec">Non-linear mapping \(\mathbf{f}(x,y)\)</div>
+      <div class="fbox">
+        <div class="frow"><span class="fl">\(f_1(x,y)=\)</span><input type="text" id="f1_expr" value="x + 0.2*y^2"></div>
+        <div class="frow"><span class="fl">\(f_2(x,y)=\)</span><input type="text" id="f2_expr" value="y + 0.5*cos(x^2)"></div>
+      </div>
+
+      <!-- Initial state -->
+      <div class="sec">Initial state \(\boldsymbol{\mu}_k\) and covariance \(\mathbf{P}_k\)</div>
+      <div class="crow"><label>Mean \(m_x\)</label><button class="play" id="play_mx">▶</button><input type="range" id="mx" min="-5" max="5" step="0.1" value="1.7"><span class="badge" id="val_mx">1.7</span></div>
+      <div class="crow"><label>Mean \(m_y\)</label><button class="play" id="play_my">▶</button><input type="range" id="my" min="-5" max="5" step="0.1" value="-0.1"><span class="badge" id="val_my">-0.1</span></div>
+      <div class="crow"><label>Std \(\sigma_x\)</label><button class="play" id="play_sx">▶</button><input type="range" id="sx" min="0.2" max="4" step="0.1" value="1.5"><span class="badge" id="val_sx">1.5</span></div>
+      <div class="crow"><label>Std \(\sigma_y\)</label><button class="play" id="play_sy">▶</button><input type="range" id="sy" min="0.2" max="4" step="0.1" value="1.6"><span class="badge" id="val_sy">1.6</span></div>
+      <div class="crow"><label>Corr. \(\rho\)</label><button class="play" id="play_r">▶</button><input type="range" id="r" min="-0.95" max="0.95" step="0.05" value="0.32"><span class="badge" id="val_r">0.32</span></div>
+
+      <!-- Hyperparameters -->
+      <div class="sec">Hyperparameters \((\alpha, \kappa, \beta)\)</div>
+      <div class="crow"><label>\(\alpha\)</label><button class="play" id="play_alpha">▶</button><input type="range" id="alpha" min="0.01" max="1" step="0.01" value="0.8"><span class="badge" id="val_alpha">0.80</span></div>
+      <div class="crow"><label>\(\kappa\)</label><button class="play" id="play_kappa">▶</button><input type="range" id="kappa" min="-2.5" max="3" step="0.1" value="1"><span class="badge" id="val_kappa">1.0</span></div>
+      <div class="crow"><label>\(\beta\)</label><button class="play" id="play_beta">▶</button><input type="range" id="beta" min="-3" max="4" step="0.1" value="2"><span class="badge" id="val_beta">2.0</span></div>
+
+      <!-- Scaling parameters and weights -->
+      <div class="sec">Scaling parameters and weights</div>
+      <div class="pbox">
+        <div class="pline"><span>\(\lambda = \alpha^2(n+\kappa)-n\)</span><strong id="val_lambda_math" style="color:var(--accent-blue)">0</strong></div>
+        <div class="pline"><span>\(\gamma = \sqrt{n+\lambda}\)</span><strong id="val_gamma_math" style="color:var(--accent-green)">0</strong></div>
+        <div class="pline"><span>\(w_0 = \frac{\lambda}{n+\lambda}\)</span><strong id="w0_val">0</strong></div>
+        <div class="pline"><span>\(w_i = \frac{1}{2(n+\lambda)}\)</span><strong id="wi_val">0</strong></div>
+        <div class="pline"><span>\(w_0^c = w_0 + 1 - \alpha^2 + \beta\)</span><strong id="w0c_val">0</strong></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Live Cholesky computation of L_{k+1} from P_{k+1}, step by step -->
+  <div id="chol">
+    <div class="ch-title">Where it breaks: computing \(\mathbf{L}_{k+1}\) from \(\mathbf{P}_{k+1}\) (\(\mathbf{P}_{k+1}=\mathbf{L}_{k+1}\mathbf{L}_{k+1}^{\top}\)), live</div>
+    <div class="ch-row">
+
+      <!-- Input: current P_{k+1} -->
+      <div class="ch-cell" style="flex:0.8;">
+        <span class="ch-label">Input \(\mathbf{P}_{k+1}\)</span>
+        <div class="mat" id="c_P"><span>0</span><span>0</span><span>0</span><span>0</span></div>
+      </div>
+
+      <div class="ch-arrow">→</div>
+
+      <!-- Step 1 -->
+      <div class="ch-cell" id="cell1">
+        <span class="ch-label">Step 1</span>
+        <span>\(\displaystyle L_{11}=\sqrt{p_{11}}\)</span>
+        <span class="ch-num" id="n1a"></span>
+        <span class="ch-num" id="n1b"></span>
+      </div>
+
+      <div class="ch-arrow">→</div>
+
+      <!-- Step 2 -->
+      <div class="ch-cell" id="cell2">
+        <span class="ch-label">Step 2</span>
+        <span>\(\displaystyle L_{21}=\frac{p_{12}}{\sqrt{p_{11}}}\)</span>
+        <span class="ch-num" id="n2a"></span>
+        <span class="ch-num" id="n2b"></span>
+      </div>
+
+      <div class="ch-arrow">→</div>
+
+      <!-- Step 3 -->
+      <div class="ch-cell" id="cell3" style="flex:1.25;">
+        <span class="ch-label">Step 3</span>
+        <span>\(\displaystyle L_{22}=\sqrt{p_{22}-\frac{p_{12}^2}{p_{11}}}\)</span>
+        <span class="ch-num" id="n3a"></span>
+        <span class="ch-num" id="n3b"></span>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Tool logic (self-contained, no KaTeX: formulas are rendered by the MathJax loaded by slideui.js) -->
+<script>
+(function () {
+  var state = { mx: 1.7, my: -0.1, sx: 1.5, sy: 1.6, r: 0.32, n: 2, alpha: 0.8, kappa: 1.0, beta: 2.0 };
+  var animState = {};
+  var inputs = ['mx', 'my', 'sx', 'sy', 'r', 'alpha', 'kappa', 'beta'];
+  var DPR = 1;
+
+  var fn1 = function (x, y) { return x + 0.2 * y * y; };
+  var fn2 = function (x, y) { return y + 0.5 * Math.cos(x * x); };
+
+  var canvasX = document.getElementById('canvasX');
+  var canvasY = document.getElementById('canvasY');
+  var ctxX = canvasX.getContext('2d');
+  var ctxY = canvasY.getContext('2d');
+
+  function $(id) { return document.getElementById(id); }
+  function fmtVal(id, v) { return v.toFixed(id === 'alpha' ? 2 : 1); }
+
+  /* ---------- Navigation: arrow keys only, the tool must not interfere ---------- */
+  // Text fields keep all keys for themselves (space, arrows, f...), Esc leaves them
+  ['f1_expr', 'f2_expr'].forEach(function (id) {
+    $(id).addEventListener('keydown', function (e) {
+      e.stopPropagation();
+      if (e.key === 'Escape') e.target.blur();
+    });
+    $(id).addEventListener('input', updateFunctions);
+  });
+  // After using sliders/buttons/checkbox, drop focus so the arrow keys change slide again
+  document.querySelectorAll('#ukf input[type=range], #ukf input[type=checkbox], #ukf button').forEach(function (el) {
+    var ev = el.type === 'range' ? 'change' : 'click';
+    el.addEventListener(ev, function () { el.blur(); });
+  });
+
+  /* ---------- Sliders, animations, presets ---------- */
+  inputs.forEach(function (id) {
+    $(id).addEventListener('input', function (e) {
+      state[id] = parseFloat(e.target.value);
+      $('val_' + id).textContent = fmtVal(id, state[id]);
+      update();
+    });
+    $('play_' + id).addEventListener('click', function () { togglePlay(id); });
+  });
+  $('toggle_LY').addEventListener('change', update);
+  $('preset_default').addEventListener('click', function () { loadPreset('default'); });
+  $('preset_crash').addEventListener('click', function () { loadPreset('crash'); });
+
+  function parseMathExpr(expr) {
+    var cleaned = expr.replace(/\^/g, '**')
+      .replace(/\bsin\b/g, 'Math.sin').replace(/\bcos\b/g, 'Math.cos')
+      .replace(/\bsqrt\b/g, 'Math.sqrt').replace(/\babs\b/g, 'Math.abs')
+      .replace(/\bPI\b/g, 'Math.PI');
+    return new Function('x', 'y', 'return ' + cleaned + ';');
+  }
+
+  function updateFunctions() {
+    try {
+      var a = parseMathExpr($('f1_expr').value);
+      var b = parseMathExpr($('f2_expr').value);
+      a(1, 1); b(1, 1);
+      fn1 = a; fn2 = b;
+      update();
+    } catch (err) {}
+  }
+
+  function togglePlay(id) {
+    var btn = $('play_' + id);
+    if (animState[id]) {
+      delete animState[id];
+      btn.classList.remove('active'); btn.textContent = '▶';
+    } else {
+      var input = $(id);
+      animState[id] = { min: parseFloat(input.min), max: parseFloat(input.max),
+                        step: parseFloat(input.step) || 0.05, dir: 1 };
+      btn.classList.add('active'); btn.textContent = '❚❚';
+    }
+  }
+
+  function animate() {
+    var changed = false;
+    Object.keys(animState).forEach(function (id) {
+      var c = animState[id];
+      var val = state[id] + c.dir * c.step * 0.2;
+      if (val >= c.max) { val = c.max; c.dir = -1; }
+      if (val <= c.min) { val = c.min; c.dir = 1; }
+      state[id] = val;
+      $(id).value = val;
+      $('val_' + id).textContent = fmtVal(id, val);
+      changed = true;
+    });
+    if (changed) update();
+    requestAnimationFrame(animate);
+  }
+  requestAnimationFrame(animate);
+
+  function loadPreset(type) {
+    Object.keys(animState).forEach(togglePlay);
+    if (type === 'default') {
+      state.mx = 1.7; state.my = -0.1; state.sx = 1.5; state.sy = 1.6; state.r = 0.32;
+      state.alpha = 0.8; state.kappa = 1.0; state.beta = 2.0;
+      $('f1_expr').value = 'x + 0.2*y^2';
+      $('f2_expr').value = 'y + 0.5*cos(x^2)';
+    } else {
+      state.mx = 2.5; state.my = 2.0; state.sx = 2.5; state.sy = 2.5; state.r = 0.5;
+      state.alpha = 0.2; state.kappa = -1.0; state.beta = -2.0;
+      $('f1_expr').value = 'x + 0.8*y^2';
+      $('f2_expr').value = 'y + 0.5*cos(x^2)';
+    }
+    inputs.forEach(function (id) {
+      $(id).value = state[id];
+      $('val_' + id).textContent = fmtVal(id, state[id]);
+    });
+    updateFunctions();
+    update();
+  }
+
+  /* ---------- UKF computation ---------- */
+  function calculateUKF() {
+    var mx = state.mx, my = state.my, sx = state.sx, sy = state.sy, r = state.r,
+        n = state.n, alpha = state.alpha, kappa = state.kappa, beta = state.beta;
+
+    var lambda = alpha * alpha * (n + kappa) - n;
+    var gamma = (n + lambda) >= 0 ? Math.sqrt(n + lambda) : NaN;
+
+    var P11 = sx * sx, P22 = sy * sy, P12 = r * sx * sy;
+    var L11 = sx, L21 = r * sy, L22 = sy * Math.sqrt(Math.max(0, 1 - r * r));
+
+    var mu = [mx, my];
+    var S = [
+      [mu[0], mu[1]],
+      [mu[0] + gamma * L11, mu[1] + gamma * L21],
+      [mu[0] - gamma * L11, mu[1] - gamma * L21],
+      [mu[0], mu[1] + gamma * L22],
+      [mu[0], mu[1] - gamma * L22]
+    ];
+
+    // Weights: w0 and wi for the mean, w0c (corrected) and wi for the covariance
+    var w0 = lambda / (n + lambda);
+    var wi = 1 / (2 * (n + lambda));
+    var w0c = w0 + (1 - alpha * alpha + beta);
+
+    var Y = S.map(function (pt) {
+      try { return [fn1(pt[0], pt[1]), fn2(pt[0], pt[1])]; }
+      catch (e) { return [NaN, NaN]; }
+    });
+
+    var mYx = w0 * Y[0][0], mYy = w0 * Y[0][1], i;
+    for (i = 1; i <= 4; i++) { mYx += wi * Y[i][0]; mYy += wi * Y[i][1]; }
+    var MY = [mYx, mYy];
+
+    var PY11 = w0c * Math.pow(Y[0][0] - mYx, 2);
+    var PY22 = w0c * Math.pow(Y[0][1] - mYy, 2);
+    var PY12 = w0c * (Y[0][0] - mYx) * (Y[0][1] - mYy);
+    for (i = 1; i <= 4; i++) {
+      PY11 += wi * Math.pow(Y[i][0] - mYx, 2);
+      PY22 += wi * Math.pow(Y[i][1] - mYy, 2);
+      PY12 += wi * (Y[i][0] - mYx) * (Y[i][1] - mYy);
+    }
+
+    // Real Cholesky, with a true NaN if P loses positive-definiteness
+    var LY11 = Math.sqrt(PY11);
+    var LY21 = (!isNaN(LY11) && LY11 > 0) ? PY12 / LY11 : NaN;
+    var LY22 = Math.sqrt(PY22 - LY21 * LY21);
+    var isIndefinite = isNaN(LY11) || isNaN(LY21) || isNaN(LY22) || isNaN(gamma);
+
+    // True warped contour and true mean (radial/angular quadrature)
+    var trueContourY = [], steps = 120;
+    for (i = 0; i <= steps; i++) {
+      var t = (i / steps) * 2 * Math.PI, u = Math.cos(t), v = Math.sin(t);
+      var x = mu[0] + L11 * u, y = mu[1] + L21 * u + L22 * v;
+      try { trueContourY.push([fn1(x, y), fn2(x, y)]); } catch (e) {}
+    }
+    var tsx = 0, tsy = 0, tw = 0, rSteps = 15, tSteps = 24;
+    for (var ri = 1; ri <= rSteps; ri++) {
+      var rv = (ri / rSteps) * 3.0, wv = rv * Math.exp(-0.5 * rv * rv);
+      for (var ti = 0; ti < tSteps; ti++) {
+        var tv = (ti / tSteps) * 2 * Math.PI;
+        var uu = rv * Math.cos(tv), vv = rv * Math.sin(tv);
+        var xx = mu[0] + L11 * uu, yy = mu[1] + L21 * uu + L22 * vv;
+        try { tsx += fn1(xx, yy) * wv; tsy += fn2(xx, yy) * wv; tw += wv; } catch (e) {}
+      }
+    }
+    var trueMY = tw > 0 ? [tsx / tw, tsy / tw] : [NaN, NaN];
+
+    return { lambda: lambda, gamma: gamma, w0: w0, wi: wi, w0c: w0c,
+             mu: mu, P: [[P11, P12], [P12, P22]], L: [[L11, 0], [L21, L22]],
+             S: S, Y: Y, MY: MY, PY: [[PY11, PY12], [PY12, PY22]],
+             LY: [[LY11, 0], [LY21, LY22]], isIndefinite: isIndefinite,
+             trueContourY: trueContourY, trueMY: trueMY };
+  }
+
+  /* ---------- Drawing ---------- */
+  // The slide is CSS-scaled: use the unscaled layout size and multiply by scale*DPR for crisp drawing.
+  function resizeCanvas() {
+    var sc = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--slide-scale')) || 1;
+    DPR = (window.devicePixelRatio || 1) * sc;
+    [canvasX, canvasY].forEach(function (c) {
+      var w = Math.max(10, Math.round(c.parentElement.clientWidth * DPR));
+      var h = Math.max(10, Math.round(c.parentElement.clientHeight * DPR));
+      if (c.width !== w) c.width = w;
+      if (c.height !== h) c.height = h;
+    });
+  }
+
+  function toScreen(x, y, canvas, center, span) {
+    var w = canvas.width, h = canvas.height;
+    var xMin = center[0] - span, xMax = center[0] + span;
+    var yMin = center[1] - span, yMax = center[1] + span;
+    return [(x - xMin) / (xMax - xMin) * w, h - (y - yMin) / (yMax - yMin) * h];
+  }
+
+  function drawGrid(ctx, canvas, center, span) {
+    var w = canvas.width, h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+    var xMin = center[0] - span, xMax = center[0] + span;
+    var yMin = center[1] - span, yMax = center[1] + span;
+    var step = Math.ceil(span / 3), p, x, y;
+
+    ctx.strokeStyle = '#f1f5f9'; ctx.lineWidth = 1;
+    for (x = Math.floor(xMin); x <= xMax; x += step) {
+      p = toScreen(x, 0, canvas, center, span);
+      ctx.beginPath(); ctx.moveTo(p[0], 0); ctx.lineTo(p[0], h); ctx.stroke();
+    }
+    for (y = Math.floor(yMin); y <= yMax; y += step) {
+      p = toScreen(0, y, canvas, center, span);
+      ctx.beginPath(); ctx.moveTo(0, p[1]); ctx.lineTo(w, p[1]); ctx.stroke();
+    }
+
+    ctx.strokeStyle = '#cbd5e1'; ctx.fillStyle = '#64748b';
+    ctx.font = (10 * DPR) + 'px sans-serif';
+    ctx.lineWidth = 1.5 * DPR;
+    ctx.strokeRect(0, 0, w, h);
+    for (x = Math.floor(xMin); x <= xMax; x += step) {
+      p = toScreen(x, 0, canvas, center, span);
+      ctx.beginPath(); ctx.moveTo(p[0], h); ctx.lineTo(p[0], h - 5 * DPR); ctx.stroke();
+      ctx.fillText(x.toFixed(0), p[0] - 4 * DPR, h - 7 * DPR);
+    }
+    for (y = Math.floor(yMin); y <= yMax; y += step) {
+      p = toScreen(0, y, canvas, center, span);
+      ctx.beginPath(); ctx.moveTo(0, p[1]); ctx.lineTo(5 * DPR, p[1]); ctx.stroke();
+      ctx.fillText(y.toFixed(0), 8 * DPR, p[1] + 3 * DPR);
+    }
+  }
+
+  function drawEllipse(ctx, canvas, center, L, scale, color, span) {
+    if (isNaN(L[0][0]) || isNaN(L[1][0]) || isNaN(L[1][1])) return;
+    ctx.strokeStyle = color; ctx.lineWidth = 2.2 * DPR;
+    ctx.beginPath();
+    for (var i = 0; i <= 100; i++) {
+      var t = (i / 100) * 2 * Math.PI, u = Math.cos(t), v = Math.sin(t);
+      var x = center[0] + scale * (L[0][0] * u);
+      var y = center[1] + scale * (L[1][0] * u + L[1][1] * v);
+      var s = toScreen(x, y, canvas, center, span);
+      if (i === 0) ctx.moveTo(s[0], s[1]); else ctx.lineTo(s[0], s[1]);
+    }
+    ctx.stroke();
+  }
+
+  function drawWarped(ctx, canvas, pts, color, center, span) {
+    if (!pts || pts.length === 0) return;
+    ctx.save();
+    ctx.strokeStyle = color; ctx.lineWidth = 2 * DPR;
+    ctx.setLineDash([5 * DPR, 4 * DPR]);
+    ctx.beginPath();
+    pts.forEach(function (pt, i) {
+      if (isNaN(pt[0]) || isNaN(pt[1])) return;
+      var s = toScreen(pt[0], pt[1], canvas, center, span);
+      if (i === 0) ctx.moveTo(s[0], s[1]); else ctx.lineTo(s[0], s[1]);
+    });
+    ctx.closePath(); ctx.stroke(); ctx.restore();
+  }
+
+  function drawPoint(ctx, canvas, pt, color, label, center, span) {
+    if (isNaN(pt[0]) || isNaN(pt[1])) return;
+    var s = toScreen(pt[0], pt[1], canvas, center, span);
+    ctx.fillStyle = color;
+    ctx.beginPath(); ctx.arc(s[0], s[1], 5 * DPR, 0, 2 * Math.PI); ctx.fill();
+    if (label) {
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold ' + (11 * DPR) + 'px sans-serif';
+      ctx.fillText(label, s[0] + 7 * DPR, s[1] - 7 * DPR);
+    }
+  }
+
+  function renderMatrix(id, m) {
+    var f = function (v) { return isNaN(v) ? '<span style="color:#dc2626;font-weight:bold;">NaN</span>' : v.toFixed(2); };
+    $(id).innerHTML = '<span>' + f(m[0][0]) + '</span><span>' + f(m[0][1]) + '</span>' +
+                      '<span>' + f(m[1][0]) + '</span><span>' + f(m[1][1]) + '</span>';
+  }
+  function num(v, d) { return isNaN(v) ? 'NaN' : v.toFixed(d); }
+
+  /* ---------- Live Cholesky of P_{k+1}, step by step ---------- */
+  function f2(v) { return v.toFixed(2); }
+  function nan() { return '<span class="nan">NaN</span>'; }
+  function neg(v) { return '<span class="neg">' + f2(v) + '</span>'; }
+  function res(v) { return '<span class="res">' + f2(v) + '</span>'; }
+
+  function renderCholSteps(P) {
+    var p11 = P[0][0], p12 = P[0][1], p22 = P[1][1];
+    var ok1, ok2, ok3, rad, L11, L21, L22;
+    var n1a, n1b, n2a, n2b, n3a, n3b;
+
+    renderMatrix('c_P', P);
+
+    // Step 1: L11 = sqrt(p11)
+    ok1 = !isNaN(p11) && p11 >= 0;
+    if (ok1) {
+      L11 = Math.sqrt(p11);
+      n1a = '= &radic;' + f2(p11);
+      n1b = '= ' + res(L11);
+    } else {
+      n1a = '= &radic;' + (isNaN(p11) ? nan() : neg(p11));
+      n1b = '= ' + nan() + ' &larr; p<sub>11</sub> &lt; 0';
+    }
+
+    // Step 2: L21 = p12 / L11
+    ok2 = ok1 && L11 > 0;
+    if (ok2) {
+      L21 = p12 / L11;
+      n2a = '= ' + f2(p12) + ' / ' + f2(L11);
+      n2b = '= ' + res(L21);
+    } else {
+      n2a = '= ' + (isNaN(p12) ? nan() : f2(p12)) + ' / ' + (ok1 ? '0' : nan());
+      n2b = '= ' + nan();
+    }
+
+    // Step 3: L22 = sqrt(p22 - p12^2 / p11)
+    if (ok2) {
+      rad = p22 - (p12 * p12) / p11;
+      ok3 = rad >= 0;
+      n3a = '= &radic;(' + f2(p22) + ' &minus; ' + f2(p12) + '&sup2;/' + f2(p11) + ')';
+      if (ok3) {
+        L22 = Math.sqrt(rad);
+        n3b = '= &radic;' + f2(rad) + ' = ' + res(L22);
+      } else {
+        n3b = '= &radic;' + neg(rad) + ' = ' + nan() + ' &larr; radicand &lt; 0';
+      }
+    } else {
+      ok3 = false;
+      n3a = '= &radic;(' + (isNaN(p22) ? nan() : f2(p22)) + ' &minus; &hellip;)';
+      n3b = '= ' + nan();
+    }
+
+    $('n1a').innerHTML = n1a; $('n1b').innerHTML = n1b;
+    $('n2a').innerHTML = n2a; $('n2b').innerHTML = n2b;
+    $('n3a').innerHTML = n3a; $('n3b').innerHTML = n3b;
+
+    // Highlight the first failing step in red (steps after it are shown as NaN too)
+    $('cell1').classList.toggle('bad', !ok1);
+    $('cell2').classList.toggle('bad', ok1 && !ok2);
+    $('cell3').classList.toggle('bad', ok2 && !ok3);
+  }
+
+  function update() {
+    resizeCanvas();
+    var ukf = calculateUKF();
+
+    var showLY = $('toggle_LY').checked;
+    $('block_LY').style.display = showLY ? 'flex' : 'none';
+    $('legend_gamma_y').style.display = showLY ? 'flex' : 'none';
+
+    $('vec_mx').textContent = ukf.mu[0].toFixed(2);
+    $('vec_my').textContent = ukf.mu[1].toFixed(2);
+    $('vec_mYx').textContent = num(ukf.MY[0], 2);
+    $('vec_mYy').textContent = num(ukf.MY[1], 2);
+
+    $('val_lambda_math').textContent = num(ukf.lambda, 4);
+    $('val_gamma_math').textContent = num(ukf.gamma, 4);
+    $('w0_val').textContent = num(ukf.w0, 4);
+    $('wi_val').textContent = num(ukf.wi, 4);
+    $('w0c_val').textContent = num(ukf.w0c, 4);
+    $('w0c_val').style.color = ukf.w0c < 0 ? '#dc2626' : '';
+
+    $('instabilityAlert').classList.toggle('active', ukf.isIndefinite);
+
+    renderMatrix('mat_P', ukf.P); renderMatrix('mat_L', ukf.L);
+    renderMatrix('mat_PY', ukf.PY); renderMatrix('mat_LY', ukf.LY);
+    renderCholSteps(ukf.PY);
+
+    var spanX = Math.max(5, (isNaN(ukf.gamma) ? 1 : ukf.gamma) * Math.max(state.sx, state.sy) * 1.6);
+    var distY = isNaN(ukf.Y[1][0]) ? 5 : Math.hypot(ukf.Y[1][0] - ukf.MY[0], ukf.Y[1][1] - ukf.MY[1]);
+    var spanY = Math.max(6, distY * 1.8);
+
+    // Space A
+    drawGrid(ctxX, canvasX, ukf.mu, spanX);
+    drawEllipse(ctxX, canvasX, ukf.mu, ukf.L, 1.0, '#2563eb', spanX);
+    if (!isNaN(ukf.gamma)) drawEllipse(ctxX, canvasX, ukf.mu, ukf.L, ukf.gamma, '#16a34a', spanX);
+    ukf.S.forEach(function (pt, idx) {
+      drawPoint(ctxX, canvasX, pt, idx === 0 ? '#7c3aed' : '#16a34a', 'S_' + idx, ukf.mu, spanX);
+    });
+
+    // Space B
+    var centerY = isNaN(ukf.MY[0]) ? [0, 0] : ukf.MY;
+    drawGrid(ctxY, canvasY, centerY, spanY);
+    drawWarped(ctxY, canvasY, ukf.trueContourY, '#f87171', centerY, spanY);
+    drawPoint(ctxY, canvasY, ukf.trueMY, '#f87171', 'μ_true', centerY, spanY);
+    if (!ukf.isIndefinite) {
+      drawEllipse(ctxY, canvasY, ukf.MY, ukf.LY, 1.0, '#dc2626', spanY);
+      if (showLY) drawEllipse(ctxY, canvasY, ukf.MY, ukf.LY, ukf.gamma, '#ea580c', spanY);
+    }
+    ukf.Y.forEach(function (pt, idx) {
+      drawPoint(ctxY, canvasY, pt, '#ea580c', 'Y_' + idx, centerY, spanY);
+    });
+    drawPoint(ctxY, canvasY, centerY, '#dc2626', 'M_k+1', centerY, spanY);
+  }
+
+  window.addEventListener('resize', update);
+  window.addEventListener('load', function () { updateFunctions(); update(); });
+  update();
+})();
+</script>
+
+</body>
+</html>
