@@ -6,6 +6,11 @@
 <title>The four filters side by side</title>
 <link rel="stylesheet" href="slideui.css">
 <script src="slideui.js" defer></script>
+<style>
+.comparison-slide .body{display:flex;flex-direction:column;justify-content:center;align-items:stretch;gap:18px}
+.comparison-slide .body>.cmp{flex:0 0 auto;width:100%;margin:0}
+.comparison-slide .ukf-notation{flex:0 0 auto;width:100%;margin:0;font-size:19px;line-height:1.5;color:var(--muted);text-align:center}
+</style>
 </head>
 <body>
 
@@ -40,9 +45,9 @@
         <div class="cmp-row three" data-step="2">
           <span class="v">1st order</span><span class="v">3rd order</span><span class="v">3rd order</span></div>
         <div class="cmp-row three" data-step="3">
-          <span class="v">Q, R</span><span class="v">Q, R, κ</span><span class="v">Q, R</span></div>
+          <span class="v">Q, R</span><span class="v">Q, R, λ, c₀</span><span class="v">Q, R</span></div>
         <div class="cmp-row three" data-step="4">
-          <span class="v">yes</span><span class="v">not if κ &lt; 0</span><span class="v">yes</span></div>
+          <span class="v">yes</span><span class="v">not guaranteed</span><span class="v">yes</span></div>
       </div>
     </div>
   </div>

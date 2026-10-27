@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UKF or CKF?</title>
+<link rel="stylesheet" href="slideui.css">
+<script src="slideui.js" defer></script>
+</head>
+<body>
+
+<div class="slide-layout">
+
+<section class="slide build ukf-ckf-choice" data-steps="3">
+  <h1>UKF or CKF?</h1>
+  <div class="body">
+    <p style="font-size:27px;margin-bottom:20px">Why keep UKF? Tunable sampling can improve accuracy on a specific problem.</p>
+    <div class="cols">
+      <div class="panel" style="padding:22px 24px">
+        <h2 style="font-size:30px;margin:0 0 12px;color:var(--accent)">UKF: flexibility</h2>
+        <p style="font-size:25px;margin-bottom:12px"><b>2n + 1 points</b> in the standard scaled rule.</p>
+        <p style="font-size:24px;margin-bottom:12px">λ controls point spread and mean weights; c₀ corrects the central covariance weight.</p>
+        <p style="font-size:24px;margin:0">Tuning can reduce higher-order approximation errors and outperform the fixed CKF rule on some nonlinear problems.</p>
+      </div>
+      <div class="panel" data-step="2" style="padding:22px 24px">
+        <h2 style="font-size:30px;margin:0 0 12px;color:var(--accent2)">CKF: a fixed rule</h2>
+        <p style="font-size:25px;margin-bottom:12px"><b>2n points</b>, each weight = 1/(2n).</p>
+        <p style="font-size:24px;margin-bottom:12px">Fixed symmetric pairs; positive equal weights.</p>
+        <p style="font-size:24px;margin:0">A simpler sampling choice with no spread tuning. Positive weights alone do not guarantee the best accuracy.</p>
+      </div>
+    </div>
+    <div data-step="3">
+      <div style="text-align:center;margin:18px 0 14px">
+        <p style="font-size:25px;font-weight:700;color:var(--accent);margin-bottom:6px">UKF offers flexibility. CKF offers a fixed rule.</p>
+        <p style="font-size:21px;color:var(--muted);margin:0">Strong nonlinearity can make tuning matter; it does not guarantee a UKF advantage.</p>
+      </div>
+      <div class="choice-conclusion">
+        <div class="panel choice-similarity" style="padding:20px 24px">
+          <h3 style="font-size:27px;color:var(--fg);margin:0 0 12px">Why can they look similar?</h3>
+          <p style="font-size:20px;line-height:1.38;color:var(--muted);margin:0">Both transform representative points through the nonlinear model.<br><br>With <b style="color:var(--fg)">λ = 0, c₀ = 0</b>, the standard UKF has the same effective points and weights as CKF. Its central point has zero weight in both mean and covariance. Our benchmark uses λ = 1 and c₀ = 2.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<!-- Sources: Julier, The Scaled Unscented Transformation (2002), https://www.cs.unc.edu/~welch/kalman/media/pdf/ACC02-IEEE1357.PDF ; Sun et al. (2023), https://doi.org/10.1029/2022WR033580. Tuning advantage is problem dependent; no universal dimension threshold is claimed. -->
+</body>
+</html>

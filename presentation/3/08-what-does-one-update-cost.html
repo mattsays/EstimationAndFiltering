@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What does one update cost?</title>
+<link rel="stylesheet" href="slideui.css">
+<script src="slideui.js" defer></script>
+</head>
+<body>
+
+<div class="slide-layout">
+
+<section class="slide build tradeoff-slide" data-steps="2">
+<h1>What does one update cost?</h1>
+<div class="body">
+<svg viewBox="0 0 1100 340" style="width:100%;max-width:1100px" role="img" aria-label="Seconds per track for EKF, CKF and UKF on the ship benchmark: EKF 0.067 seconds, CKF 0.142, UKF 0.152.">
+<g font-family="var(--font)" font-size="19" font-weight="600" fill="var(--fg)">
+<text x="0" y="22">Seconds per track (ship benchmark, 800 scans)</text>
+</g>
+<g stroke="var(--line)">
+<path d="M140.0 50 V305"/>
+<path d="M411.9 50 V305"/>
+<path d="M683.8 50 V305"/>
+<path d="M955.6 50 V305"/>
+</g>
+<g font-family="var(--font)" font-size="16" fill="var(--muted)" text-anchor="middle">
+<text x="140.0" y="327">0</text>
+<text x="411.9" y="327">0.05</text>
+<text x="683.8" y="327">0.1</text>
+<text x="955.6" y="327">0.15</text>
+</g>
+<g font-family="var(--font)">
+<text x="126" y="88" text-anchor="end" font-size="30" font-weight="650" fill="var(--fg)">EKF</text>
+<text x="126" y="109" text-anchor="end" font-size="15" fill="var(--muted)">84 µs · 1.0×</text>
+<rect class="cost-bar" x="140" y="67.0" width="363.2" height="36" rx="6" fill="#8b6ab1" style="animation-delay:0.10s"/>
+<text class="cost-value" x="515.2" y="93" font-size="22" font-weight="600" fill="var(--fg)" style="animation-delay:0.75s">0.067 s</text>
+</g>
+<g font-family="var(--font)">
+<text x="126" y="183" text-anchor="end" font-size="30" font-weight="650" fill="var(--fg)">CKF</text>
+<text x="126" y="204" text-anchor="end" font-size="15" fill="var(--muted)">178 µs · 2.1×</text>
+<rect class="cost-bar" x="140" y="162.0" width="774.8" height="36" rx="6" fill="var(--accent2)" style="animation-delay:0.25s"/>
+<text class="cost-value" x="926.8" y="188" font-size="22" font-weight="600" fill="var(--fg)" style="animation-delay:0.90s">0.142 s</text>
+</g>
+<g font-family="var(--font)">
+<text x="126" y="278" text-anchor="end" font-size="30" font-weight="650" fill="var(--fg)">UKF</text>
+<text x="126" y="299" text-anchor="end" font-size="15" fill="var(--muted)">190 µs · 2.3×</text>
+<rect class="cost-bar" x="140" y="257.0" width="826.0" height="36" rx="6" fill="var(--accent)" style="animation-delay:0.40s"/>
+<text class="cost-value" x="978.0" y="283" font-size="22" font-weight="600" fill="var(--fg)" style="animation-delay:1.05s">0.152 s</text>
+</g>
+</svg>
+<div class="takeaway" data-step="2"><b>Cost is a property of the rule and of its implementation.</b> The sigma-point filters pay for several evaluations per update, and how much depends on the machine. Measure before choosing.</div>
+</div>
+</section>
+
+</div>
+
+</body>
+</html>

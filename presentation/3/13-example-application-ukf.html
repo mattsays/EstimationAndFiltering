@@ -66,7 +66,7 @@
           <text x="546" y="66" font-size="21" fill="var(--accent2)">11 propagated points</text>
         </g>
         <g data-step="4">
-          <text x="40" y="48" font-size="23" font-weight="650" fill="var(--accent)">Point spread and weights: α, β, κ</text>
+          <text x="40" y="48" font-size="23" font-weight="650" fill="var(--accent)">Point spread: λ · covariance correction: c₀</text>
         </g>
         <g class="ukf-target" opacity="0">
           <use href="#ukf-rocket"/>
@@ -111,7 +111,7 @@
       <span class="step-num">4</span>
       <div>
         <p class="step-title">Why UKF?</p>
-        <p class="step-note">No model Jacobians. Tune the point spread and weights with α, β and κ. CKF handles the same task with a fixed rule.</p>
+        <p class="step-note">No model Jacobians. λ sets point spread and mean weights; c₀ adjusts the central covariance weight. CKF handles the same task with a fixed rule.</p>
       </div>
     </div>
   </div>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Does it buy accuracy?</title>
+<link rel="stylesheet" href="slideui.css">
+<script src="slideui.js" defer></script>
+<style>
+.acc-slide{padding:22px 16px 8px}
+.acc-slide h1{font-size:40px;margin:0 0 8px 18px}
+.acc-slide .body{justify-content:flex-start;gap:4px}
+.acc-slide .acc-panels{gap:2px;flex:1;min-height:0;align-items:center}
+.acc-slide .acc-panels>svg{flex:1 1 0;width:50%;max-width:none!important;max-height:none;height:auto}
+.acc-slide .acc-legend{font-size:21px;gap:30px;margin:0 0 4px}
+.acc-slide .acc-legend i{width:28px;height:4px}
+/* Build step: quantify the Velocity gap against the EKF baseline. */
+.acc-delta{display:flex;align-items:center;justify-content:center;gap:22px;min-height:46px;
+  margin:2px auto 0;padding:8px 24px;border:1px solid var(--cardline);border-radius:14px;
+  background:var(--card);color:var(--muted);font-size:20px;line-height:1.2}
+.acc-delta-label{font-weight:650;color:var(--fg)}
+.acc-delta-value{display:inline-flex;align-items:center;gap:8px;font-variant-numeric:tabular-nums}
+.acc-delta-value i{display:inline-block;width:22px;height:3px;border-radius:2px}
+.acc-delta-value.ukf i{background:var(--accent)}
+.acc-delta-value.ckf i{background:var(--accent2)}
+.acc-delta-value b{font-size:23px;font-weight:750}
+.acc-delta-value.ukf b{color:var(--accent)}
+.acc-delta-value.ckf b{color:var(--accent2)}
+</style>
+</head>
+<body>
+
+<div class="slide-layout">
+
+<section class="slide acc-slide build" data-steps="2">
+<h1>Does it buy accuracy?</h1>
+<div class="body">
+<div class="acc-panels">
+<!-- ACC_PANELS -->
+<svg viewBox="0 0 580 440" style="width:100%;max-width:none" role="img" aria-label="Position RMSE (m) against radar bearing noise, from 0.5 to 30 degrees, for EKF, UKF and CKF.">
+<text x="100" y="22" font-family="var(--font)" font-size="25" font-weight="650" fill="var(--fg)">Position</text>
+<text transform="translate(26 207.0) rotate(-90)" font-family="var(--font)" font-size="18" fill="var(--muted)" text-anchor="middle">RMSE (m)</text>
+<g stroke="var(--line)" stroke-width="1">
+<path d="M100 360.0 H560"/>
+<path d="M100 283.5 H560"/>
+<path d="M100 207.0 H560"/>
+<path d="M100 130.5 H560"/>
+<path d="M100 54.0 H560"/>
+</g>
+<g font-family="var(--font)" font-size="18" fill="var(--muted)" text-anchor="end">
+<text x="91" y="364.0">0</text>
+<text x="91" y="287.5">0.1</text>
+<text x="91" y="211.0">0.2</text>
+<text x="91" y="134.5">0.3</text>
+<text x="91" y="58.0">0.4</text>
+</g>
+<g font-family="var(--font)" font-size="17" fill="var(--muted)" text-anchor="middle">
+<text x="100.0" y="380">0.5&#176;</text>
+<text x="255.8" y="380">2&#176;</text>
+<text x="358.7" y="380">5&#176;</text>
+<text x="436.6" y="380">10&#176;</text>
+<text x="514.4" y="380">20&#176;</text>
+<text x="560.0" y="380">30&#176;</text>
+</g>
+<text x="330.0" y="408" font-family="var(--font)" font-size="18" fill="var(--muted)" text-anchor="middle">radar bearing noise &#963;&#952; (deg)</text>
+<polyline points="100.0,342.9 255.8,320.9 358.7,290.2 436.6,247.7 514.4,163.9 560.0,78.9" fill="none" stroke="#8b6ab1" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="100.0,342.9 255.8,320.9 358.7,290.2 436.6,248.8 514.4,172.5 560.0,104.6" fill="none" stroke="var(--accent)" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="100.0,342.9 255.8,320.8 358.7,290.1 436.6,247.7 514.4,175.3 560.0,100.7" fill="none" stroke="var(--accent2)" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="100.0" cy="342.9" r="4.5" fill="#8b6ab1" stroke="var(--bg)" stroke-width="1.2"/>
+<circle cx="255.8" cy="320.9" r="4.5" fill="#8b6ab1" stroke="var(--bg)" stroke-width="1.2"/>
+<circle cx="358.7" cy="290.2" r="4.5" fill="#8b6ab1" stroke="var(--bg)" stroke-width="1.2"/>
+<circle cx="436.6" cy="247.7" r="4.5" fill="#8b6ab1" stroke="var(--bg)" stroke-width="1.2"/>
+<circle cx="514.4" cy="163.9" r="4.5" fill="#8b6ab1" stroke="var(--bg)" stroke-width="1.2"/>
+<circle cx="560.0" cy="78.9" r="4.5" fill="#8b6ab1" stroke="var(--bg)" stroke-width="1.2"/>
+<circle cx="100.0" cy="342.9" r="4.5" fill="var(--accent)" stroke="var(--bg)" stroke-width="1.2"/>
+<circle cx="255.8" cy="320.9" r="4.5" fill="var(--accent)" stroke="var(--bg)" stroke-width="1.2"/>
+<circle cx="358.7" cy="290.2" r="4.5" fill="var(--accent)" stroke="var(--bg)" stroke-width="1.2"/>
+<circle cx="436.6" cy="248.8" r="4.5" fill="var(--accent)" stroke="var(--bg)" stroke-width="1.2"/>
+<circle cx="514.4" cy="172.5" r="4.5" fill="var(--accent)" stroke="var(--bg)" stroke-width="1.2"/>
+<circle cx="560.0" cy="104.6" r="4.5" fill="var(--accent)" stroke="var(--bg)" stroke-width="1.2"/>
+<circle cx="100.0" cy="342.9" r="4.5" fill="var(--accent2)" stroke="var(--bg)" stroke-width="1.2"/>
+<circle cx="255.8" cy="320.8" r="4.5" fill="var(--accent2)" stroke="var(--bg)" stroke-width="1.2"/>
+<circle cx="358.7" cy="290.1" r="4.5" fill="var(--accent2)" stroke="var(--bg)" stroke-width="1.2"/>
+<circle cx="436.6" cy="247.7" r="4.5" fill="var(--accent2)" stroke="var(--bg)" stroke-width="1.2"/>
+<circle cx="514.4" cy="175.3" r="4.5" fill="var(--accent2)" stroke="var(--bg)" stroke-width="1.2"/>
+<circle cx="560.0" cy="100.7" r="4.5" fill="var(--accent2)" stroke="var(--bg)" stroke-width="1.2"/>
+<text x="109.0" y="332.9" font-family="var(--font)" font-size="17" fill="var(--muted)">all three</text>
+</svg>
+<div class="acc-divider"></div>
+<svg viewBox="0 0 580 440" style="width:100%;max-width:none" role="img" aria-label="Velocity RMSE (m/s) against radar bearing noise, from 0.5 to 30 degrees, for EKF, UKF and CKF.">
+<text x="100" y="22" font-family="var(--font)" font-size="25" font-weight="650" fill="var(--fg)">Velocity</text>
+<text transform="translate(26 207.0) rotate(-90)" font-family="var(--font)" font-size="18" fill="var(--muted)" text-anchor="middle">RMSE (m/s)</text>
+<g stroke="var(--line)" stroke-width="1">
+<path d="M100 332.2 H560"/>
+<path d="M100 248.7 H560"/>
+<path d="M100 165.3 H560"/>
+<path d="M100 81.8 H560"/>
+</g>
+<g font-family="var(--font)" font-size="18" fill="var(--muted)" text-anchor="end">
+<text x="91" y="336.2">0.15</text>
+<text x="91" y="252.7">0.18</text>
+<text x="91" y="169.3">0.21</text>
+<text x="91" y="85.8">0.24</text>
+</g>
+<g font-family="var(--font)" font-size="17" fill="var(--muted)" text-anchor="middle">
+<text x="100.0" y="380">0.5&#176;</text>
+<text x="255.8" y="380">2&#176;</text>
+<text x="358.7" y="380">5&#176;</text>
+<text x="436.6" y="380">10&#176;</text>
+<text x="514.4" y="380">20&#176;</text>
+<text x="560.0" y="380">30&#176;</text>
+</g>
+<text x="330.0" y="408" font-family="var(--font)" font-size="18" fill="var(--muted)" text-anchor="middle">radar bearing noise &#963;&#952; (deg)</text>
+<polyline points="100.0,243.7 255.8,231.5 358.7,212.8 436.6,188.1 514.4,140.2 560.0,91.6" fill="none" stroke="#8b6ab1" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="100.0,281.0 255.8,270.7 358.7,252.1 436.6,223.1 514.4,160.3 560.0,99.6" fill="none" stroke="var(--accent)" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="100.0,298.8 255.8,284.1 358.7,265.1 436.6,237.9 514.4,186.7 560.0,128.8" fill="none" stroke="var(--accent2)" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="100.0" cy="243.7" r="4.5" fill="#8b6ab1" stroke="var(--bg)" stroke-width="1.2"/>
+<circle cx="255.8" cy="231.5" r="4.5" fill="#8b6ab1" stroke="var(--bg)" stroke-width="1.2"/>
+<circle cx="358.7" cy="212.8" r="4.5" fill="#8b6ab1" stroke="var(--bg)" stroke-width="1.2"/>
+<circle cx="436.6" cy="188.1" r="4.5" fill="#8b6ab1" stroke="var(--bg)" stroke-width="1.2"/>
+<circle cx="514.4" cy="140.2" r="4.5" fill="#8b6ab1" stroke="var(--bg)" stroke-width="1.2"/>
+<circle cx="560.0" cy="91.6" r="4.5" fill="#8b6ab1" stroke="var(--bg)" stroke-width="1.2"/>
+<circle cx="100.0" cy="281.0" r="4.5" fill="var(--accent)" stroke="var(--bg)" stroke-width="1.2"/>
+<circle cx="255.8" cy="270.7" r="4.5" fill="var(--accent)" stroke="var(--bg)" stroke-width="1.2"/>
+<circle cx="358.7" cy="252.1" r="4.5" fill="var(--accent)" stroke="var(--bg)" stroke-width="1.2"/>
+<circle cx="436.6" cy="223.1" r="4.5" fill="var(--accent)" stroke="var(--bg)" stroke-width="1.2"/>
+<circle cx="514.4" cy="160.3" r="4.5" fill="var(--accent)" stroke="var(--bg)" stroke-width="1.2"/>
+<circle cx="560.0" cy="99.6" r="4.5" fill="var(--accent)" stroke="var(--bg)" stroke-width="1.2"/>
+<circle cx="100.0" cy="298.8" r="4.5" fill="var(--accent2)" stroke="var(--bg)" stroke-width="1.2"/>
+<circle cx="255.8" cy="284.1" r="4.5" fill="var(--accent2)" stroke="var(--bg)" stroke-width="1.2"/>
+<circle cx="358.7" cy="265.1" r="4.5" fill="var(--accent2)" stroke="var(--bg)" stroke-width="1.2"/>
+<circle cx="436.6" cy="237.9" r="4.5" fill="var(--accent2)" stroke="var(--bg)" stroke-width="1.2"/>
+<circle cx="514.4" cy="186.7" r="4.5" fill="var(--accent2)" stroke="var(--bg)" stroke-width="1.2"/>
+<circle cx="560.0" cy="128.8" r="4.5" fill="var(--accent2)" stroke="var(--bg)" stroke-width="1.2"/>
+</svg>
+<!-- /ACC_PANELS -->
+</div>
+<div class="acc-legend">
+<span><i style="background:#8b6ab1"></i>EKF</span>
+<span><i style="background:var(--accent)"></i>UKF</span>
+<span><i style="background:var(--accent2)"></i>CKF</span>
+</div>
+<!-- Velocity deltas at 0.5 deg, EKF baseline, computed from
+     experiments/ship_tracking/accuracy-sweep.json:
+     UKF (0.1684 - 0.1818) / 0.1818 = -7.4%; CKF (0.1620 - 0.1818) / 0.1818 = -10.9%. -->
+<div class="acc-delta" data-step="2">
+<span class="acc-delta-label">Velocity RMSE vs EKF at 0.5&deg;</span>
+<span class="acc-delta-value ukf"><i></i>UKF <b>&minus;7.4%</b></span>
+<span class="acc-delta-value ckf"><i></i>CKF <b>&minus;10.9%</b></span>
+</div>
+</div>
+</section>
+
+</div>
+
+</body>
+</html>

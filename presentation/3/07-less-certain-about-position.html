@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Less certain about position</title>
+<link rel="stylesheet" href="slideui.css">
+<script src="slideui.js" defer></script>
+</head>
+<body>
+
+<div class="slide-layout">
+
+<section class="slide build experiment-slide" data-steps="4">
+<h1>Less precise bearing. Same ship trajectories.</h1>
+<div class="body">
+<p class="lead">How do the filters behave as the radar direction measurement becomes noisier?</p>
+<div class="cols uncertainty-section" data-step="2">
+<div class="panel"><h3>What we vary: bearing noise</h3><p>Standard deviation of the measured direction:</p><p class="experiment-value">0.5° → 30°</p><p>Six levels: 0.5°, 2°, 5°, 10°, 20°, 30°.</p></div>
+<div class="panel"><h3>What stays fixed</h3><p><b>Range noise: 0.01 m.</b><br>Same ship motion, process noise and initial filter covariance.</p><p style="margin-top:14px"><b>Initial covariance: P₀ = 10 I₄.</b><br>Initial uncertainty is not the variable in this experiment.</p></div>
+</div>
+<div data-step="3" class="cols methodology-section">
+<div class="panel"><h3>Paired comparison</h3><p>30 trajectories × 800 radar scans.<br>Reuse trajectories and standardized measurement noise across bearing-noise levels.</p></div>
+<div class="panel"><h3>Position and velocity error</h3><p>Compute RMSE across trajectories at each scan, then average over scans 301–800.</p></div>
+</div>
+<div data-step="4" class="experiment-parameters">
+<div class="panel"><h3>Radar interval</h3><p>0.05 s · 5 prediction steps</p></div>
+<div class="panel"><h3>UKF</h3><p>λ = 1 · c₀ = 2<br><span style="font-size:18px">α = 1, β = 2; λ = κ</span></p></div>
+<div class="panel"><h3>CKF</h3><p>8 points · equal weights</p></div>
+</div>
+</div></section>
+
+</div>
+
+</body>
+</html>

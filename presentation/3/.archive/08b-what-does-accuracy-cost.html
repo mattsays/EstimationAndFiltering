@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What does accuracy cost?</title>
+<link rel="stylesheet" href="slideui.css">
+<script src="slideui.js" defer></script>
+</head>
+<body>
+
+<div class="slide-layout">
+
+<section class="slide build tradeoff-slide" data-steps="3">
+<h1>What does accuracy cost?</h1>
+<div class="body">
+<p class="tradeoff-lead">Cost is one number per update. Accuracy is not: it changes with the scenario.</p>
+<svg viewBox="0 0 1120 292" style="width:100%;max-width:1100px" role="img" aria-label="Median time per prediction and update for the four filters, next to position RMSE at a 100 metre and at a 1,200 metre initial position uncertainty. EKF 17.2 microseconds, converted KF 19.0, CKF 34.7, UKF 41.3. At 100 metres EKF 26.4, UKF 26.3, CKF 26.3. At 1,200 metres EKF 696, UKF 390, CKF 336.">
+<g font-family="var(--font)" font-size="17" fill="var(--muted)">
+<text x="96" y="20">Time per predict + update (μs)</text>
+<text x="530" y="20" text-anchor="end" font-size="15">vs EKF</text>
+</g>
+<g stroke="var(--line)">
+<path d="M96.0 34 V232"/>
+<path d="M174.2 34 V232"/>
+<path d="M252.4 34 V232"/>
+<path d="M330.7 34 V232"/>
+<path d="M408.9 34 V232"/>
+</g>
+<g font-family="var(--font)" font-size="15" fill="var(--muted)" text-anchor="middle">
+<text x="96.0" y="244">0</text>
+<text x="174.2" y="244">10</text>
+<text x="252.4" y="244">20</text>
+<text x="330.7" y="244">30</text>
+<text x="408.9" y="244">40</text>
+</g>
+<g font-family="var(--font)">
+<text x="88" y="56" text-anchor="end" font-size="22" font-weight="650" fill="var(--fg)">EKF</text>
+<text x="88" y="73" text-anchor="end" font-size="13" fill="var(--muted)">1 evaluation</text>
+<rect x="96" y="50.0" width="134.7" height="16" rx="4" fill="#8b6ab1"/>
+<text x="237.7" y="64" font-size="18" font-weight="600" fill="var(--fg)">17.2</text>
+<text x="530" y="63" text-anchor="end" font-size="15" fill="var(--muted)">1.0×</text>
+</g>
+<g font-family="var(--font)">
+<text x="88" y="108" text-anchor="end" font-size="22" font-weight="650" fill="var(--fg)">KF*</text>
+<text x="88" y="125" text-anchor="end" font-size="13" fill="var(--muted)">converted</text>
+<rect x="96" y="102.0" width="148.4" height="16" rx="4" fill="#7d8794"/>
+<text x="251.4" y="116" font-size="18" font-weight="600" fill="var(--fg)">19.0</text>
+<text x="530" y="115" text-anchor="end" font-size="15" fill="var(--muted)">1.1×</text>
+</g>
+<g font-family="var(--font)">
+<text x="88" y="160" text-anchor="end" font-size="22" font-weight="650" fill="var(--fg)">CKF</text>
+<text x="88" y="177" text-anchor="end" font-size="13" fill="var(--muted)">8 points</text>
+<rect x="96" y="154.0" width="271.1" height="16" rx="4" fill="var(--accent2)"/>
+<text x="374.1" y="168" font-size="18" font-weight="600" fill="var(--fg)">34.7</text>
+<text x="530" y="167" text-anchor="end" font-size="15" fill="var(--muted)">2.0×</text>
+</g>
+<g font-family="var(--font)">
+<text x="88" y="212" text-anchor="end" font-size="22" font-weight="650" fill="var(--fg)">UKF</text>
+<text x="88" y="229" text-anchor="end" font-size="13" fill="var(--muted)">9 points</text>
+<rect x="96" y="206.0" width="322.7" height="16" rx="4" fill="var(--accent)"/>
+<text x="425.7" y="220" font-size="18" font-weight="600" fill="var(--fg)">41.3</text>
+<text x="530" y="219" text-anchor="end" font-size="15" fill="var(--muted)">2.4×</text>
+</g>
+<path d="M560 6 V286" stroke="var(--line)"/>
+<g font-family="var(--font)" font-size="17" fill="var(--muted)">
+<text x="585" y="20">Position RMSE (m) by initial uncertainty</text>
+<text x="585" y="38" font-size="13">same uncertainty sweep as the previous slide</text>
+</g>
+<g font-family="var(--font)">
+<text x="585" y="64" font-size="15" font-weight="600" fill="var(--fg)">prior 100 m: all three within 0.1 m</text>
+</g>
+<g stroke="var(--line)">
+<path d="M641.0 76 V148"/>
+<path d="M831.0 76 V148"/>
+<path d="M1021.0 76 V148"/>
+</g>
+<g font-family="var(--font)" font-size="13" fill="var(--muted)" text-anchor="middle">
+<text x="641.0" y="158">0</text>
+<text x="831.0" y="158">20</text>
+<text x="1021.0" y="158">40</text>
+</g>
+<g font-family="var(--font)">
+<text x="633" y="89" text-anchor="end" font-size="14" fill="var(--muted)">EKF</text>
+<rect x="641" y="76.0" width="251.0" height="16" rx="4" fill="#8b6ab1"/>
+<text x="898.0" y="89" font-size="15" font-weight="600" fill="var(--fg)">26.4</text>
+</g>
+<g font-family="var(--font)">
+<text x="633" y="117" text-anchor="end" font-size="14" fill="var(--muted)">UKF</text>
+<rect x="641" y="104.0" width="250.1" height="16" rx="4" fill="var(--accent)"/>
+<text x="897.1" y="117" font-size="15" font-weight="600" fill="var(--fg)">26.3</text>
+</g>
+<g font-family="var(--font)">
+<text x="633" y="145" text-anchor="end" font-size="14" fill="var(--muted)">CKF</text>
+<rect x="641" y="132.0" width="250.2" height="16" rx="4" fill="var(--accent2)"/>
+<text x="897.2" y="145" font-size="15" font-weight="600" fill="var(--fg)">26.3</text>
+</g>
+<g font-family="var(--font)">
+<text x="585" y="186" font-size="15" font-weight="600" fill="var(--fg)">prior 1,200 m: EKF at 2.1× the CKF</text>
+</g>
+<g stroke="var(--line)">
+<path d="M641.0 198 V270"/>
+<path d="M831.0 198 V270"/>
+<path d="M1021.0 198 V270"/>
+</g>
+<g font-family="var(--font)" font-size="13" fill="var(--muted)" text-anchor="middle">
+<text x="641.0" y="280">0</text>
+<text x="831.0" y="280">350</text>
+<text x="1021.0" y="280">700</text>
+</g>
+<g font-family="var(--font)">
+<text x="633" y="211" text-anchor="end" font-size="14" fill="var(--muted)">EKF</text>
+<rect x="641" y="198.0" width="378.0" height="16" rx="4" fill="#8b6ab1"/>
+<text x="1025.0" y="211" font-size="15" font-weight="600" fill="var(--fg)">696.2</text>
+</g>
+<g font-family="var(--font)">
+<text x="633" y="239" text-anchor="end" font-size="14" fill="var(--muted)">UKF</text>
+<rect x="641" y="226.0" width="211.9" height="16" rx="4" fill="var(--accent)"/>
+<text x="858.9" y="239" font-size="15" font-weight="600" fill="var(--fg)">390.3</text>
+</g>
+<g font-family="var(--font)">
+<text x="633" y="267" text-anchor="end" font-size="14" fill="var(--muted)">CKF</text>
+<rect x="641" y="254.0" width="182.6" height="16" rx="4" fill="var(--accent2)"/>
+<text x="829.6" y="267" font-size="15" font-weight="600" fill="var(--fg)">336.4</text>
+</g>
+</svg>
+<p class="tradeoff-note" data-step="2">Cost tracks the number of evaluations of the radar model: <b>EKF 1, CKF 8, UKF 9</b>. The CKF skips the UKF central point, so it is the cheaper of the two.</p>
+<div class="takeaway" data-step="3"><b>Cost is a property of the rule; accuracy is a property of the regime.</b> At 100 m the three nonlinear filters tie, at 1,200 m the EKF error is twice the CKF. Rank filters per regime, never on one pooled number.</div>
+</div>
+</section>
+
+</div>
+
+</body>
+</html>

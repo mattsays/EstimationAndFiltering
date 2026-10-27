@@ -285,6 +285,30 @@
 .cost-slide .body>p{text-align:center;margin:0!important}
 .cost-slide .takeaway{text-align:center;margin-top:0!important}
 .cost-slide .body>svg:active{cursor:grabbing}
+/* S3: cost of accuracy, one row per filter: time bar on the left, RMSE dot on the right */
+.tradeoff-slide h1{font-size:44px;margin-bottom:8px}
+.tradeoff-slide .body{display:flex;flex-direction:column;justify-content:center;gap:14px}
+.tradeoff-slide .tradeoff-lead{font-size:20px;line-height:1.3;color:var(--muted);text-align:center;margin:0}
+.tradeoff-slide .body>svg{width:100%;max-width:1100px;max-height:none;height:auto;display:block;margin:0 auto}
+.tradeoff-slide .tradeoff-note{font-size:17px;line-height:1.35;color:var(--muted);text-align:center;margin:0}
+.tradeoff-slide .tradeoff-note b{color:var(--fg)}
+.tradeoff-slide .takeaway{font-size:22px;line-height:1.32;padding:13px 22px;margin:2px 0 0}
+/* S3: cost only, measured on the thesis ship benchmark */
+@keyframes cost-bar-grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes cost-value-in{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:translateX(0)}}
+.tradeoff-slide .cost-bar{transform-box:fill-box;transform-origin:left center;animation:cost-bar-grow .9s cubic-bezier(.2,.85,.3,1) both}
+.tradeoff-slide .cost-value{animation:cost-value-in .4s ease-out both}
+@media (prefers-reduced-motion: reduce){.tradeoff-slide .cost-bar,.tradeoff-slide .cost-value{animation:none}}
+/* S3: accuracy of the four filters as the radar bearing noise grows */
+.acc-slide h1{font-size:44px;margin-bottom:8px}
+.acc-slide .body{display:flex;flex-direction:column;justify-content:center;gap:8px}
+.acc-slide .acc-lead{font-size:20px;line-height:1.3;color:var(--muted);text-align:center;margin:0}
+.acc-panels{display:flex;align-items:center;justify-content:center;gap:14px}
+.acc-panels>svg{flex:0 1 580px;min-width:0}
+.acc-divider{flex:0 0 1px;align-self:stretch;background:var(--line);margin:12px 0}
+.acc-legend{display:flex;justify-content:center;flex-wrap:wrap;gap:8px 24px;font-size:14px;color:var(--muted);margin:0}
+.acc-legend span{display:flex;align-items:center;gap:7px}
+.acc-legend i{display:inline-block;width:18px;height:3px;border-radius:2px}
 .experiment-slide .body{display:flex;flex-direction:column;justify-content:center;gap:26px}
 .experiment-slide .panel{padding:26px}
 .experiment-slide .panel h3{font-size:25px;color:var(--accent);margin-bottom:18px}

@@ -6,32 +6,41 @@
   <link rel="stylesheet" href="slideui.css">
   <script src="slideui.js" defer></script>
   <style>
-    /* Same agenda as module 1, with the state of each block made visible. */
-    .agenda-list { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 14px; padding-bottom: 6px; }
-    .part { display: flex; align-items: center; gap: 28px; padding: 10px 0 10px 24px; border-left: 6px solid var(--tone); border-radius: 0 14px 14px 0; }
+    /* Agenda status: green small marker for done/current, purple bar for upcoming. */
+    .agenda-list { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 14px; padding-bottom: 4px; }
+    .part { position: relative; display: flex; align-items: center; gap: 26px; padding: 12px 0 12px 26px; border-radius: 0 14px 14px 0; }
+    .part::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 7px; border-radius: 999px; background: #8b5cf6; }
+    .part.done::before, .part.current::before { top: 50%; bottom: auto; height: 30px; transform: translateY(-50%); background: #22c55e; }
     .part-who { flex: 0 0 180px; }
-    .part-tag { margin: 0 0 4px; font-size: .72rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--tone); }
-    .part-name { margin: 0; font-size: 1.35rem; font-weight: 700; color: #0f172a; }
+    .part-tag { margin: 0 0 4px; font-size: 13px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #7c3aed; }
+    .part-name { margin: 0; font-size: 22px; font-weight: 700; color: #11151b; }
     .part-topics { flex: 1; display: flex; flex-direction: column; gap: 8px; }
-    .part-card { margin: 0; padding: 10px 18px; border-radius: 12px; background: var(--tint); border: 1px solid var(--edge); }
-    .part-card b { display: block; margin-bottom: 2px; font-size: 1.1rem; font-weight: 700; color: var(--ink); }
-    .part-card span { display: block; font-size: .95rem; color: #64748b; }
-    .part-state { flex: 0 0 88px; text-align: right; padding-right: 14px; }
-    .state-pill { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: .66rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-    /* Covered: green edge and check, content still readable. */
-    .part.done { border-left-color: #22c55e; background: #f8fafc; }
+    .part-card { margin: 0; padding: 10px 18px; border-radius: 12px; background: #fff; border: 1px solid #e9d5ff; }
+    .part-card b { display: block; margin-bottom: 2px; font-size: 19px; font-weight: 700; color: #6d28d9; }
+    .part-card span { display: block; font-size: 17px; line-height: 1.3; color: #6b7280; }
+    .part-state { flex: 0 0 88px; text-align: right; padding-right: 12px; }
+    .state-pill { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .part.done { background: #f8fafc; }
     .part.done .part-tag { color: #16a34a; }
+    .part.done .part-name { color: #64748b; }
     .part.done .part-card { background: #fff; border-color: #e5e7eb; }
-    .part.done .part-card b { color: #475569; }
+    .part.done .part-card b { color: #64748b; }
     .part.done .part-card span { color: #94a3b8; }
     .part.done .state-pill { background: #dcfce7; color: #15803d; }
-    /* Current: tinted row, coloured edge. */
-    .part.current { background: var(--tint); }
-    .part.current .part-card { background: #fff; }
-    .part.current .state-pill { background: #fff; color: var(--ink); border: 1px solid var(--edge); }
-    /* Still to come: faded. */
-    .part.next { border-left-color: #cbd5e1; opacity: .42; }
-    .part.next .state-pill { background: #eef2f7; color: #64748b; }
+    .part.current { background: #f0fdf4; }
+    .part.current .part-tag { color: #15803d; }
+    .part.current .part-name { color: #14532d; }
+    .part.current .part-card { background: #fff; border-color: #bbf7d0; }
+    .part.current .part-card b { color: #166534; }
+    .part.current .part-card span { color: #64748b; }
+    .part.current .state-pill { background: #15803d; color: #fff; }
+    .part.next { background: #faf5ff; }
+    .part.next .part-tag { color: #7c3aed; }
+    .part.next .part-name { color: #4c1d95; }
+    .part.next .part-card { background: #fff; border-color: #e9d5ff; }
+    .part.next .part-card b { color: #6d28d9; }
+    .part.next .part-card span { color: #6b7280; }
+    .part.next .state-pill { background: #ede9fe; color: #6d28d9; border: 1px solid #ddd6fe; }
   </style>
 </head>
 <body>
@@ -42,7 +51,7 @@
   <div class="agenda-list">
 
     <!-- PART 1: ALBERTO PINI - covered in the first block -->
-    <div class="part done" style="--tone:#3b82f6; --tint:#eff6ff; --edge:#bfdbfe; --ink:#1e40af;">
+    <div class="part done">
       <div class="part-who">
         <p class="part-tag">Part 1</p>
         <p class="part-name">Alberto Pini</p>
@@ -61,7 +70,7 @@
     </div>
 
     <!-- PART 2: MATTEO SCURATTI - this block -->
-    <div class="part current" style="--tone:#10b981; --tint:#ecfdf5; --edge:#a7f3d0; --ink:#065f46;">
+    <div class="part current">
       <div class="part-who">
         <p class="part-tag">Part 2</p>
         <p class="part-name">Matteo Scuratti</p>
@@ -76,7 +85,7 @@
     </div>
 
     <!-- PART 3: MATTIA SICOLI - next block -->
-    <div class="part next" style="--tone:#8b5cf6; --tint:#f5f3ff; --edge:#ddd6fe; --ink:#5b21b6;">
+    <div class="part next">
       <div class="part-who">
         <p class="part-tag">Part 3</p>
         <p class="part-name">Mattia Sicoli</p>
