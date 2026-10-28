@@ -1,23 +1,33 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Thanks for the attention</title>
-<link rel="stylesheet" href="slideui.css">
-<script src="slideui.js" defer></script>
-</head>
-<body>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Thanks for the attention</title><link rel="stylesheet" href="slideui.css"><script src="slideui.js" defer></script><style>
+.thanks-slide{position:relative;padding:0!important;overflow:hidden}
+.finale-message{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:2}
+.thanks-slide h1{font-size:59px!important;line-height:1.12;margin:0;text-align:center;animation:hello 1s ease-out both}
+.fragment{position:absolute;width:310px;height:195px;opacity:0;animation:arrive .5s ease-out var(--delay) forwards;pointer-events:none}
+.fragment:nth-of-type(2){left:30px;top:10px}.fragment:nth-of-type(3){left:485px;top:0}.fragment:nth-of-type(4){right:30px;top:10px}
+.fragment:nth-of-type(5){left:30px;bottom:0}.fragment:nth-of-type(6){left:485px;bottom:0}.fragment:nth-of-type(7){right:30px;bottom:0}
+.fragment svg{width:100%!important;height:100%!important;max-height:none!important;overflow:visible;animation:bob 6s ease-in-out var(--delay) infinite}
+.fragment path,.fragment ellipse,.fragment circle{stroke-linecap:round;stroke-linejoin:round}
+.axis{fill:none;stroke:var(--muted);stroke-width:2}.blue{fill:none;stroke:var(--accent);stroke-width:4}.red{fill:none;stroke:var(--accent2);stroke-width:3}.faint{opacity:.35}
+.wheel{animation:spin 7s linear infinite}.radar-sweep{animation:sweep 4s ease-in-out infinite}.echo{animation:echo 2s ease-out infinite;transform-box:fill-box;transform-origin:center}
+.sigma{fill:var(--accent);animation:spread 3s ease-in-out infinite}.bar{transform-box:fill-box;transform-origin:bottom;animation:bars 3s ease-in-out infinite}.b2{animation-delay:.4s}.b3{animation-delay:.8s}
+.curve,.trajectory{stroke-dasharray:12 5;animation:flow 3s linear infinite}.tangent{animation:tangent 4s ease-in-out infinite}
+@keyframes hello{from{opacity:0;transform:translateY(15px) scale(.95)}to{opacity:1;transform:none}}
+@keyframes arrive{from{opacity:0;transform:scale(.7) translateY(20px) rotate(0deg)}to{opacity:.85;transform:rotate(var(--tilt,0deg))}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes sweep{0%,100%{transform:rotate(-12deg)}50%{transform:rotate(12deg)}}
+@keyframes echo{from{opacity:.8;transform:scale(.6)}to{opacity:0;transform:scale(2.5)}}
+@keyframes spread{0%,100%{transform:scale(.6)}50%{transform:scale(1)}}
+@keyframes bars{0%,100%{transform:scaleY(.65)}50%{transform:scaleY(1)}}
+@keyframes flow{to{stroke-dashoffset:-68}}
+@keyframes tangent{0%,100%{opacity:.4}50%{opacity:1}}
+@media(prefers-reduced-motion:reduce){.thanks-slide *{animation:none!important}.fragment{opacity:.85}.thanks-slide animateMotion{display:none}}
 
-<div class="slide-layout">
-
-<section class="slide title-slide">
-  <div class="body" style="display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center">
-    <h1>Thanks for the attention</h1>
-  </div>
-</section>
-
-</div>
-
-</body>
-</html>
+.fragment:nth-of-type(2){--tilt:-8deg}
+.fragment:nth-of-type(3){--tilt:5deg}
+.fragment:nth-of-type(4){--tilt:9deg}
+.fragment:nth-of-type(5){--tilt:7deg}
+.fragment:nth-of-type(6){--tilt:-6deg}
+.fragment:nth-of-type(7){--tilt:-9deg}
+@media(prefers-reduced-motion:reduce){.fragment{transform:rotate(var(--tilt,0deg))}}
+</style></head><body><div class="slide-layout"><section class="slide title-slide thanks-slide"><div class="finale-message"><h1>Thanks for the attention</h1></div><div class="fragment" style="--delay:0.75s" aria-hidden="true"><svg viewBox="0 0 320 210"><g transform="translate(130 160)"><path d="M0 -100 V0 H145" class="axis"/><g class="radar-sweep"><path d="M0 0 L110 -65" class="blue"/><path d="M0 -100 A100 100 0 0 1 100 0" class="blue faint"/></g><circle r="7" fill="var(--fg)"/><circle cx="110" cy="-65" r="7" fill="var(--accent2)"/><circle cx="110" cy="-65" r="15" class="echo red"/></g></svg></div><div class="fragment" style="--delay:0.85s" aria-hidden="true"><svg viewBox="0 0 320 210"><path d="M35 170 H285 M160 175 V30" class="axis"/><path d="M65 40 Q160 290 255 40" class="blue curve"/><path d="M65 165 H255" class="red tangent"/><circle r="7" fill="var(--accent)"><animateMotion dur="4s" repeatCount="indefinite" path="M65 40 Q160 290 255 40"/></circle></svg></div><div class="fragment" style="--delay:0.95s" aria-hidden="true"><svg viewBox="0 0 320 210"><g transform="translate(160 105)"><circle r="75" class="axis"/><g class="wheel"><circle r="64" class="blue"/><path d="M-60 0 H60 M-30 -52 L30 52 M30 -52 L-30 52" class="blue"/></g><circle r="11" fill="var(--fg)"/></g></svg></div><div class="fragment" style="--delay:1.05s" aria-hidden="true"><svg viewBox="0 0 320 210"><path d="M40 165 H285" class="axis"/><g class="bars" fill="var(--accent)"><rect class="bar b1" x="65" y="75" width="36" height="90" rx="4"/><rect class="bar b2" x="135" y="40" width="36" height="125" rx="4" fill="var(--accent2)"/><rect class="bar b3" x="205" y="95" width="36" height="70" rx="4"/></g></svg></div><div class="fragment" style="--delay:1.15s" aria-hidden="true"><svg viewBox="0 0 320 210"><g transform="translate(160 105)"><ellipse rx="100" ry="48" class="axis faint"/><g class="sigma"><circle cx="100" r="7"/><circle cx="-100" r="7"/><circle cy="48" r="7"/><circle cy="-48" r="7"/><circle cx="70" cy="34" r="7"/><circle cx="-70" cy="-34" r="7"/></g><circle r="9" fill="var(--accent2)"/></g></svg></div><div class="fragment" style="--delay:1.25s" aria-hidden="true"><svg viewBox="0 0 320 210"><path d="M30 155 C85 155 100 40 160 70 S245 160 290 45" class="blue trajectory"/><path d="M30 160 L60 142 90 150 120 55 150 78 180 65 210 135 240 110 270 75 290 38" class="axis faint"/><g><path d="M12 0 L-9 -6 L-6 0 L-9 6 Z" fill="var(--accent2)"/><animateMotion dur="5s" repeatCount="indefinite" rotate="auto" path="M30 155 C85 155 100 40 160 70 S245 160 290 45"/></g></svg></div></section></div></body></html>

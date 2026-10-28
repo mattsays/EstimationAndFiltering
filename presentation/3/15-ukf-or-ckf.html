@@ -19,7 +19,7 @@
       <div class="panel" style="padding:22px 24px">
         <h2 style="font-size:30px;margin:0 0 12px;color:var(--accent)">UKF: flexibility</h2>
         <p style="font-size:25px;margin-bottom:12px"><b>2n + 1 points</b> in the standard scaled rule.</p>
-        <p style="font-size:24px;margin-bottom:12px">λ controls point spread and mean weights; c₀ corrects the central covariance weight.</p>
+        <p style="font-size:24px;margin-bottom:12px">λ controls point spread and mean weights; ω₀ corrects the central covariance weight.</p>
         <p style="font-size:24px;margin:0">Tuning can reduce higher-order approximation errors and outperform the fixed CKF rule on some nonlinear problems.</p>
       </div>
       <div class="panel" data-step="2" style="padding:22px 24px">
@@ -37,7 +37,7 @@
       <div class="choice-conclusion">
         <div class="panel choice-similarity" style="padding:20px 24px">
           <h3 style="font-size:27px;color:var(--fg);margin:0 0 12px">Why can they look similar?</h3>
-          <p style="font-size:20px;line-height:1.38;color:var(--muted);margin:0">Both transform representative points through the nonlinear model.<br><br>With <b style="color:var(--fg)">λ = 0, c₀ = 0</b>, the standard UKF has the same effective points and weights as CKF. Its central point has zero weight in both mean and covariance. Our benchmark uses λ = 1 and c₀ = 2.</p>
+          <p style="font-size:20px;line-height:1.38;color:var(--muted);margin:0">Both transform representative points through the nonlinear model.<br><br>With <b style="color:var(--fg)">λ = 0, ω₀ = 0</b>, the standard UKF has the same effective points and weights as CKF. Its central point has zero weight in both mean and covariance. Our benchmark uses λ = 1 and ω₀ = 2.</p>
         </div>
       </div>
     </div>
