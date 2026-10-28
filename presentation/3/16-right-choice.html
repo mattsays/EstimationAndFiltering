@@ -17,7 +17,7 @@
     <p class="decision-lead" data-step="2">It depends on your application requirements!</p>
   </div>
   <div class="body">
-    <div class="decision-reason" data-step="3"><span>1</span><div><h3>Accuracy &amp; uncertainty</h3><p>Is local linearization adequate over the uncertainty region? EKF may suffice; otherwise, test sigma-point methods. Compare errors and uncertainty calibration on your data.</p></div></div>
+    <div class="decision-reason" data-step="3"><span>1</span><div><h3>Accuracy &amp; uncertainty</h3><p>Which method gives smaller errors and well-calibrated uncertainty on your data? For EKF, also check whether the local linear approximation is adequate.</p></div></div>
     <div class="decision-reason" data-step="4"><span>2</span><div><h3>Computation budget</h3><p>Can the filter meet your update rate on the available hardware?</p></div></div>
     <div class="decision-reason" data-step="5"><span>3</span><div><h3>Tuning effort</h3><p>Do UKF's tunable points improve results enough to justify tuning, or is CKF's fixed rule sufficient?</p></div></div>
   </div>
