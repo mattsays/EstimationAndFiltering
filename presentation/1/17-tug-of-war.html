@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>UKF: The Tug of War Inside P</title>
+  <link rel="stylesheet" href="slideui.css">
+  <script src="slideui.js" defer></script>
+  <style>
+    .arrow { font-size: 2rem; font-weight: bold; line-height: 1; color: #94a3b8; display: inline-block; }
+    .arrow-right { animation: nudge-x 1.2s ease-in-out infinite; }
+    .arrow-down { animation: nudge-y 1.2s ease-in-out infinite; }
+    @keyframes nudge-x { 0%, 100% { transform: translateX(-4px); } 50% { transform: translateX(4px); } }
+    @keyframes nudge-y { 0%, 100% { transform: translateY(-4px); } 50% { transform: translateY(4px); } }
+
+    /* Knot of the rope swinging between the two zones */
+    @keyframes tug { 0% { left: 28%; } 100% { left: 72%; } }
+  </style>
+</head>
+<body>
+
+<div class="slide-layout" style="padding: 32px 48px; justify-content: flex-start;">
+
+  <!-- HEADER -->
+  <div style="margin-bottom: 14px;">
+    <div class="title" style="color: #b91c1c; font-size: 2.5rem; margin-bottom: 0.25rem;">The Tug of War Inside \(\mathbf{P}_{k+1}\)</div>
+    <div class="subtitle text-muted" style="font-size: 1.35rem; margin-bottom: 0;">How a small \(\alpha\) and a nonlinear \(\mathbf{f}\) put the sign of the variance up for grabs</div>
+  </div>
+
+  <!-- ROW 1: THREE INGREDIENTS -->
+  <div style="display: flex; align-items: stretch; gap: 8px; margin-bottom: 12px;">
+
+    <!-- 1. Small alpha, huge weights -->
+    <div class="panel" data-step="1" style="flex: 1.05; padding: 14px 16px; margin: 0;">
+      <div style="font-size: 1.2rem; font-weight: 700; color: #1e3a8a; margin-bottom: 6px;">1. Small \(\alpha\) ⇒ huge weights</div>
+      <div style="font-size: 1rem; line-height: 1.4; margin-bottom: 6px;">From \(\lambda=\alpha^2(n+\kappa)-n\), define \(\varepsilon:=n+\lambda=\alpha^2(n+\kappa)\):</div>
+      <div class="math-block" style="padding: 6px; margin: 0 0 6px 0; font-size: 1rem;">
+        \(\displaystyle w_i=\frac{1}{2\varepsilon},\quad w_0=\frac{\lambda}{n+\lambda}=1-\frac{n}{\varepsilon}\)
+      </div>
+      <div class="math-block" style="padding: 6px; margin: 0 0 6px 0; font-size: 1rem;">
+        \(\displaystyle w_0^c=w_0+1-\alpha^2+\beta\approx-\frac{n}{\varepsilon}\)
+      </div>
+      <div style="font-size: 1rem; line-height: 1.35;">As \(\alpha\to0\): \(w_i\to+\infty\), \(w_0^c\to-\infty\). E.g. \(n=2,\ \kappa=0,\ \alpha=10^{-3}\): \(w_i=2.5\cdot10^5\), \(w_0^c\approx-10^6\).</div>
+    </div>
+
+    <!-- Arrow 1 to 2 -->
+    <div data-step="2" style="display: flex; align-items: center; justify-content: center; width: 30px;">
+      <span class="arrow arrow-right">→</span>
+    </div>
+
+    <!-- 2. Nonlinear f: e_0 is not zero -->
+    <div class="panel" data-step="2" style="flex: 1; padding: 14px 16px; margin: 0;">
+      <div style="font-size: 1.2rem; font-weight: 700; color: #1e3a8a; margin-bottom: 6px;">2. Nonlinear \(\mathbf{f}\) ⇒ \(\mathbf{e}_0\neq\mathbf{0}\)</div>
+      <div style="font-size: 1rem; line-height: 1.4; margin-bottom: 6px;">Mean and deviations of the images \(\mathbf{y}_i=\mathbf{f}(\mathbf{x}_i)\):</div>
+      <div class="math-block" style="padding: 6px; margin: 0 0 6px 0; font-size: 1rem;">
+        \(\displaystyle \bar{\mathbf{y}}=w_0\mathbf{y}_0+\sum_{i=1}^{2n}w_i\mathbf{y}_i\)
+      </div>
+      <div class="math-block" style="padding: 6px; margin: 0 0 6px 0; font-size: 1rem;">
+        \(\displaystyle \mathbf{e}_i=\mathbf{y}_i-\bar{\mathbf{y}}\)
+      </div>
+      <div style="font-size: 1rem; line-height: 1.35;">Linear \(\mathbf{f}\): \(\bar{\mathbf{y}}=\mathbf{y}_0\), so \(\mathbf{e}_0=\mathbf{0}\) (weights sum to 1, outer points are symmetric). Nonlinear \(\mathbf{f}\): \(\mathbf{e}_0\neq\mathbf{0}\).</div>
+    </div>
+
+    <!-- Arrow 2 to 3 -->
+    <div data-step="3" style="display: flex; align-items: center; justify-content: center; width: 30px;">
+      <span class="arrow arrow-right">→</span>
+    </div>
+
+    <!-- 3. Recombination -->
+    <div class="panel" data-step="3" style="flex: 1.1; padding: 14px 16px; margin: 0; background: #fffbeb; border: 2px solid #f59e0b;">
+      <div style="font-size: 1.2rem; font-weight: 700; color: #b45309; margin-bottom: 6px;">3. Recombine into \(\mathbf{P}_{k+1}\)</div>
+      <div class="math-block" style="padding: 8px; margin: 0 0 8px 0; font-size: 1rem;">
+        \(\displaystyle \mathbf{P}_{k+1} = \color{#dc2626}{\overbrace{w_0^c\,\mathbf{e}_0\mathbf{e}_0^T}^{\text{negative}}} + \color{#16a34a}{\overbrace{\sum_{i=1}^{2n}w_i\,\mathbf{e}_i\mathbf{e}_i^T}^{\text{positive}}}\)
+      </div>
+      <div style="font-size: 1rem; line-height: 1.4; color: #78350f;">The center point enters with a negative weight, meaning the <strong style="color: #dc2626;">red term</strong> is subtracted from the <strong style="color: #16a34a;">green term</strong>.</div>
+      <div style="font-size: 0.9rem; line-height: 1.3; margin-top: 6px; color: #92400e;">(Process noise \(\mathbf{Q}\) omitted.)</div>
+    </div>
+
+  </div>
+
+  <!-- ROW 2: TUG OF WAR -->
+  <div data-step="4" class="panel" style="padding: 12px 18px; margin: 0; background: #f8fafc; border: 2px solid #e2e8f0; display: flex; gap: 18px; align-items: stretch;">
+
+    <!-- Left: variance along a direction -->
+    <div style="flex: 1;">
+      <div style="font-size: 1.2rem; font-weight: 700; color: #1e3a8a; margin-bottom: 6px;">Variance along a direction \(\mathbf{v}\)</div>
+      <div style="font-size: 1rem; line-height: 1.4; margin-bottom: 6px;">Since \(\mathbf{v}^T(\mathbf{e}\mathbf{e}^T)\mathbf{v}=(\mathbf{v}^T\mathbf{e})^2\):</div>
+      <div class="math-block" style="padding: 8px; margin: 0 0 6px 0; font-size: 1rem;">
+        \(\displaystyle \mathbf{v}^T\mathbf{P}_{k+1}\mathbf{v} = \color{#dc2626}{\overbrace{w_0^c\,s_0^2}^{\text{negative}}} + \color{#16a34a}{\overbrace{\sum_{i=1}^{2n}w_i\,s_i^2}^{\text{positive}}}\)
+      </div>
+      <div style="font-size: 1rem; line-height: 1.4;">with \(s_i=\mathbf{v}^T\mathbf{e}_i\). \(\mathbf{P}_{k+1}\) is PD iff this is \(>0\) for every \(\mathbf{v}\neq\mathbf{0}\).</div>
+    </div>
+
+    <!-- Right: the tug of war -->
+    <div style="flex: 1.6;">
+      <div style="font-size: 1.2rem; font-weight: 700; color: #991b1b; margin-bottom: 6px;">The tug of war</div>
+      <div style="font-size: 1rem; line-height: 1.4; margin-bottom: 8px;">Outer points are only \(\gamma=\sqrt{\varepsilon}\) from the center, so \(\mathbf{e}_i\approx\mathbf{e}_0\) and the two teams pull almost equally:</div>
+
+      <div style="display: flex; align-items: center; gap: 10px;">
+
+        <!-- Team center (negative) -->
+        <div style="flex: 1; background: #fef2f2; border: 2px solid #dc2626; border-radius: 8px; padding: 6px 8px; text-align: center;">
+          <div style="font-size: 0.95rem; font-weight: 700; color: #991b1b;">1 center point</div>
+          <div style="font-size: 1rem; color: #991b1b;">\(w_0^c s_0^2\approx-\dfrac{n}{\varepsilon}s_0^2\)</div>
+        </div>
+
+        <!-- Rope with swinging knot -->
+        <div style="flex: 1.1;">
+          <div style="position: relative; height: 40px; border-radius: 8px; background: linear-gradient(90deg, #fee2e2 50%, #dcfce7 50%);">
+            <div style="position: absolute; top: 18px; left: 0; right: 0; height: 4px; background: #a16207; border-radius: 2px;"></div>
+            <div style="position: absolute; top: 8px; left: 50%; width: 2px; height: 24px; background: #334155;"></div>
+            <div style="position: absolute; top: 9px; width: 22px; height: 22px; margin-left: -11px; border-radius: 50%; background: #f59e0b; border: 3px solid #92400e; animation: tug 3s ease-in-out infinite alternate;"></div>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-top: 2px;">
+            <span style="color: #b91c1c; font-weight: 700;">\(\mathbf{v}^T\mathbf{P}\mathbf{v}<0\)</span>
+            <span style="color: #166534; font-weight: 700;">\(\mathbf{v}^T\mathbf{P}\mathbf{v}>0\)</span>
+          </div>
+        </div>
+
+        <!-- Team outer points (positive) -->
+        <div style="flex: 1; background: #f0fdf4; border: 2px solid #16a34a; border-radius: 8px; padding: 6px 8px; text-align: center;">
+          <div style="font-size: 0.95rem; font-weight: 700; color: #166534;">\(2n\) outer points</div>
+          <div style="font-size: 1rem; color: #166534;">\(\sum w_i s_i^2\approx+\dfrac{n}{\varepsilon}s_0^2\)</div>
+        </div>
+
+      </div>
+
+      <div style="font-size: 1rem; line-height: 1.4; margin-top: 8px;">Both are huge (\(\propto1/\varepsilon\)). What remains is a <strong>tiny difference</strong> of the two: nothing forces it to be positive.</div>
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+</html>
