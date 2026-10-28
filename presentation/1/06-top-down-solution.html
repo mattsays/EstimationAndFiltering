@@ -32,7 +32,7 @@
         <p style="font-size: 1.3rem; font-weight: 700; margin: 0 0 6px 0; color: #1e40af;">1. Represent</p>
         <p class="text-muted" style="font-size: 0.95rem; margin: 0 0 10px 0;">Capture the Gaussian distribution using \(2n+1\) chosen <strong>Sigma Points</strong> \(x_i\) and <strong>weights</strong> \(w_i\).</p>
         <div class="math-block" style="padding: 8px; margin: 0; font-size: 1.1rem;">
-          \(\displaystyle \{ x_i, w_i \}_{i=1}^{2n+1} \)
+          \(\displaystyle \{ x_i, w_i \}^{2n+1} \)
         </div>
       </div>
       <!-- SVG 1: Initial Gaussian & Sigma Points -->
@@ -121,7 +121,7 @@
           <strong>The Points & Weights:</strong> How do we approximate a distribution using exactly \(2n+1\) Sigma Points to perfectly match the two moments? <em>Where do we put them, and what weights do they get?</em>
         </li>
         <li>
-          <strong>The Reconstruction:</strong> How do we rebuild the distribution after the non-linear transformation? <em>And why do is the information about the distribution still in the points even after a non linear transformation?</em>
+          <strong>The Reconstruction:</strong> How do we rebuild the distribution after the non-linear transformation? <em>And why is the information about the distribution still in the points even after a non linear transformation? Why are the weights unchanged?</em>
         </li>
       </ol>
     </div>

@@ -12,17 +12,7 @@
     @keyframes nudge-x { 0%, 100% { transform: translateX(-4px); } 50% { transform: translateX(4px); } }
     @keyframes nudge-y { 0%, 100% { transform: translateY(-4px); } 50% { transform: translateY(4px); } }
 
-    /* Symmetry pulse animation */
-    @keyframes pulse-left {
-      0%, 100% { transform: translateX(0px); }
-      50% { transform: translateX(-8px); }
-    }
-    @keyframes pulse-right {
-      0%, 100% { transform: translateX(0px); }
-      50% { transform: translateX(8px); }
-    }
-
-    /* Projection flow animation */
+    /* Projection flow animation (panel 2) */
     @keyframes dash-flow {
       0% { stroke-dashoffset: 20; }
       100% { stroke-dashoffset: 0; }
@@ -34,154 +24,300 @@
 <div class="slide-layout" style="padding: 32px 48px; justify-content: flex-start;">
 
   <!-- HEADER -->
-  <div style="margin-bottom: 16px;">
-    <h1 class="title" style="font-size: 2.6rem; margin-bottom: 0.2rem;">Why Exactly \(2n+1\) Symmetric Points?</h1>
+  <div style="margin-bottom: 12px;">
+    <h1 class="title" style="font-size: 2.6rem; margin-bottom: 0.2rem;">Why \(2n+1\) Symmetric Sigma Points?</h1>
     <p class="subtitle text-muted" style="font-size: 1.35rem; margin-bottom: 0;">Preserving Gaussian zero-skewness & extracting 2nd-order non-linear curvature</p>
   </div>
 
   <!-- ROW 1: Visual Explanations (Symmetry vs Non-linear Mapping) -->
-  <div style="display: flex; align-items: stretch; gap: 16px; margin-bottom: 16px;">
+  <div style="display: flex; align-items: stretch; gap: 16px; margin-bottom: 12px;">
 
-    <!-- PANEL 1: Odd Moments & Zero Skewness -->
-    <div data-step="2" class="panel panel-primary" style="flex: 1; padding: 16px; margin: 0; display: flex; flex-direction: column; justify-content: space-between;">
-      <div>
-        <p class="text-xl text-primary" style="font-size: 1.25rem; font-weight: 700; margin-bottom: 6px;">1. Why Symmetric Pairs \(\pm\mathbf{\delta}\)?</p>
-        <p class="text-muted" style="font-size: 0.92rem; margin-bottom: 10px;">
-          Gaussians are perfectly symmetric (\(\text{Skewness} = 0\)). Asymmetric point sets would introduce <strong>artificial skew</strong>. Symmetric pairs guarantee all odd moments cancel out:
-        </p>
+    <!-- PANEL 1: Odd moments and zero skewness (2D case), default phase = B (triangle) -->
+    <div data-step="2" class="panel panel-primary" style="flex: 1.35; padding: 14px 16px; margin: 0; display: flex; flex-direction: column;">
+
+      <!-- Heading row: title on the left, A/B toggle on the right -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin: 0 0 4px 0;">
+        <p class="text-xl text-primary" style="font-size: 1.25rem; font-weight: 700; margin: 0;">1. Why Symmetric Pairs \(\pm\boldsymbol{\delta}\)?</p>
+        <div data-step="2.5" style="display: flex; gap: 4px;">
+          <button type="button" id="btnA" style="font-size: 0.78rem; font-weight: 700; padding: 2px 10px; border-radius: 999px; border: 1px solid #1d4ed8; background: #ffffff; color: #1d4ed8; cursor: pointer;">A · symmetric</button>
+          <button type="button" id="btnB" style="font-size: 0.78rem; font-weight: 700; padding: 2px 10px; border-radius: 999px; border: 1px solid #1d4ed8; background: #1d4ed8; color: #ffffff; cursor: pointer;">B · triangle</button>
+        </div>
       </div>
 
-      <!-- SVG 1: Symmetric Cancellation -->
-      <svg viewBox="0 0 280 110" style="width: 100%; height: 110px; display: block; margin: 4px 0;">
-        <!-- Base line -->
-        <line x1="20" y1="60" x2="260" y2="60" stroke="#cbd5e1" stroke-width="2"/>
-        
-        <!-- Center Mean -->
-        <circle cx="140" cy="60" r="7" fill="#1e40af"/>
-        <text x="140" y="82" font-size="12" font-weight="bold" fill="#1e40af" text-anchor="middle">\(\mathbf{\hat{x}}\)</text>
+      <!-- Intro: definition of delta, then a sentence that changes with the phase -->
+      <div class="text-muted" style="font-size: 0.92rem; line-height: 1.35; margin: 0 0 8px 0;">
+        <div>Each point is \(\mathbf{x}_i=\hat{\mathbf{x}}+\boldsymbol{\delta}_i\): \(\boldsymbol{\delta}_i\) is its <strong>offset from the mean</strong>.</div>
+        <div data-pt="A" style="display: none;">A Gaussian is symmetric around \(\hat{\mathbf{x}}\), so <strong>every odd central moment is 0</strong>:</div>
+        <div data-pt="B" style="display: block; color: #b91c1c;">The triangle has no mirror pairs, so its <strong>odd central moments are not 0</strong>:</div>
+      </div>
 
-        <!-- Left Point (-delta) -->
-        <g style="animation: pulse-left 3s ease-in-out infinite;">
-          <circle cx="60" cy="60" r="10" fill="#3b82f6"/>
-          <text x="60" y="42" font-size="12" font-weight="bold" fill="#1d4ed8" text-anchor="middle">-\(\mathbf{\delta}\)</text>
-        </g>
+      <!-- Moments strip (odd boxes are green "0" in phase A, red "not 0" in phase B) -->
+      <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+        <div style="flex: 1; text-align: center; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 3px 2px;">
+          <div style="font-size: 1.05rem;">\(\hat{\mathbf{x}}\)</div>
+          <div style="font-size: 0.75rem; color: #64748b;">mean</div>
+        </div>
+        <div style="flex: 1; text-align: center; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 3px 2px;">
+          <div style="font-size: 1.05rem;">\(\mathbf{P}\)</div>
+          <div style="font-size: 0.75rem; color: #64748b;">covariance</div>
+        </div>
+        <div data-odd="1" style="flex: 1; text-align: center; background: #fef2f2; border: 2px solid #dc2626; color: #991b1b; border-radius: 6px; padding: 2px;">
+          <div style="font-size: 1.05rem; font-weight: 700;"><span data-pv="A" style="display: none;">\(0\)</span><span data-pv="B" style="display: inline;">\(\neq 0\)</span></div>
+          <div style="font-size: 0.75rem;">skewness (3rd)</div>
+        </div>
+        <div style="flex: 1; text-align: center; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 3px 2px;">
+          <div style="font-size: 1.05rem;">\(3\)</div>
+          <div style="font-size: 0.75rem; color: #64748b;">kurtosis (4th)</div>
+        </div>
+        <div data-odd="1" style="flex: 1; text-align: center; background: #fef2f2; border: 2px solid #dc2626; color: #991b1b; border-radius: 6px; padding: 2px;">
+          <div style="font-size: 1.05rem; font-weight: 700;"><span data-pv="A" style="display: none;">\(0\)</span><span data-pv="B" style="display: inline;">\(\neq 0\)</span></div>
+          <div style="font-size: 0.75rem;">5th moment</div>
+        </div>
+        <div style="flex: 0.5; text-align: center; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 3px 2px;">
+          <div style="font-size: 1.05rem;">\(\cdots\)</div>
+          <div style="font-size: 0.75rem; color: #64748b;">&nbsp;</div>
+        </div>
+      </div>
 
-        <!-- Right Point (+delta) -->
-        <g style="animation: pulse-right 3s ease-in-out infinite;">
-          <circle cx="220" cy="60" r="10" fill="#3b82f6"/>
-          <text x="220" y="42" font-size="12" font-weight="bold" fill="#1d4ed8" text-anchor="middle">+\(\mathbf{\delta}\)</text>
-        </g>
-      </svg>
+      <!-- Picture (own step): 2D plane on the left, expanded equations on the right; phase chosen with the toggle -->
+      <div data-step="2.5" style="display: flex; gap: 12px; height: 164px;">
 
-      <div class="math-block" style="padding: 6px; font-size: 0.95rem;">
-        \(\displaystyle (+\mathbf{\delta})^3 + (-\mathbf{\delta})^3 = 0 \implies \text{Zero artificial skew}\)
+        <!-- 2D picture: plane with the points, plus their projections on the x axis -->
+        <svg viewBox="0 0 150 150" style="width: 164px; height: 164px; flex: none; display: block; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px;">
+
+          <!-- x axis for the projections -->
+          <line x1="8" y1="138" x2="138" y2="138" stroke="#cbd5e1" stroke-width="1.5"/>
+          <text x="141" y="141" font-size="9" font-style="italic" fill="#64748b">x</text>
+
+          <!-- Phase A: mean + 2 mirror pairs along the columns of L -->
+          <g data-ph="A" style="opacity: 0; transition: opacity 0.25s;">
+            <!-- gamma-sigma ellipse generated by L -->
+            <circle cx="0" cy="0" r="1" transform="matrix(46 -15 0 -40 75 75)" fill="none" stroke="#93c5fd" stroke-width="1.5" stroke-dasharray="4 3" vector-effect="non-scaling-stroke"/>
+            <!-- mirror axes -->
+            <line x1="29" y1="90" x2="121" y2="60" stroke="#cbd5e1" stroke-width="1"/>
+            <line x1="75" y1="35" x2="75" y2="115" stroke="#cbd5e1" stroke-width="1"/>
+            <!-- projections on x -->
+            <line x1="121" y1="60" x2="121" y2="138" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3 3"/>
+            <line x1="29" y1="90" x2="29" y2="138" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3 3"/>
+            <line x1="75" y1="35" x2="75" y2="138" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3 3"/>
+            <circle cx="121" cy="138" r="4" fill="#3b82f6"/>
+            <circle cx="29" cy="138" r="4" fill="#3b82f6"/>
+            <circle cx="75" cy="138" r="4" fill="#3b82f6"/>
+            <!-- delta arrow: offset of the +a point from the mean -->
+            <line x1="80.7" y1="73.1" x2="108.7" y2="64.1" stroke="#1d4ed8" stroke-width="2"/>
+            <polygon points="115.3,61.9 109.7,67.4 107.6,60.7" fill="#1d4ed8"/>
+            <text x="88" y="62" font-size="9" font-weight="700" font-style="italic" fill="#1d4ed8">δ₁</text>
+            <!-- the 4 outer points -->
+            <circle cx="121" cy="60" r="6" fill="#3b82f6"/>
+            <circle cx="29" cy="90" r="6" fill="#3b82f6"/>
+            <circle cx="75" cy="35" r="6" fill="#3b82f6"/>
+            <circle cx="75" cy="115" r="6" fill="#3b82f6"/>
+            <text x="127" y="56" font-size="10" font-weight="700" font-style="italic" fill="#1d4ed8">+a</text>
+            <text x="5" y="86" font-size="10" font-weight="700" font-style="italic" fill="#1d4ed8">−a</text>
+            <text x="81" y="33" font-size="10" font-weight="700" font-style="italic" fill="#1d4ed8">+b</text>
+            <text x="81" y="123" font-size="10" font-weight="700" font-style="italic" fill="#1d4ed8">−b</text>
+          </g>
+
+          <!-- Phase B: mean + triangle at 120 degrees (does not follow L) -->
+          <g data-ph="B" style="opacity: 1; transition: opacity 0.25s;">
+            <circle cx="75" cy="75" r="46" fill="none" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="4 3"/>
+            <polygon points="121,75 52,35.2 52,114.8" fill="none" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="4 3"/>
+            <!-- projections on x -->
+            <line x1="121" y1="75" x2="121" y2="138" stroke="#ea580c" stroke-width="1" stroke-dasharray="3 3"/>
+            <line x1="52" y1="35.2" x2="52" y2="134" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3 3"/>
+            <line x1="52" y1="114.8" x2="52" y2="142" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3 3"/>
+            <circle cx="121" cy="138" r="4" fill="#ea580c"/>
+            <circle cx="52" cy="134" r="3.5" fill="#3b82f6"/>
+            <circle cx="52" cy="142" r="3.5" fill="#3b82f6"/>
+            <!-- delta arrow: offset of the right point from the mean -->
+            <line x1="81" y1="75" x2="108" y2="75" stroke="#c2410c" stroke-width="2"/>
+            <polygon points="115,75 108,71.5 108,78.5" fill="#c2410c"/>
+            <text x="90" y="70" font-size="9" font-weight="700" font-style="italic" fill="#c2410c">δ₁</text>
+            <!-- the 3 outer points -->
+            <circle cx="121" cy="75" r="6" fill="#ea580c"/>
+            <circle cx="52" cy="35.2" r="6" fill="#3b82f6"/>
+            <circle cx="52" cy="114.8" r="6" fill="#3b82f6"/>
+            <text x="98" y="52" font-size="9" fill="#64748b">120°</text>
+          </g>
+
+          <!-- Mean (always visible) -->
+          <circle cx="75" cy="75" r="6" fill="#1e40af"/>
+          <text x="80" y="90" font-size="10" font-weight="700" fill="#1e40af">x̂</text>
+        </svg>
+
+        <!-- Expanded equations, two phases stacked in the same box -->
+        <div style="position: relative; flex: 1; min-width: 0;">
+
+          <!-- Phase A text -->
+          <div data-ph="A" style="position: absolute; top: 0; left: 0; right: 0; opacity: 0; transition: opacity 0.25s; pointer-events: none;">
+            <div style="font-size: 0.92rem; font-weight: 700; color: #16a34a; line-height: 1.35; margin-bottom: 4px;">A. Mean + mirror pairs, equal weights (\(\mathbf{a}=\gamma\mathbf{L}_1,\ \mathbf{b}=\gamma\mathbf{L}_2\))</div>
+            <div class="math-block" style="padding: 4px; margin: 0 0 4px 0; font-size: 0.92rem;">
+              \(\displaystyle \sum_i \boldsymbol{\delta}_i=\mathbf{a}-\mathbf{a}+\mathbf{b}-\mathbf{b}=\mathbf{0}\)
+            </div>
+            <div class="math-block" style="padding: 4px; margin: 0 0 4px 0; font-size: 0.92rem;">
+              \(\displaystyle \sum_i \boldsymbol{\delta}_i^{\otimes 3}=\mathbf{a}^{\otimes 3}-\mathbf{a}^{\otimes 3}+\mathbf{b}^{\otimes 3}-\mathbf{b}^{\otimes 3}=\mathbf{0}\)
+            </div>
+            <div style="font-size: 0.92rem; font-weight: 700; color: #16a34a;">✓ each point has a mirror partner: odd moments cancel</div>
+          </div>
+
+          <!-- Phase B text -->
+          <div data-ph="B" style="position: absolute; top: 0; left: 0; right: 0; opacity: 1; transition: opacity 0.25s; pointer-events: none;">
+            <div style="font-size: 0.92rem; font-weight: 700; color: #dc2626; line-height: 1.35; margin-bottom: 4px;">B. Mean + triangle at 120°, equal weights (\(\boldsymbol{\delta}_k=r\,\mathbf{u}_k\), seen along \(x\))</div>
+            <div class="math-block" style="padding: 4px; margin: 0 0 4px 0; font-size: 0.92rem;">
+              \(\displaystyle \sum_k \delta_{k,x}=r\big[1-\tfrac12-\tfrac12\big]=0\)
+            </div>
+            <div class="math-block" style="padding: 4px; margin: 0 0 4px 0; font-size: 0.92rem;">
+              \(\displaystyle \sum_k \delta_{k,x}^{3}=r^3\big[1^3+(-\tfrac12)^3+(-\tfrac12)^3\big]=\tfrac34\,r^3\neq0\)
+            </div>
+            <div style="font-size: 0.92rem; font-weight: 700; color: #dc2626;">✗ no mirror partners: the mean is fine, but a skew appears</div>
+          </div>
+
+        </div>
       </div>
     </div>
 
-    <!-- PANEL 2: Non-linear Function Mapping -->
-    <div data-step="3" class="panel panel-accent" style="flex: 1.3; padding: 16px; margin: 0; display: flex; flex-direction: column; justify-content: space-between;">
+    <!-- PANEL 2: Non-linear function mapping -->
+    <div data-step="3" class="panel panel-accent" style="flex: 1; padding: 14px 16px; margin: 0; display: flex; flex-direction: column; justify-content: space-between;">
       <div>
-        <p class="text-xl text-accent" style="font-size: 1.25rem; font-weight: 700; margin-bottom: 6px;">2. Aren't 2 Symmetrical Points Redundant? No!</p>
-        <p class="text-muted" style="font-size: 0.92rem; margin-bottom: 6px;">
-          Though inputs are symmetric; passing them through non-linear \(f_k(\mathbf{x})\) yields <strong>asymmetric outputs</strong> (\(\Delta y_+ \neq \Delta y_-\)). This measures local space bending!
+        <p class="text-xl text-accent" style="font-size: 1.2rem; font-weight: 700; margin: 0 0 4px 0;">2. Aren't 2 Symmetrical Points Redundant? No!</p>
+        <p class="text-muted" style="font-size: 0.92rem; line-height: 1.35; margin: 0 0 6px 0;">
+          Though inputs are symmetric, passing them through a non-linear \(f(\mathbf{x})\) yields <strong>asymmetric outputs</strong> (\(\Delta y_+ \neq \Delta y_-\)). This measures local space bending!
         </p>
       </div>
 
-      <!-- SVG 2: Curved Function Mapping with Axes -->
-      <svg viewBox="0 0 320 120" style="width: 100%; height: 120px; display: block; margin: 2px 0;">
+      <!-- SVG 2: curved function mapping (plain text labels: MathJax cannot typeset inside SVG) -->
+      <svg viewBox="0 0 320 120" style="width: 100%; height: 130px; display: block; margin: 2px 0;">
         <!-- Axes -->
         <line x1="40" y1="105" x2="300" y2="105" stroke="#64748b" stroke-width="1.5"/>
         <line x1="40" y1="10" x2="40" y2="105" stroke="#64748b" stroke-width="1.5"/>
-        
-        <!-- Axis Labels -->
-        <text x="295" y="118" font-size="10" font-weight="bold" fill="#475569" text-anchor="end">Input \(X\)</text>
-        <text x="12" y="18" font-size="10" font-weight="bold" fill="#475569">Output \(Y = f(X)\)</text>
+
+        <!-- Axis labels -->
+        <text x="295" y="118" font-size="10" font-weight="bold" fill="#475569" text-anchor="end">Input X</text>
+        <text x="12" y="18" font-size="10" font-weight="bold" fill="#475569">Output Y = f(X)</text>
 
         <!-- Non-linear curve f(x) -->
         <path d="M 50 95 Q 160 85 290 15" fill="none" stroke="#f59e0b" stroke-width="3"/>
         <text x="250" y="25" font-size="11" font-weight="bold" fill="#d97706">f(X)</text>
 
-        <!-- Input Points on X axis -->
+        <!-- Input points on X axis -->
         <circle cx="80" cy="105" r="4" fill="#3b82f6"/>
         <circle cx="160" cy="105" r="4" fill="#1e40af"/>
         <circle cx="240" cy="105" r="4" fill="#3b82f6"/>
 
-        <text x="80" y="117" font-size="9" fill="#1d4ed8" text-anchor="middle">-\(\mathbf{\delta}\)</text>
-        <text x="160" y="117" font-size="9" font-weight="bold" fill="#1e40af" text-anchor="middle">\(\mathbf{\hat{x}}\)</text>
-        <text x="240" y="117" font-size="9" fill="#1d4ed8" text-anchor="middle">+\(\mathbf{\delta}\)</text>
+        <text x="80" y="117" font-size="9" fill="#1d4ed8" text-anchor="middle">−δ</text>
+        <text x="160" y="117" font-size="9" font-weight="bold" fill="#1e40af" text-anchor="middle">x̂</text>
+        <text x="240" y="117" font-size="9" fill="#1d4ed8" text-anchor="middle">+δ</text>
 
-        <!-- Dynamic Projections -->
-        <!-- Center -->
+        <!-- Dynamic projections -->
         <path d="M 160 105 L 160 72 L 40 72" fill="none" stroke="#1e40af" stroke-width="1.5" stroke-dasharray="3,3" style="animation: dash-flow 1.5s linear infinite;"/>
-        
-        <!-- Left (-delta) -> small y shift -->
         <path d="M 80 105 L 80 91 L 40 91" fill="none" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="3,3" style="animation: dash-flow 1.5s linear infinite;"/>
-
-        <!-- Right (+delta) -> large y shift -->
         <path d="M 240 105 L 240 38 L 40 38" fill="none" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="3,3" style="animation: dash-flow 1.5s linear infinite;"/>
 
-        <!-- Transformed Points on Y axis -->
+        <!-- Transformed points on Y axis -->
         <circle cx="40" cy="91" r="4.5" fill="#3b82f6"/>
         <circle cx="40" cy="72" r="5" fill="#1e40af"/>
         <circle cx="40" cy="38" r="4.5" fill="#3b82f6"/>
 
-        <!-- Asymmetry Delta Brackets on Y -->
+        <!-- Asymmetry brackets on Y -->
         <line x1="28" y1="72" x2="28" y2="91" stroke="#3b82f6" stroke-width="2"/>
-        <text x="24" y="84" font-size="9" font-weight="bold" fill="#3b82f6" text-anchor="end">\(\Delta y_-\)</text>
+        <text x="24" y="84" font-size="9" font-weight="bold" fill="#3b82f6" text-anchor="end">Δy₋</text>
 
         <line x1="28" y1="72" x2="28" y2="38" stroke="#d97706" stroke-width="2"/>
-        <text x="24" y="52" font-size="9" font-weight="bold" fill="#d97706" text-anchor="end">\(\Delta y_+\)</text>
+        <text x="24" y="52" font-size="9" font-weight="bold" fill="#d97706" text-anchor="end">Δy₊</text>
       </svg>
 
-      <div class="math-block" style="padding: 6px; font-size: 0.95rem;">
-        \(\displaystyle \Delta y_+ \neq \Delta y_- \implies \text{Captures 2nd-order Taylor curvature } (\tfrac{1}{2}f''\mathbf{\delta}^2)\)
+      <div class="math-block" style="padding: 6px; margin: 0; font-size: 0.95rem;">
+        \(\displaystyle \Delta y_+ \neq \Delta y_- \;\Rightarrow\; \text{curvature } \tfrac12 f''\delta^2\)
       </div>
     </div>
 
   </div>
 
-  <!-- ROW 2: Expanded Summary & Mathematical Proof -->
-  <div data-step="4" class="panel" style="padding: 18px 24px; margin: 0; background: #f8fafc; border: 2px solid #e2e8f0; flex: 1;">
-    <p class="text-primary" style="font-size: 1.15rem; font-weight: 700; margin: 0 0 10px 0; text-align: center;">
+  <!-- ROW 2: Summary of the construction -->
+  <div data-step="4" class="panel" style="padding: 12px 20px; margin: 0; background: #f8fafc; border: 2px solid #e2e8f0; flex: none;">
+    <p class="text-primary" style="font-size: 1.1rem; font-weight: 700; margin: 0 0 8px 0; text-align: center;">
       Summary: Construction of Minimal \(2n+1\) Sigma Points
     </p>
 
-    <div style="display: flex; justify-content: space-around; align-items: center; text-align: center; gap: 16px;">
-      
-      <div style="flex: 1; background: white; padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1;">
-        <strong style="font-size: 1.1rem; color: #1e293b;">1 Center Point</strong><br>
-        <span class="text-primary" style="font-weight: 700; font-size: 1.05rem;">\(\mathbf{x}_0 = \mathbf{\hat{x}}\)</span><br>
-        <span class="text-muted" style="font-size: 0.88rem;">Anchors the mean & controls scaling</span>
+    <div style="display: flex; justify-content: space-around; align-items: center; text-align: center; gap: 14px;">
+
+      <div style="flex: 1; background: white; padding: 8px 10px; border-radius: 10px; border: 1px solid #cbd5e1;">
+        <strong style="font-size: 1.05rem; color: #1e293b;">1 Center Point</strong><br>
+        <span class="text-primary" style="font-weight: 700; font-size: 1.05rem;">\(\mathbf{x}_0 = \hat{\mathbf{x}}\)</span><br>
+        <span class="text-muted" style="font-size: 0.85rem;">Anchors the mean & controls scaling</span>
       </div>
 
       <div style="font-size: 1.6rem; font-weight: bold; color: #94a3b8;">+</div>
 
-      <div style="flex: 1.3; background: white; padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1;">
-        <strong style="font-size: 1.1rem; color: #1e293b;">\(2 \times n\) Cholesky Pairs</strong><br>
-        <span class="text-primary" style="font-weight: 700; font-size: 1.05rem;">\(\mathbf{x}_i = \mathbf{\hat{x}} \pm \gamma \mathbf{L}_i\)</span><br>
-        <span class="text-muted" style="font-size: 0.88rem;">Symmetric pairs along covariance axes (\(\mathbf{P} = \mathbf{L}\mathbf{L}^T\))</span>
+      <div style="flex: 1.3; background: white; padding: 8px 10px; border-radius: 10px; border: 1px solid #cbd5e1;">
+        <strong style="font-size: 1.05rem; color: #1e293b;">\(2 \times n\) Cholesky Pairs</strong><br>
+        <span class="text-primary" style="font-weight: 700; font-size: 1.05rem;">\(\mathbf{x}_i = \hat{\mathbf{x}} \pm \gamma \mathbf{L}_i\)</span><br>
+        <span class="text-muted" style="font-size: 0.85rem;">Symmetric pairs along covariance axes (\(\mathbf{P} = \mathbf{L}\mathbf{L}^T\))</span>
       </div>
 
       <div style="font-size: 1.6rem; font-weight: bold; color: #94a3b8;">=</div>
 
-      <div style="flex: 1.2; background: #eff6ff; padding: 12px; border-radius: 10px; border: 1.5px solid #3b82f6;">
-        <strong style="font-size: 1.15rem; color: #1d4ed8;">\(2n + 1\) Minimal Points</strong><br>
+      <div style="flex: 1.2; background: #eff6ff; padding: 8px 10px; border-radius: 10px; border: 1.5px solid #3b82f6;">
+        <strong style="font-size: 1.1rem; color: #1d4ed8;">\(2n + 1\) Minimal Points</strong><br>
         <span class="text-primary" style="font-weight: 700; font-size: 1.05rem;">2D: \(n=2 \implies 5\) Points</span><br>
-        <span class="text-muted" style="font-size: 0.88rem;">Exact 2nd-order Taylor accuracy for any \(f(\cdot)\)</span>
+        <span class="text-muted" style="font-size: 0.85rem;">Exact 2nd-order Taylor accuracy for any \(f(\cdot)\)</span>
       </div>
 
     </div>
-    
+
     <!-- NOTE -->
-    <div data-step="4">
-        <p class="text-accent" style="font-size: 1.15rem; font-weight: bold; margin: 5px;">
-          Note: in the professor's slides \(L_i\) is \(C^\frac{1}{2}_i \) and \( C=(C^\frac12)(C^\frac12)^T \)
-        </p>
-    </div>
-    
+    <p class="text-accent" style="font-size: 1rem; font-weight: bold; margin: 8px 0 0 0; text-align: center;">
+      Note: in the professor's slides \(\mathbf{L}_i\) is \(\mathbf{C}^{1/2}_i\) and \(\mathbf{C}=\mathbf{C}^{1/2}(\mathbf{C}^{1/2})^T\)
+    </p>
   </div>
 
 </div>
+
+<!-- A/B toggle: buttons are ignored by slideui's click-to-advance, and drop focus so the arrow keys keep changing slide -->
+<script>
+(function () {
+  var groups = { A: [], B: [] };
+  document.querySelectorAll('[data-ph]').forEach(function (el) {
+    groups[el.getAttribute('data-ph')].push(el);
+  });
+  var btns = { A: document.getElementById('btnA'), B: document.getElementById('btnB') };
+  var oddBoxes = document.querySelectorAll('[data-odd]');
+  var pvs = document.querySelectorAll('[data-pv]');
+  var pts = document.querySelectorAll('[data-pt]');
+
+  function setPhase(p) {
+    // Picture and equations (cross-fade) and button states
+    ['A', 'B'].forEach(function (k) {
+      groups[k].forEach(function (el) { el.style.opacity = (k === p) ? '1' : '0'; });
+      btns[k].style.background = (k === p) ? '#1d4ed8' : '#ffffff';
+      btns[k].style.color = (k === p) ? '#ffffff' : '#1d4ed8';
+    });
+
+    // Intro sentence and odd-moment values: show only the current phase
+    pts.forEach(function (el) { el.style.display = (el.getAttribute('data-pt') === p) ? 'block' : 'none'; });
+    pvs.forEach(function (el) { el.style.display = (el.getAttribute('data-pv') === p) ? 'inline' : 'none'; });
+
+    // Odd-moment boxes: green "0" for the symmetric set, red "not 0" for the triangle
+    oddBoxes.forEach(function (box) {
+      if (p === 'A') {
+        box.style.background = '#f0fdf4'; box.style.borderColor = '#16a34a'; box.style.color = '#166534';
+      } else {
+        box.style.background = '#fef2f2'; box.style.borderColor = '#dc2626'; box.style.color = '#991b1b';
+      }
+    });
+  }
+
+  ['A', 'B'].forEach(function (k) {
+    btns[k].addEventListener('click', function (e) {
+      setPhase(k);
+      e.currentTarget.blur();
+    });
+  });
+
+  // Default state: triangle
+  setPhase('B');
+})();
+</script>
 
 </body>
 </html>

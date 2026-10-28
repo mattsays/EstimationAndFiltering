@@ -19,8 +19,8 @@
 
   <!-- HEADER -->
   <div style="margin-bottom: 14px;">
-    <div class="title" style="color: #1e3a8a; font-size: 2.4rem; margin-bottom: 0.25rem;">Placing the Sigma Points</div>
-    <div class="subtitle text-muted" style="font-size: 1.3rem; margin-bottom: 0;">Where they go, and why a small \(\alpha\) helps when \(\mathbf{f}\) is strongly nonlinear</div>
+    <div class="title" style="color: #1e3a8a; font-size: 2.4rem; margin-bottom: 0.25rem;">Placing the Sigma Points & Assigning Weights Mathematically</div>
+    <div class="subtitle text-muted" style="font-size: 1.3rem; margin-bottom: 0;">Where they go, how much they weigh, and why a small \(\alpha\) helps when \(\mathbf{f}\) is strongly nonlinear</div>
   </div>
 
   <!-- ROW 1: SQUARE ROOT -> POINTS -> WEIGHTS -->
@@ -28,11 +28,12 @@
 
     <!-- Block 1: matrix square root -->
     <div class="panel" data-step="1" style="flex: 0.9; padding: 12px 16px; margin: 0;">
-      <div style="font-size: 1.15rem; font-weight: 700; color: #1e3a8a; margin-bottom: 6px;">1. Square root of \(\mathbf{P}\)</div>
-      <div style="font-size: 0.95rem; line-height: 1.4; margin-bottom: 8px;">Factor the prior covariance. The columns of \(\mathbf{L}\) are the directions the points spread along.</div>
-      <div class="math-block" style="padding: 6px; margin: 0; font-size: 1.05rem;">
+      <div style="font-size: 1.15rem; font-weight: 700; color: #1e3a8a; margin-bottom: 6px;">1. Place along \(\mathbf{L}\) axes</div>
+      <div style="font-size: 0.95rem; line-height: 1.4; margin-bottom: 8px;">\(\mathbf{L}\) is a square root of \(\mathbf{P}\): it turns a unit circle into the uncertainty ellipse.</div>
+      <div class="math-block" style="padding: 6px; margin: 0 0 8px 0; font-size: 1.05rem;">
         \(\displaystyle \mathbf{P}=\mathbf{L}\mathbf{L}^T\)
       </div>
+      <div style="font-size: 0.95rem; line-height: 1.4; margin-bottom: 0;">Sigma points: \(\gamma\) steps along the axes, pushed through \(\mathbf{L}\).</div>
     </div>
 
     <!-- Arrow 1 to 2 -->
@@ -71,59 +72,93 @@
 
   </div>
 
-  <!-- ROW 2: WHY A SMALL ALPHA -->
+  <!-- ROW 2: WHY A SMALL ALPHA (intuition + looping animation) -->
   <div style="display: flex; align-items: stretch; gap: 8px;">
 
-    <!-- Taylor argument -->
-    <div class="panel" data-step="4" style="flex: 1.15; padding: 12px 16px; margin: 0; background: #fffbeb; border: 2px solid #f59e0b;">
-      <div style="font-size: 1.15rem; font-weight: 700; color: #b45309; margin-bottom: 6px;">Why a small \(\alpha\)?</div>
-      <div style="font-size: 0.95rem; line-height: 1.4; margin-bottom: 6px; color: #78350f;">The points sample \(\mathbf{f}\) at \(\boldsymbol\delta=\pm\gamma(\mathbf{L})_i\), so \(\|\boldsymbol\delta\|\sim\gamma\):</div>
-      <div class="math-block" style="padding: 6px; margin: 0 0 6px 0; font-size: 0.95rem;">
-        \(\displaystyle \mathbf{f}(\hat{\mathbf{x}}+\boldsymbol\delta)=\mathbf{f}+\mathbf{J}\boldsymbol\delta+\tfrac12\boldsymbol\delta^T\mathbf{H}\boldsymbol\delta+\cdots\)
+    <!-- Intuition panel -->
+    <div class="panel" data-step="4" style="flex: 1; padding: 12px 16px; margin: 0; background: #fffbeb; border: 2px solid #f59e0b;">
+      <div style="font-size: 1.15rem; font-weight: 700; color: #b45309; margin-bottom: 6px;">Why choose a small \(\alpha\)?</div>
+      <div style="font-size: 1.05rem; line-height: 1.4; margin-bottom: 10px; color: #78350f;">Sigma points are <strong>probes</strong> of \(\mathbf{f}\). The parameter \(\alpha\) is the knob that sets how far from the mean they sit.</div>
+
+      <!-- Large alpha -->
+      <div style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px;">
+        <div style="width: 12px; height: 12px; border-radius: 50%; background: #dc2626; margin-top: 7px; flex: none;"></div>
+        <div style="font-size: 1.05rem; line-height: 1.4; color: #78350f;"><strong>Large \(\alpha\):</strong> probes land far away, where \(\mathbf{f}\) may look nothing like it does near \(\hat{\mathbf{x}}\).</div>
       </div>
-      <div style="font-size: 0.95rem; line-height: 1.4; color: #78350f;">The neglected high-order terms grow with \(\gamma=\alpha\sqrt{n+\kappa}\). A small \(\alpha\) keeps the sampling <strong>local</strong>, which matters most when \(\mathbf{f}\) bends strongly.</div>
+
+      <!-- Small alpha -->
+      <div style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px;">
+        <div style="width: 12px; height: 12px; border-radius: 50%; background: #16a34a; margin-top: 7px; flex: none;"></div>
+        <div style="font-size: 1.05rem; line-height: 1.4; color: #78350f;"><strong>Small \(\alpha\):</strong> probes stay where the distribution actually lives, so they capture the local behavior.</div>
+      </div>
+
+      <!-- Take-away -->
+      <div style="font-size: 1.05rem; line-height: 1.4; color: #78350f; margin-bottom: 6px;">The more strongly \(\mathbf{f}\) bends, the smaller \(\alpha\) should be.</div>
+      <div style="font-size: 0.95rem; line-height: 1.3; color: #92400e;">But this choice has a price: see the next slide.</div>
     </div>
 
-    <!-- Large alpha picture -->
-    <div class="panel" data-step="5" style="flex: 1; padding: 12px 14px; margin: 0;">
-      <div style="font-size: 1.05rem; font-weight: 700; color: #991b1b; margin-bottom: 6px;">Large \(\alpha\): points far from \(\hat{x}\)</div>
-      <svg viewBox="0 0 300 150" style="width: 100%; height: 150px; display: block; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px;">
-        <line x1="0" y1="149" x2="300" y2="149" stroke="#cbd5e1" stroke-width="1"/>
-        <polyline fill="none" stroke="#2563eb" stroke-width="2.5" points="0,135 25,135 50,135 75,134.7 100,132.8 112.5,129.3 125,120.7 137.5,102.7 150,75 162.5,47.3 175,29.3 187.5,20.7 200,17.2 225,15.3 250,15 275,15 300,15"/>
-        <line x1="118.75" y1="150" x2="181.25" y2="0" stroke="#16a34a" stroke-width="2"/>
-        <line x1="40" y1="135" x2="260" y2="15" stroke="#ea580c" stroke-width="2" stroke-dasharray="6 4"/>
-        <line x1="40" y1="135" x2="40" y2="149" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3 3"/>
-        <line x1="260" y1="15" x2="260" y2="149" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3 3"/>
-        <line x1="150" y1="75" x2="150" y2="149" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3 3"/>
-        <circle cx="40" cy="135" r="5" fill="#ea580c"/>
-        <circle cx="260" cy="15" r="5" fill="#ea580c"/>
-        <circle cx="150" cy="75" r="5" fill="#7c3aed"/>
-        <circle cx="40" cy="149" r="3.5" fill="#16a34a"/>
-        <circle cx="150" cy="149" r="3.5" fill="#7c3aed"/>
-        <circle cx="260" cy="149" r="3.5" fill="#16a34a"/>
-      </svg>
-      <div style="font-size: 0.88rem; line-height: 1.3; margin-top: 6px; color: #7f1d1d;">Points land on the flat tails: the secant slope (orange) misses the local slope at \(\hat{x}\) (green).</div>
-    </div>
+    <!-- Animated picture: sigma points move in and out along the curve -->
+    <div class="panel" data-step="5" style="flex: 1.5; padding: 12px 16px; margin: 0;">
+      <div style="font-size: 1.15rem; font-weight: 700; color: #1e3a8a; margin-bottom: 6px;">The knob \(\alpha\) in action</div>
+      <svg viewBox="0 0 600 220" style="width: 100%; height: 200px; display: block; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px;">
 
-    <!-- Small alpha picture -->
-    <div class="panel" data-step="5" style="flex: 1; padding: 12px 14px; margin: 0;">
-      <div style="font-size: 1.05rem; font-weight: 700; color: #166534; margin-bottom: 6px;">Small \(\alpha\): points stay local</div>
-      <svg viewBox="0 0 300 150" style="width: 100%; height: 150px; display: block; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px;">
-        <line x1="0" y1="149" x2="300" y2="149" stroke="#cbd5e1" stroke-width="1"/>
-        <polyline fill="none" stroke="#2563eb" stroke-width="2.5" points="0,135 25,135 50,135 75,134.7 100,132.8 112.5,129.3 125,120.7 137.5,102.7 150,75 162.5,47.3 175,29.3 187.5,20.7 200,17.2 225,15.3 250,15 275,15 300,15"/>
-        <line x1="118.75" y1="150" x2="181.25" y2="0" stroke="#16a34a" stroke-width="2"/>
-        <line x1="115" y1="142.4" x2="185" y2="7.6" stroke="#ea580c" stroke-width="2" stroke-dasharray="6 4"/>
-        <line x1="130" y1="113.5" x2="130" y2="149" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3 3"/>
-        <line x1="170" y1="36.5" x2="170" y2="149" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3 3"/>
-        <line x1="150" y1="75" x2="150" y2="149" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3 3"/>
-        <circle cx="130" cy="113.5" r="5" fill="#ea580c"/>
-        <circle cx="170" cy="36.5" r="5" fill="#ea580c"/>
-        <circle cx="150" cy="75" r="5" fill="#7c3aed"/>
-        <circle cx="130" cy="149" r="3.5" fill="#16a34a"/>
-        <circle cx="150" cy="149" r="3.5" fill="#7c3aed"/>
-        <circle cx="170" cy="149" r="3.5" fill="#16a34a"/>
+        <!-- x axis -->
+        <line x1="0" y1="215" x2="600" y2="215" stroke="#cbd5e1" stroke-width="1.5"/>
+
+        <!-- strongly nonlinear function f -->
+        <polyline fill="none" stroke="#2563eb" stroke-width="3" points="0,190 60,190 100,190 140,189.9 180,189.6 200,188.9 220,187.1 240,182.4 250,177.9 260,170.9 270,160.8 280,147 290,129.6 300,110 310,90.4 320,73 330,59.2 340,49.1 350,42.1 360,37.6 380,32.9 400,31.1 420,30.4 460,30.1 500,30 540,30 600,30"/>
+
+        <!-- true local slope of f at the mean (tangent) -->
+        <line x1="247.5" y1="215" x2="352.5" y2="5" stroke="#16a34a" stroke-width="2.5"/>
+
+        <!-- slope "seen" by the two sigma points (secant), follows the points -->
+        <line x1="112.5" y1="209.9" x2="487.5" y2="10.1" stroke="#ea580c" stroke-width="2.5" stroke-dasharray="7 5">
+          <animate attributeName="x1" dur="10s" repeatCount="indefinite" keyTimes="0;0.10;0.15;0.20;0.25;0.30;0.35;0.40;0.45;0.55;0.60;0.65;0.70;0.75;0.80;0.85;0.90;1" values="112.5;112.5;137.5;162.5;187.5;212.5;231.25;247.5;262.5;262.5;247.5;231.25;212.5;187.5;162.5;137.5;112.5;112.5"/>
+          <animate attributeName="y1" dur="10s" repeatCount="indefinite" keyTimes="0;0.10;0.15;0.20;0.25;0.30;0.35;0.40;0.45;0.55;0.60;0.65;0.70;0.75;0.80;0.85;0.90;1" values="209.9;209.9;209.7;209.2;207.8;204.1;198;188.1;173.5;173.5;188.1;198;204.1;207.8;209.2;209.7;209.9;209.9"/>
+          <animate attributeName="x2" dur="10s" repeatCount="indefinite" keyTimes="0;0.10;0.15;0.20;0.25;0.30;0.35;0.40;0.45;0.55;0.60;0.65;0.70;0.75;0.80;0.85;0.90;1" values="487.5;487.5;462.5;437.5;412.5;387.5;368.75;352.5;337.5;337.5;352.5;368.75;387.5;412.5;437.5;462.5;487.5;487.5"/>
+          <animate attributeName="y2" dur="10s" repeatCount="indefinite" keyTimes="0;0.10;0.15;0.20;0.25;0.30;0.35;0.40;0.45;0.55;0.60;0.65;0.70;0.75;0.80;0.85;0.90;1" values="10.1;10.1;10.3;10.8;12.2;15.9;22;31.9;46.5;46.5;31.9;22;15.9;12.2;10.8;10.3;10.1;10.1"/>
+        </line>
+
+        <!-- mean (central sigma point) -->
+        <circle cx="300" cy="110" r="7" fill="#7c3aed"/>
+        <circle cx="300" cy="215" r="4.5" fill="#7c3aed"/>
+
+        <!-- right sigma point, moving along the curve -->
+        <circle cx="450" cy="30.1" r="7" fill="#ea580c">
+          <animate attributeName="cx" dur="10s" repeatCount="indefinite" keyTimes="0;0.10;0.15;0.20;0.25;0.30;0.35;0.40;0.45;0.55;0.60;0.65;0.70;0.75;0.80;0.85;0.90;1" values="450;450;430;410;390;370;355;342;330;330;342;355;370;390;410;430;450;450"/>
+          <animate attributeName="cy" dur="10s" repeatCount="indefinite" keyTimes="0;0.10;0.15;0.20;0.25;0.30;0.35;0.40;0.45;0.55;0.60;0.65;0.70;0.75;0.80;0.85;0.90;1" values="30.1;30.1;30.2;30.7;31.8;34.7;39.6;47.5;59.2;59.2;47.5;39.6;34.7;31.8;30.7;30.2;30.1;30.1"/>
+        </circle>
+        <circle cx="450" cy="215" r="4.5" fill="#ea580c">
+          <animate attributeName="cx" dur="10s" repeatCount="indefinite" keyTimes="0;0.10;0.15;0.20;0.25;0.30;0.35;0.40;0.45;0.55;0.60;0.65;0.70;0.75;0.80;0.85;0.90;1" values="450;450;430;410;390;370;355;342;330;330;342;355;370;390;410;430;450;450"/>
+        </circle>
+
+        <!-- left sigma point, moving along the curve -->
+        <circle cx="150" cy="189.9" r="7" fill="#ea580c">
+          <animate attributeName="cx" dur="10s" repeatCount="indefinite" keyTimes="0;0.10;0.15;0.20;0.25;0.30;0.35;0.40;0.45;0.55;0.60;0.65;0.70;0.75;0.80;0.85;0.90;1" values="150;150;170;190;210;230;245;258;270;270;258;245;230;210;190;170;150;150"/>
+          <animate attributeName="cy" dur="10s" repeatCount="indefinite" keyTimes="0;0.10;0.15;0.20;0.25;0.30;0.35;0.40;0.45;0.55;0.60;0.65;0.70;0.75;0.80;0.85;0.90;1" values="189.9;189.9;189.8;189.4;188.2;185.3;180.4;172.5;160.8;160.8;172.5;180.4;185.3;188.2;189.4;189.8;189.9;189.9"/>
+        </circle>
+        <circle cx="150" cy="215" r="4.5" fill="#ea580c">
+          <animate attributeName="cx" dur="10s" repeatCount="indefinite" keyTimes="0;0.10;0.15;0.20;0.25;0.30;0.35;0.40;0.45;0.55;0.60;0.65;0.70;0.75;0.80;0.85;0.90;1" values="150;150;170;190;210;230;245;258;270;270;258;245;230;210;190;170;150;150"/>
+        </circle>
+
+        <!-- state label, fades between the two regimes -->
+        <text x="12" y="26" font-size="18" font-weight="700" fill="#dc2626" font-family="sans-serif" opacity="1">
+          Large α: far, secant is off
+          <animate attributeName="opacity" dur="10s" repeatCount="indefinite" keyTimes="0;0.2;0.3;0.7;0.8;1" values="1;1;0;0;1;1"/>
+        </text>
+        <text x="12" y="26" font-size="18" font-weight="700" fill="#16a34a" font-family="sans-serif" opacity="0">
+          Small α: close, secant ≈ tangent
+          <animate attributeName="opacity" dur="10s" repeatCount="indefinite" keyTimes="0;0.3;0.4;0.6;0.7;1" values="0;0;1;1;0;0"/>
+        </text>
       </svg>
-      <div style="font-size: 0.88rem; line-height: 1.3; margin-top: 6px; color: #14532d;">Points stay near the mean: the secant (orange) matches the local slope (green).</div>
+
+      <!-- Legend -->
+      <div style="display: flex; gap: 14px; margin-top: 6px; font-size: 0.88rem; line-height: 1.3; color: #334155;">
+        <span><span style="display: inline-block; width: 16px; height: 3px; background: #2563eb; vertical-align: middle;"></span> \(\mathbf{f}\)</span>
+        <span><span style="display: inline-block; width: 16px; height: 3px; background: #16a34a; vertical-align: middle;"></span> true local slope</span>
+        <span><span style="display: inline-block; width: 16px; height: 0; border-top: 3px dashed #ea580c; vertical-align: middle;"></span> slope seen by the points</span>
+        <span><span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #7c3aed; vertical-align: middle;"></span> mean</span>
+      </div>
     </div>
 
   </div>
