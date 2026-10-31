@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>UKF: From Negative Variance to NaN</title>
+  <link rel="stylesheet" href="slideui.css">
+  <script src="slideui.js" defer></script>
+  <style>
+    .arrow { font-size: 2rem; font-weight: bold; line-height: 1; color: #94a3b8; display: inline-block; }
+    .arrow-right { animation: nudge-x 1.2s ease-in-out infinite; }
+    .arrow-down { animation: nudge-y 1.2s ease-in-out infinite; }
+    @keyframes nudge-x { 0%, 100% { transform: translateX(-4px); } 50% { transform: translateX(4px); } }
+    @keyframes nudge-y { 0%, 100% { transform: translateY(-4px); } 50% { transform: translateY(4px); } }
+  </style>
+</head>
+<body>
+
+<div class="slide-layout" style="padding: 36px 48px; justify-content: flex-start;">
+
+  <!-- HEADER -->
+  <div style="margin-bottom: 14px;">
+    <h1 class="title" style="color: #b91c1c; font-size: 2.5rem; margin-bottom: 0.25rem;">From Negative Variance to NaN</h1>
+    <p class="subtitle" style="font-size: 1.35rem; margin-bottom: 0;">Why an invalid covariance crashes the filter one step later</p>
+  </div>
+
+  <!-- RECAP of the previous slide -->
+  <div style="background: #fef2f2; border: 2px solid #fca5a5; border-radius: 8px; padding: 8px 18px; margin-bottom: 16px; font-size: 1.1rem; color: #7f1d1d;">
+    Previous slide: in the scalar example \(P_{k+1}=p_{11}<0\), a negative variance.
+  </div>
+
+  <!-- ROW: Sylvester -> Cholesky -> NaN -->
+  <div style="display: flex; align-items: stretch; gap: 10px; margin-bottom: 16px;">
+
+    <!-- 4. Sylvester -->
+    <div class="panel" data-step="1" style="flex: 1; padding: 16px 18px; margin: 0; background: #fffbeb; border: 2px solid #f59e0b;">
+      <p class="text-xl" style="font-size: 1.3rem; font-weight: 700; color: #b45309; margin-bottom: 8px;">4. When is \(\mathbf{P}\) positive-definite?</p>
+      <p class="text-lg" style="font-size: 1.05rem; color: #78350f; margin-bottom: 8px;">Sylvester's criterion for a \(2\times2\) matrix:</p>
+      <div class="math-block" style="padding: 8px; margin: 0 0 8px 0; font-size: 1.1rem;">
+        \(\displaystyle \mathbf{P}\succ0\iff\begin{cases}p_{11}>0\\ \det\mathbf{P}>0\end{cases}\)
+      </div>
+      <p class="text-lg" style="font-size: 1.05rem; color: #78350f; margin: 0;">In our scalar example \(P_{k+1}=p_{11}\): the first condition already fails.</p>
+    </div>
+
+    <div data-step="2" style="width: 30px; align-self: center; display: flex; justify-content: center;">
+      <span class="arrow arrow-right">→</span>
+    </div>
+
+    <!-- 5. Cholesky -->
+    <div class="panel" data-step="2" style="flex: 1.45; padding: 16px 18px; margin: 0; background: #fef2f2; border: 2px solid #fca5a5;">
+      <p class="text-xl" style="font-size: 1.3rem; font-weight: 700; color: #991b1b; margin-bottom: 8px;">5. Cholesky at step \(k+2\): \(\mathbf{P}_{k+1}=\mathbf{L}\mathbf{L}^T\)</p>
+      <div class="math-block" style="padding: 6px; margin: 0 0 8px 0; font-size: 1rem;">
+        \(\displaystyle \begin{bmatrix}p_{11}&p_{12}\\p_{12}&p_{22}\end{bmatrix}=\begin{bmatrix}L_{11}^2&L_{11}L_{21}\\L_{11}L_{21}&L_{21}^2+L_{22}^2\end{bmatrix}\)
+      </div>
+      <div class="math-block" style="padding: 6px; margin: 0 0 8px 0; font-size: 1.1rem; color: #dc2626;">
+        \(\displaystyle L_{11}=\sqrt{p_{11}},\qquad L_{21}=\frac{p_{12}}{L_{11}}\)
+      </div>
+      <div class="math-block" style="padding: 6px; margin: 0 0 8px 0; font-size: 1.1rem; color: #dc2626;">
+        \(\displaystyle L_{22}=\sqrt{\det\mathbf{P}/p_{11}}\)
+      </div>
+      <p class="text-lg" style="font-size: 1.05rem; color: #7f1d1d; margin: 0;"><strong>\(\sqrt{\text{negative}}\)</strong> as soon as \(p_{11}<0\) or \(\det\mathbf{P}<0\).</p>
+    </div>
+
+    <div data-step="3" style="width: 30px; align-self: center; display: flex; justify-content: center;">
+      <span class="arrow arrow-right">→</span>
+    </div>
+
+    <!-- 6. NaN -->
+    <div class="panel" data-step="3" style="flex: 0.95; padding: 16px 18px; margin: 0; background: #fef2f2; border: 2px solid #dc2626;">
+      <p class="text-xl" style="font-size: 1.3rem; font-weight: 700; color: #991b1b; margin-bottom: 8px;">6. Sigma points are NaN</p>
+      <div class="math-block" style="padding: 8px; margin: 0 0 8px 0; font-size: 1.05rem; color: #dc2626;">
+        \(\displaystyle \mathbf{x}_i=\hat{\mathbf{x}}_{k+1}\pm\gamma(\mathbf{L})_i=\text{NaN}\)
+      </div>
+      <p class="text-lg" style="font-size: 1.05rem; color: #7f1d1d; margin: 0;">No prediction for \(k+2\), and every later estimate is NaN.</p>
+    </div>
+
+  </div>
+
+  <!-- TIMING BANNER -->
+  <div data-step="4" style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 18px; font-size: 1.05rem; line-height: 1.4;">
+    <strong>Where and when:</strong> the damage is done in \(k\to k+1\) (\(\mathbf{P}_{k+1}\) is not PD), but nothing fails there. The crash comes one iteration later, at the Cholesky needed to place the sigma points for \(k+2\).
+  </div>
+
+</div>
+
+</body>
+</html>

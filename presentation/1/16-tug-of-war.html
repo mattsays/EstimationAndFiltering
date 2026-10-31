@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>UKF: From Tug of War to Negative Variance</title>
+  <link rel="stylesheet" href="slideui.css">
+  <script src="slideui.js" defer></script>
+  <style>
+    .arrow { font-size: 2rem; font-weight: bold; line-height: 1; color: #94a3b8; display: inline-block; }
+    .arrow-right { animation: nudge-x 1.2s ease-in-out infinite; }
+    .arrow-down { animation: nudge-y 1.2s ease-in-out infinite; }
+    @keyframes nudge-x { 0%, 100% { transform: translateX(-4px); } 50% { transform: translateX(4px); } }
+    @keyframes nudge-y { 0%, 100% { transform: translateY(-4px); } 50% { transform: translateY(4px); } }
+  </style>
+</head>
+<body>
+
+<div class="slide-layout" style="padding: 36px 48px; justify-content: flex-start;">
+
+  <!-- HEADER -->
+  <div style="margin-bottom: 16px;">
+    <h1 class="title" style="color: #b91c1c; font-size: 2.5rem; margin-bottom: 0.25rem;">From Tug of War to Negative Variance</h1>
+    <p class="subtitle" style="font-size: 1.35rem; margin-bottom: 0;">A scalar example: can the UKF produce a negative variance?</p>
+  </div>
+
+  <!-- ROW 1: inputs -> sigma points + weights -->
+  <div style="display: flex; align-items: stretch; gap: 12px; margin-bottom: 16px;">
+
+    <!-- Inputs -->
+    <div class="panel" style="flex: 1; padding: 16px 20px; margin: 0;">
+      <p class="text-xl" style="font-size: 1.3rem; font-weight: 700; margin-bottom: 10px;">Inputs</p>
+      <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px;">
+        <span class="text-muted" style="width: 90px; font-size: 1rem;">state</span>
+        <span style="font-size: 1.15rem;">\(x \sim \mathcal{N}(0,\, P_k)\)</span>
+      </div>
+      <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px;">
+        <span class="text-muted" style="width: 90px; font-size: 1rem;">function</span>
+        <span style="font-size: 1.15rem;">\(f(x) = x^2\)</span>
+      </div>
+      <div style="display: flex; align-items: baseline; gap: 10px;">
+        <span class="text-muted" style="width: 90px; font-size: 1rem;">parameters</span>
+        <span style="font-size: 1.15rem;">\(n=1,\ \kappa=0,\ \alpha=0.1\)</span>
+      </div>
+    </div>
+
+    <div data-step="1" style="width: 36px; align-self: center; display: flex; justify-content: center;">
+      <span class="arrow arrow-right">→</span>
+    </div>
+
+    <!-- Sigma points -->
+    <div class="panel panel-primary" data-step="1" style="flex: 1; padding: 16px 20px; margin: 0;">
+      <p class="text-xl text-primary" style="font-size: 1.3rem; font-weight: 700; margin-bottom: 10px;">Sigma points</p>
+      <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px;">
+        <span class="text-muted" style="width: 90px; font-size: 1rem;">before \(f\)</span>
+        <span style="font-size: 1.15rem;">\(x_0=0,\ x_{1,2}=\pm0.1\sqrt{P_k}\)</span>
+      </div>
+      <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px;">
+        <span class="text-muted" style="width: 90px; font-size: 1rem;">after \(f\)</span>
+        <span style="font-size: 1.15rem;">\(y_0=0,\ y_{1,2}=0.01\,P_k\)</span>
+      </div>
+      <div style="display: flex; align-items: baseline; gap: 10px;">
+        <span class="text-muted" style="width: 90px; font-size: 1rem;">mean of \(y\)</span>
+        <span style="font-size: 1.15rem;">\(\bar{y}=P_k\)</span>
+      </div>
+    </div>
+
+    <div data-step="1" style="width: 24px; align-self: center; text-align: center; font-size: 1.8rem; font-weight: 700; color: #94a3b8;">+</div>
+
+    <!-- Weights -->
+    <div class="panel panel-accent" data-step="1" style="flex: 1; padding: 16px 20px; margin: 0;">
+      <p class="text-xl text-accent" style="font-size: 1.3rem; font-weight: 700; margin-bottom: 10px;">Weights</p>
+      <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px;">
+        <span class="text-muted" style="width: 90px; font-size: 1rem;">mean</span>
+        <span style="font-size: 1.15rem;">\(w_0=-99,\ w_{1,2}=50\)</span>
+      </div>
+      <div style="display: flex; align-items: baseline; gap: 10px;">
+        <span class="text-muted" style="width: 90px; font-size: 1rem;">covariance</span>
+        <span style="font-size: 1.15rem;">\(w_0^c=-98.01+\beta\)</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ROW 2: the tug of war -->
+  <div class="panel" data-step="2" style="padding: 14px 20px; margin: 0 0 12px 0; background: #f8fafc; border: 2px solid #e2e8f0;">
+    <p style="font-size: 1.3rem; font-weight: 700; color: #1e3a8a; margin: 0 0 10px 0;">The tug of war that builds the new variance \(P_{k+1}\)</p>
+
+    <div style="display: flex; gap: 16px;">
+
+      <!-- Case beta = +2 -->
+      <div style="flex: 1; background: #ffffff; border: 2px solid #86efac; border-radius: 8px; padding: 10px 14px;">
+        <div style="font-size: 1.1rem; font-weight: 700; color: #166534; margin-bottom: 8px;">\(\beta=+2\)</div>
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+          <div style="width: 330px; font-size: 1rem;">outer: \(\sum_{i=1}^{2}w_i\,(y_i-\bar{y})^2\) = <span style="color: #16a34a; font-weight: 700;">+98.01 \(P_k^2\)</span></div>
+          <div style="flex: 1; height: 16px; background: #e2e8f0; border-radius: 4px; overflow: hidden;"><div style="width: 98%; height: 100%; background: #16a34a;"></div></div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+          <div style="width: 330px; font-size: 1rem;">center: \(w_0^c\,(y_0-\bar{y})^2\) = <span style="color: #dc2626; font-weight: 700;">&minus;96.01 \(P_k^2\)</span></div>
+          <div style="flex: 1; height: 16px; background: #e2e8f0; border-radius: 4px; overflow: hidden;"><div style="width: 96%; height: 100%; background: #dc2626;"></div></div>
+        </div>
+        <div style="font-size: 1.1rem; font-weight: 700; color: #166534;">\(P_{k+1}=+2.00\,P_k^2>0\) ✓ valid variance</div>
+      </div>
+
+      <!-- Case beta = -2 -->
+      <div data-step="3" style="flex: 1; background: #ffffff; border: 2px solid #fca5a5; border-radius: 8px; padding: 10px 14px;">
+        <div style="font-size: 1.1rem; font-weight: 700; color: #991b1b; margin-bottom: 8px;">\(\beta=-2\)</div>
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+          <div style="width: 330px; font-size: 1rem;">outer: \(\sum_{i=1}^{2}w_i\,(y_i-\bar{y})^2\) = <span style="color: #16a34a; font-weight: 700;">+98.01 \(P_k^2\)</span></div>
+          <div style="flex: 1; height: 16px; background: #e2e8f0; border-radius: 4px; overflow: hidden;"><div style="width: 98%; height: 100%; background: #16a34a;"></div></div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+          <div style="width: 330px; font-size: 1rem;">center: \(w_0^c\,(y_0-\bar{y})^2\) = <span style="color: #dc2626; font-weight: 700;">&minus;100.01 \(P_k^2\)</span></div>
+          <div style="flex: 1; height: 16px; background: #e2e8f0; border-radius: 4px; overflow: hidden;"><div style="width: 100%; height: 100%; background: #dc2626;"></div></div>
+        </div>
+        <div style="font-size: 1.1rem; font-weight: 700; color: #991b1b;">\(P_{k+1}=-2.00\,P_k^2<0\) ✗ negative variance</div>
+      </div>
+
+    </div>
+
+    <p data-step="3" style="font-size: 1.05rem; color: #334155; margin: 10px 0 0 0;">The two sides almost cancel, so a tiny leftover decides the sign: \(\beta\) tips the balance.</p>
+  </div>
+
+  <!-- ROW 3: hook to the next slide -->
+  <div data-step="4" style="background: #fef2f2; border: 2px solid #fca5a5; border-radius: 8px; padding: 10px 18px; font-size: 1.1rem; color: #7f1d1d;">
+    <strong>A negative variance is not a valid covariance.</strong> What does the filter do with it at the next step?
+  </div>
+
+</div>
+
+</body>
+</html>

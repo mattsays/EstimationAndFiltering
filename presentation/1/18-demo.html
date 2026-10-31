@@ -157,7 +157,7 @@
         <div class="cv-wrap"><canvas id="canvasY"></canvas></div>
         <div id="instabilityAlert" class="alert">
           <strong>Cholesky failure (NaN)!</strong>
-          \(\mathbf{P}_{k+1}\) lost positive-definiteness: \(\mathbf{L}_{k+1}\) contains <strong>NaN</strong>.
+          <span id="alertDetail"></span>
         </div>
         <div class="legend">
           <div class="legend-item"><div class="l-dash"></div><span>True warped \(1\sigma\) contour</span></div>
@@ -377,8 +377,10 @@
       $('f1_expr').value = 'x + 0.2*y^2';
       $('f2_expr').value = 'y + 0.5*cos(x^2)';
     } else {
-      state.mx = 2.5; state.my = 2.0; state.sx = 2.5; state.sy = 2.5; state.r = 0.5;
-      state.alpha = 0.2; state.kappa = -1.0; state.beta = -2.0;
+      // same state and alpha as the default; stronger nonlinearity + negative kappa/beta
+      // => w0c < 0 => p11 < 0 => sqrt(p11) = NaN
+      state.mx = 1.7; state.my = -0.1; state.sx = 1.5; state.sy = 1.6; state.r = 0.32;
+      state.alpha = 0.8; state.kappa = -1.0; state.beta = -3.0;
       $('f1_expr').value = 'x + 0.8*y^2';
       $('f2_expr').value = 'y + 0.5*cos(x^2)';
     }
@@ -648,6 +650,14 @@
     $('w0c_val').style.color = ukf.w0c < 0 ? '#dc2626' : '';
 
     $('instabilityAlert').classList.toggle('active', ukf.isIndefinite);
+    if (ukf.isIndefinite) {
+      var p11 = ukf.PY[0][0];
+      $('alertDetail').innerHTML = (isNaN(p11) || p11 >= 0)
+        ? 'P<sub>k+1</sub> lost positive-definiteness: L<sub>k+1</sub> contains NaN.'
+        : 'p<sub>11</sub> = ' + p11.toFixed(2) + ' &lt; 0, so L<sub>11</sub> = &radic;p<sub>11</sub> = NaN, ' +
+          'and the NaN spreads to L<sub>21</sub>, L<sub>22</sub>. This can only happen because w<sub>0</sub><sup>c</sup> = ' +
+          ukf.w0c.toFixed(2) + ' &lt; 0 (negative weight on the centre point).';
+    }
 
     renderMatrix('mat_P', ukf.P); renderMatrix('mat_L', ukf.L);
     renderMatrix('mat_PY', ukf.PY); renderMatrix('mat_LY', ukf.LY);
