@@ -18,7 +18,7 @@ class NoiseSensitivityTests(unittest.TestCase):
 
     def test_filter_noise_matches_truth_and_restores_after_error(self):
         saved = {name: getattr(sb, name) for name in ('Q1', 'Q2', 'SIGMA_R', 'SIGMA_B', 'Q', 'R')}
-        for parameter in ns.BASE:
+        for parameter in ns.SWEEPS:
             config = ns.configuration(parameter, ns.BASE[parameter] * 2)
             with self.assertRaisesRegex(RuntimeError, 'restore'):
                 with ns.filter_noise(config):
@@ -56,15 +56,18 @@ class NoiseSensitivityTests(unittest.TestCase):
             np.testing.assert_array_equal(other_truth, truth)
             np.testing.assert_array_equal(other_obs[:, fixed_channel], base_obs[:, fixed_channel])
 
-    def test_process_sweeps_reuse_measurement_noise(self):
+    def test_process_noise_cannot_vary(self):
+        self.assertEqual(set(ns.SWEEPS), {'sigma_r', 'sigma_b_deg'})
         draws = ns.draw_randomness(np.random.default_rng(17), 20)
         for parameter in ('q_position', 'q_velocity'):
-            config = ns.configuration(parameter, ns.BASE[parameter] * 2)
-            truth, obs = ns.simulate(draws, config)
-            expected = sb.h_batch(truth.T).T
-            np.testing.assert_allclose(obs[:, 0] - expected[:, 0], config['sigma_r'] * draws[2][:, 0], atol=1e-15)
-            np.testing.assert_allclose(sb.wrap(obs[:, 1] - expected[:, 1]),
-                                       np.deg2rad(config['sigma_b_deg']) * draws[2][:, 1], atol=1e-15)
+            with self.assertRaises(ValueError):
+                ns.configuration(parameter, ns.BASE[parameter] * 2)
+            invalid = {**ns.BASE, parameter: ns.BASE[parameter] * 2}
+            with self.assertRaisesRegex(ValueError, 'process noise is fixed'):
+                ns.simulate(draws, invalid)
+            with self.assertRaisesRegex(ValueError, 'process noise is fixed'):
+                with ns.filter_noise(invalid):
+                    self.fail('A changed Q must not enter the experiment')
 
     def test_failed_track_invalidates_whole_condition_without_stopping_other_methods(self):
         rng = np.random.default_rng(8)

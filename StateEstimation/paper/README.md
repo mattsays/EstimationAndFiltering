@@ -1,6 +1,6 @@
 # Typst paper draft
 
-The current English working draft is [main.typ](main.typ), compiled as [draft.pdf](draft.pdf). It contains the problem statement, related work, implemented estimators, experimental protocol, four noise sweeps, results, limitations and references. Citations use IEEE numbering; this is a readable single-column course-paper layout, not an official IEEE submission template.
+The current English working draft is [main.typ](main.typ), compiled as [draft.pdf](draft.pdf). It contains the problem statement, related work, implemented estimators, experimental protocol, two measurement-noise sweeps at fixed process covariance, results, limitations and references. Citations use IEEE numbering; this is a readable single-column course-paper layout, not an official IEEE submission template.
 
 The author is currently Mattia Sicoli, following the project owner. Confirm the final author list before submission if this is a joint paper.
 
@@ -39,15 +39,17 @@ typst compile --root .. main.typ draft.pdf
 
 The draft was checked with Typst 0.15.0. It uses built-in Typst features and a local BibLaTeX bibliography, without remote template packages.
 
-Tables and numerical statements read the project's existing `../ship_tracking/noise-sensitivity.json`; no result JSON is duplicated. Assertions reject a different run count, seed, time grid, nominal noise or sweep grid until the corresponding prose is revised.
+Tables and numerical statements read the project's existing `../ship_tracking/noise-sensitivity.json`; no result JSON is duplicated. Assertions reject a different run count, seed, time grid, nominal noise or measurement sweep grid until the corresponding prose is revised.
 
-To regenerate the paper's four vector plots, run from `../ship_tracking` in a Python environment with NumPy and Matplotlib:
+To regenerate the paper's two vector plots, run from `../ship_tracking` in a Python environment with NumPy and Matplotlib:
 
 ```bash
 python3 make_kf_report.py --paper-dir ../paper/figures
 ```
 
 Then recompile the paper. Regenerate the figures whenever the experiment data change; Typst loads the numerical tables dynamically but embeds the last exported SVGs. The plotting command also refreshes the existing Markdown report. The simulation kernels and result file are unchanged by paper authoring.
+
+The process covariance remains `Q = diag(0.0001, 0.0001, 0.0001, 0.0001)` per substep. Only bearing SD and range SD vary, independently; the other radar SD stays nominal.
 
 ## Selected literature and where it belongs
 

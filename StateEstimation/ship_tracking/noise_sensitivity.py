@@ -1,7 +1,7 @@
-"""Paired one-factor-at-a-time sweeps of measurement and process noise.
+"""Paired one-factor-at-a-time sweeps of radar measurement noise with fixed process covariance.
 
 All noises are independent white Gaussian sequences. Each sweep varies exactly
-one discrete-time standard deviation, with truth and filter covariances matched.
+one radar standard deviation. The process covariance Q remains fixed.
 Run: python3 noise_sensitivity.py --runs 30 --scans 800
 """
 
@@ -22,20 +22,26 @@ BASE = {'sigma_r': 0.01, 'sigma_b_deg': 0.5, 'q_position': 0.01, 'q_velocity': 0
 SWEEPS = {
     'sigma_b_deg': (0.5, 2., 5., 10., 20., 30.),
     'sigma_r': (0.01, 0.02, 0.05, 0.1, 0.2, 0.5),
-    'q_position': (0.0025, 0.005, 0.01, 0.02, 0.04, 0.08),
-    'q_velocity': (0.0025, 0.005, 0.01, 0.02, 0.04, 0.08),
 }
 
 
 def configuration(parameter, value):
-    if parameter not in BASE or not np.isfinite(value) or value <= 0:
-        raise ValueError('unknown noise parameter or non-positive/non-finite value')
+    if parameter not in SWEEPS or not np.isfinite(value) or value <= 0:
+        raise ValueError('only bearing/range noise may vary, with a positive finite SD')
     return {**BASE, parameter: float(value)}
+
+
+def validate_configuration(config):
+    if set(config) != set(BASE) or any(not np.isfinite(v) or v <= 0 for v in config.values()):
+        raise ValueError('noise configuration must contain positive finite standard deviations')
+    if any(config[name] != BASE[name] for name in ('q_position', 'q_velocity')):
+        raise ValueError('process noise is fixed at the nominal Q in this experiment')
 
 
 @contextmanager
 def filter_noise(config):
     """Give all filters the actual noise parameters and restore globals on exit."""
+    validate_configuration(config)
     names = ('Q1', 'Q2', 'SIGMA_R', 'SIGMA_B', 'Q', 'R')
     saved = {name: getattr(sb, name) for name in names}
     try:
@@ -63,6 +69,7 @@ def draw_randomness(rng, scans):
 
 def simulate(draws, config):
     """Replay fixed standard-normal draws at the specified true noise levels."""
+    validate_configuration(config)
     initial, process, measurement = draws
     x = initial.copy()
     states = np.empty((len(process), 4))
@@ -133,8 +140,10 @@ def main():
     hashes = {name: hashlib.sha256((here / name).read_bytes()).hexdigest()
               for name in ('noise_sensitivity.py', 'ship_benchmark.py')}
     result = {
-        'schema_version': 1, 'runs': args.runs, 'scans': args.scans,
+        'schema_version': 2, 'runs': args.runs, 'scans': args.scans,
         'seed': args.seed, 'burn_in': args.burn_in, 'base': BASE,
+        'sensitivity_parameters': list(SWEEPS),
+        'fixed_process_covariance': np.diag([BASE['q_position'] ** 2] * 2 + [BASE['q_velocity'] ** 2] * 2).tolist(),
         'dt': sb.DT, 'substeps': sb.SUBSTEPS, 'radar_interval': sb.DT * sb.SUBSTEPS,
         'initial_mean': sb.X0_HAT.tolist(), 'initial_covariance_scale': sb.P0,
         'noise_model': 'mutually independent, temporally white Gaussian noise',
@@ -167,7 +176,7 @@ def main():
             temporary.replace(args.out)
     result['complete'] = True
     args.out.write_text(json.dumps(result, indent=2, allow_nan=False))
-    print(f'\nWrote {args.out}: four sweeps, {len(evaluated)} unique conditions.', flush=True)
+    print(f'\nWrote {args.out}: two measurement sweeps, {len(evaluated)} unique conditions.', flush=True)
 
 
 if __name__ == '__main__':

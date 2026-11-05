@@ -1,0 +1,6 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+
+# Local editor output; the versioned paper preview is draft.pdf.
+/StateEstimation/paper/main.pdf

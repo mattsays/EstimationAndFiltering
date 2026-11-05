@@ -10,9 +10,9 @@
 #let expected-levels = (
   sigma_b_deg: (0.5, 2.0, 5.0, 10.0, 20.0, 30.0),
   sigma_r: (0.01, 0.02, 0.05, 0.1, 0.2, 0.5),
-  q_position: (0.0025, 0.005, 0.01, 0.02, 0.04, 0.08),
-  q_velocity: (0.0025, 0.005, 0.01, 0.02, 0.04, 0.08),
 )
+#assert(data.sweeps.keys().sorted() == expected-levels.keys().sorted(),
+  message: "This paper includes only bearing and range noise sweeps.")
 #for (parameter, expected) in expected-levels {
   assert(data.sweeps.at(parameter).map(case => case.value) == expected,
     message: "Update the paper's sweep grid for " + parameter)

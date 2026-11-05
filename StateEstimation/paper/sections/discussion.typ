@@ -1,4 +1,3 @@
-#pagebreak()
 = Discussion and limitations
 
 The baseline has linear motion while the other filters know the nonlinear turn. Observed differences therefore combine motion-model mismatch, Cartesian conversion statistics, and nonlinear moment approximations. A further experiment using constant-velocity truth for every method would be needed to isolate measurement nonlinearity. Likewise, no parameter search was performed to build an optimally tuned linear maneuvering tracker.

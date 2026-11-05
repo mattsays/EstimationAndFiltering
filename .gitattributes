@@ -1,0 +1,5 @@
+*.pdf binary
+*.png binary
+
+# Matplotlib SVG paths contain harmless trailing spaces.
+*.svg whitespace=-blank-at-eol

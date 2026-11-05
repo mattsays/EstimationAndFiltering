@@ -4,7 +4,7 @@
 
 [Project 2](../Project%202.md) includes both process noise $\mathbf{W}_k\sim\mathcal{N}(0,Q)$ and measurement noise $\mathbf{V}_k\sim\mathcal{N}(0,R)$. It gives no numerical values for their covariances and does not require a noise sensitivity sweep. Replacing white noise with coloured noise, AR noise or a random walk is an optional improvement direction. The project already follows the nonlinear radar measurement direction.
 
-The experiments below model **both process and measurement noise** as independent, temporally white Gaussian sequences. Varying their standard deviations studies noise intensity; it does not implement the optional coloured-noise extension.
+The experiments below model **both process and measurement noise** as independent, temporally white Gaussian sequences. Only bearing and range standard deviations are varied. The process covariance is fixed at $Q=\operatorname{diag}(10^{-4},10^{-4},10^{-4},10^{-4})$ in every condition. This does not implement the optional coloured-noise extension.
 
 ## Models and parameters
 
@@ -37,10 +37,10 @@ Bearing standard deviations are displayed in degrees, converted to radians befor
 | --- | --- | --- |
 | Bearing measurement $\sigma_\theta$ | 0.5 degrees | 0.5, 2, 5, 10, 20, 30 degrees |
 | Range measurement $\sigma_r$ | 0.01 m | 0.01, 0.02, 0.05, 0.1, 0.2, 0.5 m |
-| Position process increment $q_p$ | 0.01 m | 0.0025, 0.005, 0.01, 0.02, 0.04, 0.08 m |
-| Velocity process increment $q_v$ | 0.01 m/s | 0.0025, 0.005, 0.01, 0.02, 0.04, 0.08 m/s |
+| Position process increment $q_p$ | 0.01 m | Fixed |
+| Velocity process increment $q_v$ | 0.01 m/s | Fixed |
 
-**One parameter varies at a time.** Within a process-noise sweep, the same SD is used for the two symmetric spatial axes, while the other process-noise block and both measurement noises stay nominal. Standard deviations are varied, so multiplying an SD by two multiplies its variance by four.
+**One parameter varies at a time.** The bearing sweep keeps range noise nominal, and the range sweep keeps bearing noise nominal. Both process-noise blocks stay fixed in both sweeps. Standard deviations are varied, so multiplying an SD by two multiplies its variance by four.
 
 ## Linear KF baseline
 
@@ -74,12 +74,12 @@ Converted-measurement filtering and its conversion bias and covariance issues ar
 
 - 30 trajectories per condition, 800 radar scans per trajectory, seed 20261026.
 - Integration step 0.01 s, 5 substeps per radar scan, radar interval 0.05 s, trajectory duration 40 s.
-- The same initial states and standardized process and measurement draws are reused across every condition. Changing measurement noise leaves truth unchanged. Changing process noise necessarily changes the trajectories, using the same underlying random draws.
-- Within each condition, all five filters receive identical truth and observations for evaluation. Each filter is given the actual noise levels: both its $Q$ and $R$ are updated to match the simulator. This is a matched-noise sensitivity study, not a covariance-misspecification experiment.
+- The same initial states and standardized process and measurement draws are reused across every condition. Every condition uses identical true trajectories because the process noise is fixed. Only the selected measurement-noise amplitude changes.
+- Within each condition, all five filters receive identical truth and observations for evaluation. Each filter uses the fixed nominal $Q$ and the actual polar-noise $R$ for that condition; KF-CV approximates the converted Cartesian covariance as described above. This is a matched-noise sensitivity study, not a covariance-misspecification experiment.
 - Every filter starts from mean $[1,1,1,1]^T$ and covariance $10I_4$. The nonlinear shore-turn model and all other parameters remain fixed. KF-CV retains its constant-velocity model and has no separate maneuver-noise tuning.
 - Position RMSE at each scan is the square root of the mean squared Euclidean position error across all trajectories. Velocity RMSE uses the two velocity components. Tables average these per-scan RMSE values over scans 301-800 (15.05-40 s). They do not pool time samples before taking the square root.
 - All tracks enter the metrics. A non-finite estimate or numerical failure invalidates the entire method/condition; survivor-only averages are not reported. Failed points appear as gaps in graphs and `FAILED` in tables.
-- The nominal condition is identical in all four sweeps and is evaluated once, then reused within this execution. There are 24 displayed points and 21 unique configurations. CKF and SCKF are both executed, even where their curves overlap.
+- The nominal condition is identical in both measurement sweeps and is evaluated once, then reused within this execution. There are 12 displayed points and 11 unique configurations. CKF and SCKF are both executed, even where their curves overlap.
 - The EKF evaluates the dynamics Jacobian before propagation. Timings include filtering and conversion, excluding simulation and plotting; they depend on implementation and hardware.
 
 ## Nominal-noise comparison
@@ -89,10 +89,10 @@ All four noise standard deviations are nominal. Runtime is per 800-scan track.
 | Method | Position RMSE (m) | Velocity RMSE (m/s) | Runtime (ms/track) | Tracks |
 | --- | ---: | ---: | ---: | ---: |
 | KF-CV (converted) | 0.0225 | 0.4378 | 19.0 | 30/30 |
-| EKF | 0.0222 | 0.1818 | 66.3 | 30/30 |
-| UKF | 0.0223 | 0.1684 | 151.9 | 30/30 |
-| CKF | 0.0223 | 0.1620 | 149.2 | 30/30 |
-| SCKF | 0.0223 | 0.1620 | 176.4 | 30/30 |
+| EKF | 0.0222 | 0.1818 | 66.2 | 30/30 |
+| UKF | 0.0223 | 0.1684 | 147.8 | 30/30 |
+| CKF | 0.0223 | 0.1620 | 144.1 | 30/30 |
+| SCKF | 0.0223 | 0.1620 | 183.2 | 30/30 |
 
 ## Measurement noise
 
@@ -122,35 +122,6 @@ Each table cell is **position RMSE (m) / velocity RMSE (m/s)**. All other noise 
 | 0.2 | 0.1643 / 0.5522 | 0.0815 / 0.2131 | 0.0821 / 0.2613 | 0.0812 / 0.2483 | 0.0812 / 0.2483 |
 | 0.5 | 0.3810 / 0.6658 | 0.1479 / 0.2478 | 0.1530 / 0.3393 | 0.1498 / 0.3121 | 0.1498 / 0.3121 |
 
-
-## Process noise
-
-Each table cell is **position RMSE (m) / velocity RMSE (m/s)**. All other noise parameters stay at the nominal values above.
-
-![Independent noise sweeps: position and velocity RMSE for all five filters.](figures/process-noise-comparison.png)
-
-### Process noise on position
-
-| Position increment SD per substep (m) | KF-CV (converted) | EKF | UKF | CKF | SCKF |
-| ---: | ---: | ---: | ---: | ---: | ---: |
-| 0.0025 | 0.0203 / 0.2483 | 0.0167 / 0.0986 | 0.0165 / 0.1026 | 0.0166 / 0.0990 | 0.0166 / 0.0990 |
-| 0.005 | 0.0203 / 0.3181 | 0.0190 / 0.1364 | 0.0189 / 0.1253 | 0.0189 / 0.1222 | 0.0189 / 0.1222 |
-| 0.01 | 0.0225 / 0.4378 | 0.0222 / 0.1818 | 0.0223 / 0.1684 | 0.0223 / 0.1620 | 0.0223 / 0.1620 |
-| 0.02 | 0.0260 / 0.6875 | 0.0260 / 0.2647 | 0.0260 / 0.2421 | 0.0260 / 0.2320 | 0.0260 / 0.2320 |
-| 0.04 | 0.0285 / 0.8759 | 0.0295 / 0.4442 | 0.0296 / 0.3688 | 0.0295 / 0.3618 | 0.0295 / 0.3618 |
-| 0.08 | 0.0325 / 1.4258 | 0.0462 / 0.7499 | 0.0461 / 0.6845 | 0.0413 / 0.6472 | 0.0413 / 0.6472 |
-
-### Process noise on velocity
-
-| Velocity increment SD per substep (m/s) | KF-CV (converted) | EKF | UKF | CKF | SCKF |
-| ---: | ---: | ---: | ---: | ---: | ---: |
-| 0.0025 | 0.0225 / 0.6431 | 0.0218 / 0.2177 | 0.0217 / 0.1113 | 0.0217 / 0.1092 | 0.0217 / 0.1092 |
-| 0.005 | 0.0230 / 0.5975 | 0.0224 / 0.2174 | 0.0224 / 0.1461 | 0.0224 / 0.1426 | 0.0224 / 0.1426 |
-| 0.01 | 0.0225 / 0.4378 | 0.0222 / 0.1818 | 0.0223 / 0.1684 | 0.0223 / 0.1620 | 0.0223 / 0.1620 |
-| 0.02 | 0.0237 / 0.4157 | 0.0234 / 0.2308 | 0.0235 / 0.2317 | 0.0235 / 0.2268 | 0.0235 / 0.2268 |
-| 0.04 | 0.0257 / 0.5697 | 0.0252 / 0.3450 | 0.0252 / 0.3316 | 0.0252 / 0.3287 | 0.0252 / 0.3287 |
-| 0.08 | 0.0308 / 0.8182 | 0.0287 / 0.5137 | 0.0287 / 0.5036 | 0.0287 / 0.4959 | 0.0287 / 0.4959 |
-
 ## Interpretation and limits
 
 All five filters produced finite estimates for all 30 tracks in every condition.
@@ -159,17 +130,13 @@ At the highest tested bearing noise (30), KF-CV vs CKF position RMSE is 0.6435 v
 
 At the highest tested range noise (0.5), KF-CV vs CKF position RMSE is 0.3810 vs 0.1498 m, and velocity RMSE is 0.6658 vs 0.3121 m/s.
 
-At the highest tested process noise on position (0.08), KF-CV vs CKF position RMSE is 0.0325 vs 0.0413 m, and velocity RMSE is 1.4258 vs 0.6472 m/s.
-
-At the highest tested process noise on velocity (0.08), KF-CV vs CKF position RMSE is 0.0308 vs 0.0287 m, and velocity RMSE is 0.8182 vs 0.4959 m/s.
-
-The comparison includes motion-model mismatch: nonlinear filters know the ship's turning force, whereas KF-CV does not. Differences must not be attributed solely to measurement nonlinearity. In particular, higher process noise changes the physical trajectories and when turns occur; the process sweep is not merely a change in filter confidence. No monotonic ranking or universal superiority follows from this finite ensemble. A separate constant-velocity truth experiment could isolate measurement effects, and a separate mismatched-noise experiment could test incorrect assumed $Q/R$.
+The comparison includes motion-model mismatch: nonlinear filters know the ship's turning force, whereas KF-CV does not. Differences must not be attributed solely to measurement nonlinearity. The process covariance and all true trajectories stay fixed, so the two sweeps isolate changes in bearing or range noise within this shared tracking scenario. No monotonic ranking or universal superiority follows from this finite ensemble. A separate constant-velocity truth experiment could isolate measurement effects, and a separate mismatched-noise experiment could test incorrect assumed $Q/R$.
 
 Gaussian range errors are not clipped: the observation model can produce negative noisy ranges near the origin. This retains the stated additive Gaussian model. No samples are removed on that basis.
 
 ## Project files and reproduction
 
-The project keeps a single current results file, [noise-sensitivity.json](noise-sensitivity.json), containing settings, source hashes, per-condition summaries, and full per-scan RMSE curves. The simulation entry point is `noise_sensitivity.py`; the filter and ship model implementations are in `ship_benchmark.py`. PNG and SVG versions of the two figures are in `figures/`.
+The project keeps a single current results file, [noise-sensitivity.json](noise-sensitivity.json), containing settings, source hashes, per-condition summaries, and full per-scan RMSE curves. The simulation entry point is `noise_sensitivity.py`; the filter and ship model implementations are in `ship_benchmark.py`. PNG and SVG versions of the measurement-noise figure are in `figures/`.
 
 From this folder, with NumPy and Matplotlib installed:
 
@@ -179,7 +146,7 @@ python3 noise_sensitivity.py --runs 30 --scans 800 --out noise-sensitivity.json
 python3 make_kf_report.py
 ```
 
-Tests cover conversion statistics against Monte Carlo samples, the linear KF, process covariance aggregation, the EKF Jacobian evaluation point, changing exactly one noise parameter, matching simulator/filter covariances, restoring parameters after exceptions, replaying the original random draw order, preserving truth for measurement sweeps, and reusing standardized measurement noise for process sweeps.
+Tests cover conversion statistics against Monte Carlo samples, the linear KF, process covariance aggregation, the EKF Jacobian evaluation point, changing exactly one noise parameter, matching simulator/filter covariances, restoring parameters after exceptions, replaying the original random draw order, preserving truth for measurement sweeps, and rejecting attempts to vary the fixed process noise.
 
 The original exported `../presentation.html` remains a source presentation; it does not include these new figures. A short paper with the required literature citations remains to be prepared.
 

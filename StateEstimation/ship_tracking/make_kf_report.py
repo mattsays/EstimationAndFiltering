@@ -23,8 +23,6 @@ LABELS = {name: ('KF-CV (converted)' if name == 'KF' else name) for name in ORDE
 AXES = {
     'sigma_b_deg': ('Bearing noise', 'Bearing SD (degrees)'),
     'sigma_r': ('Range noise', 'Range SD (m)'),
-    'q_position': ('Process noise on position', 'Position increment SD per substep (m)'),
-    'q_velocity': ('Process noise on velocity', 'Velocity increment SD per substep (m/s)'),
 }
 
 INTRODUCTION = r'''# State estimation: KF comparison and noise sensitivity
@@ -33,7 +31,7 @@ INTRODUCTION = r'''# State estimation: KF comparison and noise sensitivity
 
 [Project 2](../Project%202.md) includes both process noise $\mathbf{W}_k\sim\mathcal{N}(0,Q)$ and measurement noise $\mathbf{V}_k\sim\mathcal{N}(0,R)$. It gives no numerical values for their covariances and does not require a noise sensitivity sweep. Replacing white noise with coloured noise, AR noise or a random walk is an optional improvement direction. The project already follows the nonlinear radar measurement direction.
 
-The experiments below model **both process and measurement noise** as independent, temporally white Gaussian sequences. Varying their standard deviations studies noise intensity; it does not implement the optional coloured-noise extension.
+The experiments below model **both process and measurement noise** as independent, temporally white Gaussian sequences. Only bearing and range standard deviations are varied. The process covariance is fixed at $Q=\operatorname{diag}(10^{-4},10^{-4},10^{-4},10^{-4})$ in every condition. This does not implement the optional coloured-noise extension.
 
 ## Models and parameters
 
@@ -66,10 +64,10 @@ Bearing standard deviations are displayed in degrees, converted to radians befor
 | --- | --- | --- |
 | Bearing measurement $\sigma_\theta$ | 0.5 degrees | 0.5, 2, 5, 10, 20, 30 degrees |
 | Range measurement $\sigma_r$ | 0.01 m | 0.01, 0.02, 0.05, 0.1, 0.2, 0.5 m |
-| Position process increment $q_p$ | 0.01 m | 0.0025, 0.005, 0.01, 0.02, 0.04, 0.08 m |
-| Velocity process increment $q_v$ | 0.01 m/s | 0.0025, 0.005, 0.01, 0.02, 0.04, 0.08 m/s |
+| Position process increment $q_p$ | 0.01 m | Fixed |
+| Velocity process increment $q_v$ | 0.01 m/s | Fixed |
 
-**One parameter varies at a time.** Within a process-noise sweep, the same SD is used for the two symmetric spatial axes, while the other process-noise block and both measurement noises stay nominal. Standard deviations are varied, so multiplying an SD by two multiplies its variance by four.
+**One parameter varies at a time.** The bearing sweep keeps range noise nominal, and the range sweep keeps bearing noise nominal. Both process-noise blocks stay fixed in both sweeps. Standard deviations are varied, so multiplying an SD by two multiplies its variance by four.
 
 ## Linear KF baseline
 
@@ -113,7 +111,14 @@ def load_results():
     if expected != results['source_sha256']:
         raise ValueError('Simulation sources changed after these results were generated')
     if set(results['sweeps']) != set(AXES):
-        raise ValueError('Expected four independent noise sweeps')
+        raise ValueError('Expected only bearing and range sweeps')
+    expected_q = np.diag([results['base']['q_position'] ** 2] * 2 + [results['base']['q_velocity'] ** 2] * 2)
+    if not np.array_equal(results['fixed_process_covariance'], expected_q):
+        raise ValueError('The declared process covariance must stay fixed')
+    for parameter, cases in results['sweeps'].items():
+        for case in cases:
+            if any(case['config'][key] != value for key, value in results['base'].items() if key != parameter):
+                raise ValueError('Only the selected radar-noise parameter may change')
     return results
 
 
@@ -149,13 +154,11 @@ def plot_family(results, parameters, output_name, family_title):
 
 
 def paper_figures(results, destination):
-    """Export four compact vector plots with legible type at paper width."""
+    """Export two compact vector plots with legible type at paper width."""
     destination.mkdir(parents=True, exist_ok=True)
     short_axes = {
         'sigma_b_deg': 'Bearing SD (degrees)',
         'sigma_r': 'Range SD (m)',
-        'q_position': 'Position increment SD per step (m)',
-        'q_velocity': 'Velocity increment SD per step (m/s)',
     }
     with plt.rc_context({'font.size': 8.5, 'axes.titlesize': 9,
                          'svg.fonttype': 'path'}):
@@ -186,7 +189,7 @@ def paper_figures(results, destination):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--paper-dir', type=Path, help='also export four compact SVG figures for the Typst paper')
+    parser.add_argument('--paper-dir', type=Path, help='also export two compact SVG figures for the Typst paper')
     args = parser.parse_args()
     results = load_results()
     if args.paper_dir is not None:
@@ -194,17 +197,16 @@ def main():
     (HERE / 'figures').mkdir(exist_ok=True)
     plt.rcParams.update({'font.size': 10, 'axes.titlesize': 12})
     plot_family(results, ('sigma_b_deg', 'sigma_r'), 'measurement-noise-comparison', 'Measurement noise R')
-    plot_family(results, ('q_position', 'q_velocity'), 'process-noise-comparison', 'Process noise Q')
     first_time = (results['burn_in'] + 1) * results['radar_interval']
     last_time = results['scans'] * results['radar_interval']
     text = INTRODUCTION + f'''- {results['runs']} trajectories per condition, {results['scans']} radar scans per trajectory, seed {results['seed']}.
 - Integration step {results['dt']:g} s, {results['substeps']} substeps per radar scan, radar interval {results['radar_interval']:g} s, trajectory duration {last_time:g} s.
-- The same initial states and standardized process and measurement draws are reused across every condition. Changing measurement noise leaves truth unchanged. Changing process noise necessarily changes the trajectories, using the same underlying random draws.
-- Within each condition, all five filters receive identical truth and observations for evaluation. Each filter is given the actual noise levels: both its $Q$ and $R$ are updated to match the simulator. This is a matched-noise sensitivity study, not a covariance-misspecification experiment.
+- The same initial states and standardized process and measurement draws are reused across every condition. Every condition uses identical true trajectories because the process noise is fixed. Only the selected measurement-noise amplitude changes.
+- Within each condition, all five filters receive identical truth and observations for evaluation. Each filter uses the fixed nominal $Q$ and the actual polar-noise $R$ for that condition; KF-CV approximates the converted Cartesian covariance as described above. This is a matched-noise sensitivity study, not a covariance-misspecification experiment.
 - Every filter starts from mean $[1,1,1,1]^T$ and covariance $10I_4$. The nonlinear shore-turn model and all other parameters remain fixed. KF-CV retains its constant-velocity model and has no separate maneuver-noise tuning.
 - Position RMSE at each scan is the square root of the mean squared Euclidean position error across all trajectories. Velocity RMSE uses the two velocity components. Tables average these per-scan RMSE values over scans {results['burn_in']+1}-{results['scans']} ({first_time:g}-{last_time:g} s). They do not pool time samples before taking the square root.
 - All tracks enter the metrics. A non-finite estimate or numerical failure invalidates the entire method/condition; survivor-only averages are not reported. Failed points appear as gaps in graphs and `FAILED` in tables.
-- The nominal condition is identical in all four sweeps and is evaluated once, then reused within this execution. There are 24 displayed points and 21 unique configurations. CKF and SCKF are both executed, even where their curves overlap.
+- The nominal condition is identical in both measurement sweeps and is evaluated once, then reused within this execution. There are 12 displayed points and 11 unique configurations. CKF and SCKF are both executed, even where their curves overlap.
 - The EKF evaluates the dynamics Jacobian before propagation. Timings include filtering and conversion, excluding simulation and plotting; they depend on implementation and hardware.
 
 ## Nominal-noise comparison
@@ -225,7 +227,6 @@ All four noise standard deviations are nominal. Runtime is per {results['scans']
             text += f"| {LABELS[name]} | FAILED | FAILED | n/a | n/a |\n"
     for title, parameters, figure in (
         ('Measurement noise', ('sigma_b_deg', 'sigma_r'), 'measurement-noise-comparison'),
-        ('Process noise', ('q_position', 'q_velocity'), 'process-noise-comparison'),
     ):
         text += f'\n## {title}\n\n'
         text += 'Each table cell is **position RMSE (m) / velocity RMSE (m/s)**. All other noise parameters stay at the nominal values above.\n\n'
@@ -258,13 +259,13 @@ All four noise standard deviations are nominal. Runtime is per {results['scans']
             text += (f"At the highest tested {AXES[parameter][0].lower()} ({case['value']:g}), "
                      f"KF-CV vs CKF position RMSE is {kf['pos_rmse']:.4f} vs {ckf['pos_rmse']:.4f} m, "
                      f"and velocity RMSE is {kf['vel_rmse']:.4f} vs {ckf['vel_rmse']:.4f} m/s.\n\n")
-    text += r'''The comparison includes motion-model mismatch: nonlinear filters know the ship's turning force, whereas KF-CV does not. Differences must not be attributed solely to measurement nonlinearity. In particular, higher process noise changes the physical trajectories and when turns occur; the process sweep is not merely a change in filter confidence. No monotonic ranking or universal superiority follows from this finite ensemble. A separate constant-velocity truth experiment could isolate measurement effects, and a separate mismatched-noise experiment could test incorrect assumed $Q/R$.
+    text += r'''The comparison includes motion-model mismatch: nonlinear filters know the ship's turning force, whereas KF-CV does not. Differences must not be attributed solely to measurement nonlinearity. The process covariance and all true trajectories stay fixed, so the two sweeps isolate changes in bearing or range noise within this shared tracking scenario. No monotonic ranking or universal superiority follows from this finite ensemble. A separate constant-velocity truth experiment could isolate measurement effects, and a separate mismatched-noise experiment could test incorrect assumed $Q/R$.
 
 Gaussian range errors are not clipped: the observation model can produce negative noisy ranges near the origin. This retains the stated additive Gaussian model. No samples are removed on that basis.
 
 ## Project files and reproduction
 
-The project keeps a single current results file, [noise-sensitivity.json](noise-sensitivity.json), containing settings, source hashes, per-condition summaries, and full per-scan RMSE curves. The simulation entry point is `noise_sensitivity.py`; the filter and ship model implementations are in `ship_benchmark.py`. PNG and SVG versions of the two figures are in `figures/`.
+The project keeps a single current results file, [noise-sensitivity.json](noise-sensitivity.json), containing settings, source hashes, per-condition summaries, and full per-scan RMSE curves. The simulation entry point is `noise_sensitivity.py`; the filter and ship model implementations are in `ship_benchmark.py`. PNG and SVG versions of the measurement-noise figure are in `figures/`.
 
 From this folder, with NumPy and Matplotlib installed:
 
@@ -274,14 +275,14 @@ python3 noise_sensitivity.py --runs 30 --scans 800 --out noise-sensitivity.json
 python3 make_kf_report.py
 ```
 
-Tests cover conversion statistics against Monte Carlo samples, the linear KF, process covariance aggregation, the EKF Jacobian evaluation point, changing exactly one noise parameter, matching simulator/filter covariances, restoring parameters after exceptions, replaying the original random draw order, preserving truth for measurement sweeps, and reusing standardized measurement noise for process sweeps.
+Tests cover conversion statistics against Monte Carlo samples, the linear KF, process covariance aggregation, the EKF Jacobian evaluation point, changing exactly one noise parameter, matching simulator/filter covariances, restoring parameters after exceptions, replaying the original random draw order, preserving truth for measurement sweeps, and rejecting attempts to vary the fixed process noise.
 
 The original exported `../presentation.html` remains a source presentation; it does not include these new figures. A short paper with the required literature citations remains to be prepared.
 
 '''
     text += f"Execution environment: {results['environment']}.\n"
     (HERE / 'KF comparison.md').write_text(text)
-    print('Wrote KF comparison.md and two PNG/SVG figures from noise-sensitivity.json')
+    print('Wrote KF comparison.md and the measurement-noise PNG/SVG figure from noise-sensitivity.json')
 
 
 if __name__ == '__main__':
